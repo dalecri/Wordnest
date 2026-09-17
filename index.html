@@ -1,1285 +1,204 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="vif">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" id="themeColorMeta" content="#FFFFFF">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Wordnest">
-  <title>Wordnest · French Flashcards</title>
-
-  <link rel="apple-touch-icon" href="wordnest.jpg">
-  <link rel="apple-touch-icon" href="wordnest.png">
-  <link rel="icon" type="image/jpeg" href="wordnest.jpg">
-  <link rel="icon" type="image/png" href="wordnest.png">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;700&family=IBM+Plex+Mono:wght@400;600;700&family=VT323&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Space Mono', 'monospace'],
-            serif: ['Space Mono', 'monospace'],
-          },
-          screens: {
-            'xs': '380px',
-            'ipadmini': '768px',
-            'ipad': '820px',
-            'landscape-mobile': { 'raw': '(max-height: 500px) and (orientation: landscape)' }
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    /* ============ GLOBAL TYPE SETTINGS (independent of color theme) ============ */
-    :root {
-      --app-font: 'Space Mono', monospace;
-      --word-scale: 1;
-    }
-
-    /* ============ THEME PRESETS (retro pixel palettes) ============ */
-    :root, [data-theme="doux"] {
-      /* Arcade — warm cream bg, classic ghost colors (cyan/orange/pink/red) */
-      --app-bg: #F4EFE4;
-      --paper: #FFFFFF;
-      --card-front: #FFFFFF;
-      --ink: #1D1B16;
-      --ink-soft: #6B5F3E;
-
-      --theme-blue-sat: #00C2E0;
-      --theme-orange-sat: #FF8A3D;
-      --theme-sage-sat: #FF6FB0;
-      --theme-rose-sat: #E8483C;
-
-      --card-border: #1A1917;
-    }
-
-    [data-theme="nuit"] {
-      /* Night — dark neon arcade */
-      --app-bg: #100F17;
-      --paper: #1B1926;
-      --card-front: #1B1926;
-      --ink: #F1EFFB;
-      --ink-soft: #9490B0;
-
-      --theme-blue-sat: #3FD0F2;
-      --theme-orange-sat: #FFC24B;
-      --theme-sage-sat: #3FE08F;
-      --theme-rose-sat: #FF5C9E;
-    }
-
-    [data-theme="vif"] {
-      /* Game Boy — monochrome LCD green */
-      --app-bg: #B7CB8B;
-      --paper: #E6F0C9;
-      --card-front: #E6F0C9;
-      --ink: #24361D;
-      --ink-soft: #55704A;
-
-      --theme-blue-sat: #2E4A22;
-      --theme-orange-sat: #55732C;
-      --theme-sage-sat: #3D6B32;
-      --theme-rose-sat: #6D8C44;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-    html {
-      background: var(--app-bg);
-    }
-
-    body {
-      background-color: var(--app-bg);
-      color: var(--ink);
-      overflow: hidden;
-      font-family: var(--app-font);
-      -webkit-font-smoothing: antialiased;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* generic stepped pixel-corner cuts */
-    .pixel-corner-sm {
-      clip-path: polygon(
-        0 6px, 6px 6px, 6px 0,
-        calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
-        100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
-        6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
-      );
-    }
-    .pixel-corner-lg {
-      clip-path: polygon(
-        0 14px, 14px 14px, 14px 0,
-        calc(100% - 14px) 0, calc(100% - 14px) 14px, 100% 14px,
-        100% calc(100% - 14px), calc(100% - 14px) calc(100% - 14px), calc(100% - 14px) 100%,
-        14px 100%, 14px calc(100% - 14px), 0 calc(100% - 14px)
-      );
-    }
-
-    /* ============ HEADER (auto-hide overlay) ============ */
-    .app-header {
-      position: relative;
-      width: 100%;
-      flex-shrink: 0;
-      z-index: 50;
-      padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 10px;
-      background: transparent;
-      border: none;
-    }
-
-    .header-top-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      width: 100%;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .brand-pixel {
-      font-family: var(--app-font);
-      font-weight: 700;
-      font-size: 19px;
-      letter-spacing: 0.01em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .brand-dot { width: 8px; height: 8px; }
-
-    /* All header controls are plain icons/text — no boxes, borders, or shadows */
-    .icon-btn-plain {
-      width: 38px;
-      height: 38px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      color: var(--ink-soft);
-      transition: transform 0.15s ease, color 0.2s ease;
-      touch-action: manipulation;
-      flex-shrink: 0;
-    }
-    .icon-btn-plain:active { transform: scale(0.88); }
-
-    .lang-toggle-btn {
-      height: 38px;
-      padding: 0 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      border: none;
-      color: var(--ink-soft);
-      font-family: var(--app-font);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-      transition: transform 0.15s ease, color 0.2s ease;
-      touch-action: manipulation;
-      flex-shrink: 0;
-    }
-    .lang-toggle-btn:active { transform: scale(0.88); }
-
-    /* ============ PROGRESS PILL ============ */
-    .progress-pill {
-      flex-shrink: 0;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      color: var(--ink);
-      background: var(--paper);
-      border: 2.5px solid var(--ink);
-      padding: 8px 16px;
-      box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
-      white-space: nowrap;
-    }
-    .progress-pill { clip-path: polygon(
-        0 6px, 6px 6px, 6px 0,
-        calc(100% - 6px) 0, calc(100% - 6px) 6px, 100% 6px,
-        100% calc(100% - 6px), calc(100% - 6px) calc(100% - 6px), calc(100% - 6px) 100%,
-        6px 100%, 6px calc(100% - 6px), 0 calc(100% - 6px)
-    ); }
-
-    /* ============ MAIN STAGE ============ */
-    .main-stage {
-      flex: 1;
-      min-height: 0;
-      width: 100vw;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: clamp(18px, 4vh, 34px);
-      padding: 16px;
-      padding-bottom: calc(16px + env(safe-area-inset-bottom));
-    }
-
-    #deckWrap {
-      transition: height 0.35s cubic-bezier(0.16, 1, 0.3, 1), max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .fcard {
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: none;
-      perspective: 1500px;
-    }
-
-    .card-inner {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .fcard.flipped .card-inner {
-      transform: rotateY(180deg);
-    }
-
-    .face {
-      position: absolute;
-      inset: 0;
-      border-radius: 26px;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      border: 9px solid var(--card-border);
-      box-shadow: 0 8px 0 rgba(0, 0, 0, 0.15), 0 10px 18px rgba(0, 0, 0, 0.18);
-      transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-    }
-
-    .face.front { transform: rotateY(0deg); z-index: 2; background: var(--card-front); }
-    .face.back { transform: rotateY(180deg); z-index: 1; color: var(--paper); }
-
-    .theme-blue { background-color: var(--theme-blue-sat); }
-    .theme-orange { background-color: var(--theme-orange-sat); }
-    .theme-sage { background-color: var(--theme-sage-sat); }
-    .theme-rose { background-color: var(--theme-rose-sat); }
-
-    .theme-light-blue { --suit-color: var(--theme-blue-sat); }
-    .theme-light-orange { --suit-color: var(--theme-orange-sat); }
-    .theme-light-sage { --suit-color: var(--theme-sage-sat); }
-    .theme-light-rose { --suit-color: var(--theme-rose-sat); }
-    .face.front { color: var(--suit-color); }
-
-    .card-word {
-      font-family: var(--app-font);
-      font-weight: 700;
-      font-size: calc(clamp(26px, 7.5vw, 42px) * var(--word-scale));
-      text-align: center;
-      line-height: 1.2;
-      padding: 0 30px;
-      word-break: break-word;
-    }
-
-    .card-corner {
-      position: absolute;
-      display: flex;
-      line-height: 0;
-    }
-    .corner-tl { top: 12px; left: 12px; }
-    .corner-br { bottom: 12px; right: 12px; transform: rotate(180deg); }
-
-    .fcard.behind {
-      transform: scale(0.95) translateY(14px) rotate(-1deg);
-      opacity: 1;
-      pointer-events: none;
-      z-index: 10;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
-    }
-    .fcard.behind2 {
-      transform: scale(0.9) translateY(28px) rotate(1deg);
-      opacity: 1;
-      pointer-events: none;
-      z-index: 5;
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s;
-    }
-    /* face-down deck look for the stacked cards behind the active one */
-    .fcard.behind::after,
-    .fcard.behind2::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      z-index: 6;
-      border-radius: 26px;
-      border: 9px solid var(--card-border);
-      background-image: repeating-conic-gradient(var(--card-front) 0% 25%, color-mix(in srgb, var(--theme-blue-sat) 45%, var(--card-front)) 0% 50%);
-      background-size: 22px 22px;
-    }
-
-    .fcard.entering {
-      animation: cardEnter 0.35s steps(6);
-    }
-    @keyframes cardEnter {
-      from { transform: scale(0.92) translateY(20px); opacity: 0; }
-      to { transform: none; opacity: 1; }
-    }
-
-    .stamp {
-      position: absolute;
-      bottom: 24px;
-      font-family: var(--app-font);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      border: 2px solid currentColor;
-      border-radius: 4px;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 30;
-      transition: opacity 0.1s ease;
-    }
-    .stamp.acquis { right: 24px; color: #1E4620; background-color: #E2F3E5; }
-    .stamp.revoir { left: 24px; color: #611D24; background-color: #FCE8E9; }
-
-    /* ============ BOTTOM SHEETS ============ */
-    .sheet-backdrop {
-      position: fixed;
-      inset: 0;
-      z-index: 60;
-      background: rgba(10, 8, 14, 0.45);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    .sheet-backdrop.visible { opacity: 1; pointer-events: auto; }
-
-    .bottom-sheet {
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      z-index: 70;
-      background: var(--paper);
-      color: var(--ink);
-      border-radius: 14px 14px 0 0;
-      border-top: 4px solid var(--ink);
-      padding: 10px 22px calc(26px + env(safe-area-inset-bottom));
-      max-height: 82vh;
-      overflow-y: auto;
-      transform: translateY(110%);
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .bottom-sheet.open { transform: translateY(0); }
-
-    .sheet-handle {
-      width: 40px;
-      height: 5px;
-      background: var(--ink);
-      opacity: 0.25;
-      margin: 10px auto 18px;
-    }
-
-    .sheet-input {
-      width: 100%;
-      font-family: var(--app-font);
-      font-size: 13px;
-      border-radius: 6px;
-      padding: 12px 14px;
-      background: var(--card-front);
-      color: var(--ink);
-      border: 2.5px solid var(--ink);
-      outline: none;
-    }
-    .sheet-input:focus {
-      box-shadow: 3px 3px 0 var(--theme-blue-sat);
-    }
-    .sheet-label {
-      font-size: 9.5px;
-      text-transform: uppercase;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--ink-soft);
-      display: block;
-      margin-bottom: 6px;
-    }
-    .sheet-code-block {
-      font-family: var(--app-font);
-      font-size: 11px;
-      line-height: 1.5;
-      background: color-mix(in srgb, var(--ink) 6%, transparent);
-      border: 2px solid var(--ink);
-      border-radius: 6px;
-      padding: 10px 12px;
-      overflow-x: auto;
-      white-space: pre;
-      color: var(--ink);
-      margin: 0;
-    }
-    .sheet-primary-btn {
-      width: 100%;
-      padding: 13px;
-      background: var(--ink);
-      color: var(--paper);
-      font-family: var(--app-font);
-      font-size: 13px;
-      font-weight: 700;
-      border-radius: 8px;
-      border: 3px solid var(--ink);
-      box-shadow: 4px 4px 0 color-mix(in srgb, var(--ink) 55%, transparent);
-      transition: transform 0.08s steps(2), box-shadow 0.08s steps(2);
-    }
-    .sheet-primary-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 transparent; }
-    .sheet-primary-btn:disabled { opacity: 0.35; }
-    .sheet-secondary-btn {
-      flex: 1;
-      padding: 11px;
-      font-family: var(--app-font);
-      font-size: 12px;
-      font-weight: 700;
-      border-radius: 8px;
-      background: var(--paper);
-      color: var(--ink);
-      border: 2.5px solid var(--ink);
-      box-shadow: 3px 3px 0 var(--ink);
-      transition: transform 0.08s steps(2), box-shadow 0.08s steps(2);
-    }
-    .sheet-secondary-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
-    .sheet-divider {
-      height: 3px;
-      background: var(--ink);
-      opacity: 0.12;
-      margin: 20px 0;
-    }
-
-    .theme-swatch {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 8px;
-      border-radius: 8px;
-      background: var(--paper);
-      border: 2.5px solid var(--ink);
-      box-shadow: 3px 3px 0 var(--ink);
-      transition: transform 0.08s steps(2), box-shadow 0.08s steps(2);
-    }
-    .theme-swatch.active {
-      background: color-mix(in srgb, var(--ink) 8%, var(--paper));
-    }
-    .theme-swatch:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
-    .swatch-dots { display: flex; gap: 3px; }
-    .swatch-dots span { width: 10px; height: 10px; border-radius: 2px; display: block; }
-    .theme-swatch-label {
-      font-family: var(--app-font);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      color: var(--ink);
-    }
-
-    .switch { position: relative; display: inline-block; width: 42px; height: 25px; flex-shrink: 0; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .switch-track {
-      position: absolute; inset: 0; cursor: pointer;
-      background: var(--card-front);
-      border: 2.5px solid var(--ink);
-      border-radius: 8px;
-      transition: background 0.2s ease;
-    }
-    .switch-track::before {
-      content: "";
-      position: absolute;
-      width: 15px; height: 15px;
-      left: 2px; top: 2px;
-      background: var(--ink);
-      border-radius: 3px;
-      transition: transform 0.15s steps(3);
-    }
-    .switch input:checked + .switch-track::before { transform: translateX(17px); }
-
-    .sheet-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .sheet-row-label { font-size: 13px; font-weight: 600; color: var(--ink); }
-    .sheet-row-sub { font-size: 11px; color: var(--ink-soft); margin-top: 2px; }
-
-    .toast {
-      font-family: var(--app-font);
-      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.3);
-      border: 2.5px solid rgba(0,0,0,0.15);
-    }
-  </style>
-</head>
-
-<body class="h-dvh w-screen relative select-none overflow-hidden">
-
-  <!-- Auto-hiding header -->
-  <header id="appHeader" class="app-header">
-    <div class="header-top-row">
-      <div class="brand brand-pixel" style="color: var(--ink);">
-        Wordnest
-        <span class="brand-dot" style="background:var(--theme-rose-sat);"></span>
-      </div>
-      <div class="header-actions">
-        <button id="btnCustomize" aria-label="Customize" class="icon-btn-plain">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="6" y1="4" x2="6" y2="20"></line>
-            <line x1="12" y1="4" x2="12" y2="20"></line>
-            <line x1="18" y1="4" x2="18" y2="20"></line>
-            <circle cx="6" cy="9" r="2.2" fill="var(--paper)" stroke="currentColor" stroke-width="2"></circle>
-            <circle cx="12" cy="15" r="2.2" fill="var(--paper)" stroke="currentColor" stroke-width="2"></circle>
-            <circle cx="18" cy="7" r="2.2" fill="var(--paper)" stroke="currentColor" stroke-width="2"></circle>
-          </svg>
-        </button>
-        <button id="btnLangToggle" aria-label="Toggle study direction" class="lang-toggle-btn">
-          <span id="langToggleLabel">FR→EN</span>
-        </button>
-        <button id="btnOpenAdd" aria-label="Add a card" class="icon-btn-plain">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Main study stage -->
-  <main id="mainStage" class="main-stage">
-    <div id="deckWrap" class="relative w-full max-w-[340px] xs:max-w-[400px] ipadmini:max-w-[460px] ipad:max-w-[500px] aspect-[3/4] h-[70vh] xs:h-[74vh] ipadmini:h-[76vh] max-h-[700px] overflow-visible flex items-center justify-center">
-      <div id="deck" class="relative w-full h-full overflow-visible"></div>
-    </div>
-
-    <div id="progressPill" class="progress-pill">0 cards</div>
-  </main>
-
-  <!-- Shared backdrop for sheets -->
-  <div id="sheetBackdrop" class="sheet-backdrop"></div>
-
-  <!-- Add / Import / Export sheet -->
-  <div id="addSheet" class="bottom-sheet">
-    <div class="sheet-handle"></div>
-    <h3 class="font-semibold text-lg text-center mb-5" style="color: var(--ink);">New card</h3>
-
-    <div class="space-y-3 mb-4">
-      <div>
-        <label class="sheet-label">French</label>
-        <input id="inFr" placeholder="e.g. Fier" class="sheet-input" autocomplete="off">
-      </div>
-      <div>
-        <label class="sheet-label">English</label>
-        <input id="inEn" placeholder="e.g. Proud" class="sheet-input" autocomplete="off">
-      </div>
-    </div>
-
-    <button id="btnAdd" disabled class="sheet-primary-btn">Add to deck</button>
-
-    <div class="sheet-divider"></div>
-
-    <label class="sheet-label">Import / Export (JSON)</label>
-    <p class="text-xs mb-2" style="color: var(--ink-soft);">Expected format — an array of French / English pairs:</p>
-    <pre class="sheet-code-block">[
-  { "fr": "bonjour", "en": "hello" },
-  { "fr": "merci", "en": "thank you" }
-]</pre>
-
-    <p class="text-xs mb-2 mt-3" style="color: var(--ink-soft);">No file handy? Copy this prompt into any AI chatbot, save what it gives you as a .json file, then import it below.</p>
-    <div class="flex gap-2 mb-3">
-      <input id="promptTopic" placeholder="topic — e.g. cooking, travel" class="sheet-input" style="flex:1;" autocomplete="off">
-      <button id="btnCopyPrompt" class="sheet-secondary-btn" style="flex:0 0 auto; padding-left:14px; padding-right:14px;">Copy prompt</button>
-    </div>
-
-    <div class="flex gap-3">
-      <button id="btnImport" class="sheet-secondary-btn">Import</button>
-      <button id="btnExport" class="sheet-secondary-btn">Export</button>
-    </div>
-    <input type="file" id="importFile" accept=".json,application/json" class="hidden">
-  </div>
-
-  <!-- Customize sheet -->
-  <div id="customizeSheet" class="bottom-sheet">
-    <div class="sheet-handle"></div>
-    <h3 class="font-semibold text-lg text-center mb-5" style="color: var(--ink);">Customize</h3>
-
-    <label class="sheet-label">Theme</label>
-    <div class="flex gap-3 mb-6" id="themeOptions">
-      <button class="theme-swatch" data-theme="doux">
-        <span class="swatch-dots">
-          <span style="background:#00C2E0"></span><span style="background:#FF8A3D"></span><span style="background:#FF6FB0"></span><span style="background:#E8483C"></span>
-        </span>
-        <span class="theme-swatch-label">Arcade</span>
-      </button>
-      <button class="theme-swatch" data-theme="nuit">
-        <span class="swatch-dots">
-          <span style="background:#3FD0F2"></span><span style="background:#FFC24B"></span><span style="background:#3FE08F"></span><span style="background:#FF5C9E"></span>
-        </span>
-        <span class="theme-swatch-label">Night</span>
-      </button>
-      <button class="theme-swatch" data-theme="vif">
-        <span class="swatch-dots">
-          <span style="background:#2E4A22"></span><span style="background:#55732C"></span><span style="background:#3D6B32"></span><span style="background:#6D8C44"></span>
-        </span>
-        <span class="theme-swatch-label">Game Boy</span>
-      </button>
-    </div>
-
-    <div class="sheet-divider"></div>
-
-    <label class="sheet-label">Font</label>
-    <div class="flex gap-2 mb-6" id="fontOptions">
-      <button class="theme-swatch" data-font="spaceMono">
-        <span style="font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--ink);">Aa</span>
-        <span class="theme-swatch-label">Space</span>
-      </button>
-      <button class="theme-swatch" data-font="jetbrainsMono">
-        <span style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700; color:var(--ink);">Aa</span>
-        <span class="theme-swatch-label">JetBrains</span>
-      </button>
-      <button class="theme-swatch" data-font="ibmPlexMono">
-        <span style="font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:700; color:var(--ink);">Aa</span>
-        <span class="theme-swatch-label">Plex</span>
-      </button>
-      <button class="theme-swatch" data-font="vt323">
-        <span style="font-family:'VT323',monospace; font-size:22px; font-weight:700; color:var(--ink);">Aa</span>
-        <span class="theme-swatch-label">VT323</span>
-      </button>
-    </div>
-
-    <label class="sheet-label">Card text size</label>
-    <div class="flex gap-2 mb-6" id="sizeOptions">
-      <button class="theme-swatch" data-size="sm">
-        <span style="font-family:var(--app-font); font-size:14px; font-weight:700; color:var(--ink);">Aa</span>
-        <span class="theme-swatch-label">Small</span>
-      </button>
-      <button class="theme-swatch" data-size="md">
-        <span style="font-family:var(--app-font); font-size:18px; font-weight:700; color:var(--ink);">Aa</span>
-        <span class="theme-swatch-label">Medium</span>
-      </button>
-      <button class="theme-swatch" data-size="lg">
-        <span style="font-family:var(--app-font); font-size:22px; font-weight:700; color:var(--ink);">Aa</span>
-        <span class="theme-swatch-label">Large</span>
-      </button>
-    </div>
-
-    <div class="sheet-divider"></div>
-
-    <label class="sheet-label">Progress</label>
-    <p class="text-xs mb-3" style="color: var(--ink-soft);">Puts every mastered card back into the learning deck.</p>
-    <button id="btnResetProgress" class="sheet-secondary-btn" style="width:100%;">Reset progress</button>
-  </div>
-
-  <div id="toast" class="toast"></div>
-
-  <script>
-    (() => {
-      'use strict';
-
-      function uid() {
-        return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-      }
-
-      let state = { cards: [], settings: { theme: 'vif', showButtons: true, frontLang: 'fr', fontFamily: 'spaceMono', fontSize: 'md' } };
-      let queue = [];
-      let flipped = false;
-      let animating = false;
-
-      const seed = [
-        { fr: 'à gauche', en: 'to the left' },
-        { fr: 'à droite', en: 'to the right' },
-        { fr: 'tout droit', en: 'straight ahead' },
-        { fr: 'en face de', en: 'across from' },
-        { fr: 'à côté de', en: 'next to' },
-        { fr: 'au coin de', en: 'at the corner of' },
-        { fr: 'au bout de', en: 'at the end of' },
-        { fr: 'vers', en: 'towards' },
-        { fr: 'au-dessus de', en: 'above' },
-        { fr: 'au-dessous de', en: 'below' },
-        { fr: 'traverser', en: 'to cross' },
-        { fr: 'faire demi-tour', en: 'to turn around' },
-        { fr: 'fier / fière', en: 'proud' },
-        { fr: 'déçu(e)', en: 'disappointed' },
-        { fr: 'inquiet / inquiète', en: 'worried' },
-        { fr: 'soulagé(e)', en: 'relieved' },
-        { fr: 'gêné(e)', en: 'embarrassed' },
-        { fr: 'épuisé(e)', en: 'exhausted' },
-        { fr: 'agacé(e)', en: 'annoyed' },
-        { fr: 'ravi(e)', en: 'delighted' },
-        { fr: 'bouleversé(e)', en: 'deeply upset' },
-        { fr: 'méfiant(e)', en: 'suspicious' },
-        { fr: 'avoir hâte de', en: 'to look forward to' },
-        { fr: 'en avoir marre de', en: 'to be fed up with' }
-      ];
-
-      const THEMES = ['blue', 'orange', 'sage', 'rose'];
-      const SHAPES = ['shape-1', 'shape-2', 'shape-3', 'shape-4'];
-
-      /* ============ PIXEL SUIT ICONS ============ */
-      const SUIT_BY_THEME = { blue: 'spade', orange: 'diamond', sage: 'club', rose: 'heart' };
-      const SUIT_GRIDS = {
-        heart:   ['.XX.XX.', 'XXXXXXX', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'],
-        diamond: ['...X...', '..XXX..', '.XXXXX.', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'],
-        club:    ['..X.X..', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '...X...', '..XXX..'],
-        spade:   ['...X...', '..XXX..', '.XXXXX.', 'XXXXXXX', 'XXXXXXX', '..X.X..', '.XXXXX.']
-      };
-      function pixelSuitSVG(key, unit) {
-        const grid = SUIT_GRIDS[key];
-        const n = grid.length;
-        let rects = '';
-        grid.forEach((row, y) => {
-          for (let x = 0; x < row.length; x++) {
-            if (row[x] === 'X') rects += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
-          }
-        });
-        return `<svg width="${unit}" height="${unit}" viewBox="0 0 ${n} ${n}" fill="currentColor" shape-rendering="crispEdges">${rects}</svg>`;
-      }
-
-      /* ============ LOCAL STORAGE (IndexedDB) ============ */
-      const DB_NAME = 'cartes-db';
-      const DB_VERSION = 1;
-      const STORE_NAME = 'kv';
-      const STATE_KEY = 'app-state';
-
-      let dbPromise = null;
-      function openDB() {
-        return new Promise((resolve, reject) => {
-          if (!window.indexedDB) { reject(new Error('IndexedDB unavailable')); return; }
-          const req = indexedDB.open(DB_NAME, DB_VERSION);
-          req.onupgradeneeded = () => {
-            if (!req.result.objectStoreNames.contains(STORE_NAME)) {
-              req.result.createObjectStore(STORE_NAME);
-            }
-          };
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => reject(req.error);
-        });
-      }
-      function getDB() {
-        if (!dbPromise) dbPromise = openDB();
-        return dbPromise;
-      }
-      async function idbGet(key) {
-        const db = await getDB();
-        return new Promise((resolve, reject) => {
-          const tx = db.transaction(STORE_NAME, 'readonly');
-          const req = tx.objectStore(STORE_NAME).get(key);
-          req.onsuccess = () => resolve(req.result);
-          req.onerror = () => reject(req.error);
-        });
-      }
-      async function idbSet(key, value) {
-        const db = await getDB();
-        return new Promise((resolve, reject) => {
-          const tx = db.transaction(STORE_NAME, 'readwrite');
-          tx.objectStore(STORE_NAME).put(value, key);
-          tx.oncomplete = () => resolve();
-          tx.onerror = () => reject(tx.error);
-        });
-      }
-
-      async function cacheLocally() {
-        try { await idbSet(STATE_KEY, state); } catch (e) { /* ignore */ }
-      }
-      async function loadLocalCache() {
-        try { return await idbGet(STATE_KEY); } catch (e) { return null; }
-      }
-
-      function seedIfEmpty() {
-        if (state.cards.length > 0) return;
-        seed.forEach(s => {
-          state.cards.push({ id: uid(), fr: s.fr, en: s.en, mastered: false });
-        });
-      }
-
-      async function load() {
-        const cached = await loadLocalCache();
-        if (cached) {
-          state.cards = cached.cards || [];
-          state.settings = Object.assign({ theme: 'vif', showButtons: true, frontLang: 'fr', fontFamily: 'spaceMono', fontSize: 'md' }, cached.settings || {});
-        }
-        seedIfEmpty();
-        cacheLocally();
-      }
-
-      function persist() {
-        cacheLocally();
-      }
-
-      const $ = id => document.getElementById(id);
-      const deckEl = $('deck');
-      const progressPill = $('progressPill');
-      const sheetBackdrop = $('sheetBackdrop');
-      const addSheet = $('addSheet');
-      const customizeSheet = $('customizeSheet');
-
-      function cardById(id) { return state.cards.find(c => c.id === id); }
-      function learning() { return state.cards.filter(c => !c.mastered); }
-
-      function toast(msg) {
-        const t = $('toast');
-        t.textContent = msg;
-        t.className = "toast fixed left-1/2 -translate-x-1/2 bottom-12 bg-[var(--ink)] text-[var(--paper)] text-xs font-semibold px-5 py-2.5 rounded-md z-[9999] transition-all transform translate-y-0 opacity-100";
-        clearTimeout(t._h);
-        t._h = setTimeout(() => {
-          t.className = "toast fixed left-1/2 -translate-x-1/2 bottom-12 bg-[var(--ink)] text-[var(--paper)] text-xs font-semibold px-5 py-2.5 rounded-md z-[9999] transition-all transform translate-y-4 opacity-0 pointer-events-none";
-        }, 1800);
-      }
-
-      /* ============ PROGRESS PILL ============ */
-      function updateProgress() {
-        const total = state.cards.length;
-        if (total === 0) { progressPill.textContent = 'No cards'; return; }
-        const mastered = state.cards.filter(c => c.mastered).length;
-        const remaining = total - mastered;
-        progressPill.textContent = `${mastered} mastered · ${remaining} learning`;
-      }
-
-      /* ============ DECK RENDERING ============ */
-      function rebuildQueue() {
-        queue = learning().map(c => c.id);
-        for (let i = queue.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [queue[i], queue[j]] = [queue[j], queue[i]];
-        }
-      }
-
-      function getCardVisuals(id) {
-        let code = 0;
-        for (let i = 0; i < id.length; i++) code += id.charCodeAt(i);
-        return { theme: THEMES[code % THEMES.length], shape: SHAPES[(code + 2) % SHAPES.length] };
-      }
-
-      function renderDeck(initial) {
-        flipped = false;
-        updateProgress();
-
-        if (state.cards.length === 0) {
-          deckEl.innerHTML = emptyHTML('☁︎', 'No cards yet', 'Start building your vocabulary by adding a card.', 'openAdd', 'Add cards');
-          hookEmpty();
-          return;
-        }
-
-        if (queue.length === 0) {
-          deckEl.innerHTML = emptyHTML('✿', 'All mastered!', "You've mastered every card.", 'restart', 'Study again');
-          hookEmpty();
-          return;
-        }
-
-        if (initial) {
-          deckEl.innerHTML = '';
-          const slice = queue.slice(0, 3);
-          for (let i = slice.length - 1; i >= 0; i--) {
-            const c = cardById(slice[i]);
-            if (!c) continue;
-            const el = buildCard(c);
-            if (i === 1) el.className = 'fcard absolute inset-0 behind';
-            if (i === 2) el.className = 'fcard absolute inset-0 behind2';
-            if (i === 0) el.className = 'fcard absolute inset-0 z-20 entering';
-            deckEl.appendChild(el);
-          }
-          attachDrag(deckEl.lastElementChild);
-        }
-      }
-
-      function emptyHTML(glyph, title, body, action, label) {
-        return `<div class="empty flex flex-col items-center justify-center text-center p-6 w-full h-full" style="background:var(--card-front); border:9px solid var(--card-border); border-radius:26px; box-shadow:0 8px 0 rgba(0,0,0,0.15), 0 10px 18px rgba(0,0,0,0.18);">
-          <div class="glyph text-5xl mb-4" style="color:var(--theme-rose-sat);">${glyph}</div>
-          <h2 class="font-semibold text-xl mb-2" style="color:var(--ink);">${title}</h2>
-          <p class="text-xs max-w-[220px] mb-6 leading-relaxed" style="color:var(--ink-soft);">${body}</p>
-          <button class="btn text-xs font-semibold px-6 py-3 rounded-md transition-all" style="background:var(--ink); color:var(--paper); border:2.5px solid var(--ink);" data-action="${action}">${label}</button>
-        </div>`;
-      }
-
-      function hookEmpty() {
-        const b = deckEl.querySelector('[data-action]');
-        if (!b) return;
-        b.addEventListener('click', () => {
-          if (b.dataset.action === 'openAdd') {
-            openSheet(addSheet);
-          } else {
-            state.cards.forEach(c => { c.mastered = false; });
-            persist();
-            rebuildQueue();
-            renderDeck(true);
-          }
-        });
-      }
-
-      function buildCard(c) {
-        const el = document.createElement('div');
-        el.dataset.id = c.id;
-        const visuals = getCardVisuals(c.id);
-        const suitKey = SUIT_BY_THEME[visuals.theme];
-        const frontText = state.settings.frontLang === 'fr' ? c.fr : c.en;
-        const backText = state.settings.frontLang === 'fr' ? c.en : c.fr;
-        const suitIcon = pixelSuitSVG(suitKey, 20);
-
-        el.innerHTML = `
-          <div class="stamp acquis">mastered</div>
-          <div class="stamp revoir">review</div>
-          <div class="card-inner">
-            <div class="face front theme-light-${visuals.theme}">
-              <span class="card-corner corner-tl">${suitIcon}</span>
-              <span class="card-corner corner-br">${suitIcon}</span>
-              <div class="card-word">${escapeHTML(frontText)}</div>
-            </div>
-            <div class="face back theme-${visuals.theme}">
-              <span class="card-corner corner-tl">${suitIcon}</span>
-              <span class="card-corner corner-br">${suitIcon}</span>
-              <div class="card-word">${escapeHTML(backText)}</div>
-            </div>
-          </div>`;
-        return el;
-      }
-
-      function escapeHTML(s) {
-        return s.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
-      }
-
-      function attachDrag(el) {
-        if (!el) return;
-        let startX = 0, startY = 0, dx = 0, dy = 0;
-        let dragging = false, moved = false;
-
-        const stampA = el.querySelector('.stamp.acquis');
-        const stampR = el.querySelector('.stamp.revoir');
-
-        const down = e => {
-          if (animating) return;
-          dragging = true;
-          moved = false;
-          startX = e.clientX;
-          startY = e.clientY;
-          el.setPointerCapture(e.pointerId);
-          el.style.transition = 'none';
-        };
-
-        const move = e => {
-          if (!dragging) return;
-          dx = e.clientX - startX;
-          dy = e.clientY - startY;
-          if (Math.abs(dx) > 6 || Math.abs(dy) > 6) moved = true;
-
-          const rot = dx * 0.05;
-          el.style.transform = `translate(${dx}px, ${dy * 0.3}px) rotate(${rot}deg)`;
-
-          const progress = Math.min(Math.abs(dx) / 100, 1);
-          if (dx > 0) { stampA.style.opacity = progress; stampR.style.opacity = 0; }
-          else { stampR.style.opacity = progress; stampA.style.opacity = 0; }
-        };
-
-        const up = () => {
-          if (!dragging) return;
-          dragging = false;
-          const threshold = Math.min(deckEl.offsetWidth * 0.32, 110);
-          if (dx > threshold) fly(el, 'right');
-          else if (dx < -threshold) fly(el, 'left');
-          else {
-            el.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2)';
-            el.style.transform = '';
-            stampA.style.opacity = 0;
-            stampR.style.opacity = 0;
-            if (!moved) flipCard(el);
-          }
-          dx = 0; dy = 0;
-        };
-
-        el.addEventListener('pointerdown', down);
-        el.addEventListener('pointermove', move);
-        el.addEventListener('pointerup', up);
-        el.addEventListener('pointercancel', up);
-      }
-
-      function flipCard(el) {
-        el = el || deckEl.lastElementChild;
-        if (!el) return;
-        flipped = !flipped;
-        el.classList.toggle('flipped', flipped);
-      }
-
-      function fly(el, dir) {
-        if (animating) return;
-        animating = true;
-
-        const stamp = el.querySelector('.stamp.' + (dir === 'right' ? 'acquis' : 'revoir'));
-        if (stamp) stamp.style.opacity = 1;
-        el.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s';
-
-        if (dir === 'right') el.style.transform = 'translate(180vw, -10dvh) rotate(32deg)';
-        else el.style.transform = 'translate(-180vw, -10dvh) rotate(-32deg)';
-        el.style.opacity = '0';
-
-        const id = el.dataset.id;
-        if (dir === 'right') {
-          const c = cardById(id);
-          if (c) { c.mastered = true; persist(); }
-          queue = queue.filter(q => q !== id);
-        } else {
-          queue = queue.filter(q => q !== id);
-          queue.push(id);
-        }
-        updateProgress();
-
-        const cardsInDom = Array.from(deckEl.querySelectorAll('.fcard'));
-        const cardB = cardsInDom[cardsInDom.length - 2];
-        const cardC = cardsInDom[cardsInDom.length - 3];
-
-        if (cardB) {
-          cardB.className = 'fcard absolute inset-0 z-20';
-          cardB.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s';
-          cardB.style.opacity = '';
-          attachDrag(cardB);
-        }
-        if (cardC) {
-          cardC.className = 'fcard absolute inset-0 behind';
-          cardC.style.transition = 'transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s';
-          cardC.style.opacity = '';
-        }
-
-        const nextSlice = queue.slice(0, 3);
-        if (nextSlice.length >= 3) {
-          const newCardData = cardById(nextSlice[2]);
-          if (newCardData) {
-            const newEl = buildCard(newCardData);
-            newEl.className = 'fcard absolute inset-0 behind2';
-            deckEl.insertBefore(newEl, deckEl.firstChild);
-          }
-        }
-
-        setTimeout(() => {
-          el.remove();
-          animating = false;
-          flipped = false;
-          if (queue.length === 0 || state.cards.length === 0) renderDeck(true);
-        }, 300);
-      }
-
-      function buttonSwipe(dir) {
-        const el = deckEl.lastElementChild;
-        if (!el || animating) return;
-        el.style.transform = `translate(${dir === 'right' ? 30 : -30}px, -4px) rotate(${dir === 'right' ? 3 : -3}deg)`;
-        requestAnimationFrame(() => fly(el, dir));
-      }
-
-      document.addEventListener('keydown', e => {
-        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
-        if (e.key === 'ArrowRight') buttonSwipe('right');
-        if (e.key === 'ArrowLeft') buttonSwipe('left');
-        if (e.key === ' ') { e.preventDefault(); flipCard(); }
-      });
-
-      /* ============ ADD CARD ============ */
-      const inFr = $('inFr'), inEn = $('inEn'), btnAdd = $('btnAdd');
-
-      function validate() { btnAdd.disabled = !(inFr.value.trim() && inEn.value.trim()); }
-      inFr.addEventListener('input', validate);
-      inEn.addEventListener('input', validate);
-      [inFr, inEn].forEach(i => i.addEventListener('keydown', e => {
-        if (e.key === 'Enter' && !btnAdd.disabled) addCard();
-      }));
-      btnAdd.addEventListener('click', addCard);
-
-      function addCard() {
-        const c = { id: uid(), fr: inFr.value.trim(), en: inEn.value.trim(), mastered: false };
-        state.cards.unshift(c);
-        queue.unshift(c.id);
-        persist();
-        inFr.value = ''; inEn.value = '';
-        validate();
-        inFr.focus();
-        if (deckEl.querySelector('.empty')) renderDeck(true);
-        else updateProgress();
-        toast('Card added!');
-      }
-
-      /* ============ IMPORT / EXPORT ============ */
-      $('btnCopyPrompt').addEventListener('click', async () => {
-        const topic = $('promptTopic').value.trim() || 'everyday vocabulary';
-        const prompt = `Create 100 JSON pairs of French/English vocabulary words for practicing the topic: "${topic}". Return ONLY a raw JSON array in exactly this format, with no extra text, no markdown code fences, and no explanation:\n\n[{"fr": "french word or phrase", "en": "english translation"}, ...]`;
-
-        try {
-          await navigator.clipboard.writeText(prompt);
-          toast('Prompt copied!');
-        } catch (e) {
-          try {
-            const ta = document.createElement('textarea');
-            ta.value = prompt;
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.focus();
-            ta.select();
-            document.execCommand('copy');
-            ta.remove();
-            toast('Prompt copied!');
-          } catch (e2) {
-            toast('Could not copy — select the text manually');
-          }
-        }
-      });
-
-      $('btnExport').addEventListener('click', () => {
-        const data = state.cards.map(c => ({ fr: c.fr, en: c.en }));
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'wordnest-export.json';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        toast('Export ready');
-      });
-
-      $('btnImport').addEventListener('click', () => $('importFile').click());
-      $('importFile').addEventListener('change', async e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        try {
-          const text = await file.text();
-          const data = JSON.parse(text);
-          if (!Array.isArray(data)) throw new Error('format');
-          const have = new Set(state.cards.map(c => c.fr.trim().toLowerCase()));
-          let count = 0;
-          data.forEach(item => {
-            const fr = (item.fr || '').trim();
-            const en = (item.en || '').trim();
-            if (fr && en && !have.has(fr.toLowerCase())) {
-              state.cards.push({ id: uid(), fr, en, mastered: false });
-              have.add(fr.toLowerCase());
-              count++;
-            }
-          });
-          persist();
-          rebuildQueue();
-          renderDeck(true);
-          toast(count > 0 ? `${count} card(s) imported` : 'No new cards');
-        } catch (err) {
-          toast('Invalid JSON file');
-        }
-        e.target.value = '';
-      });
-
-      /* ============ SHEETS ============ */
-      function openSheet(el) {
-        sheetBackdrop.classList.add('visible');
-        el.classList.add('open');
-      }
-      function closeSheets() {
-        addSheet.classList.remove('open');
-        customizeSheet.classList.remove('open');
-        sheetBackdrop.classList.remove('visible');
-      }
-      $('btnOpenAdd').addEventListener('click', () => openSheet(addSheet));
-      $('btnCustomize').addEventListener('click', () => openSheet(customizeSheet));
-      sheetBackdrop.addEventListener('click', closeSheets);
-
-      /* ============ THEME + BUTTON VISIBILITY ============ */
-      function applyTheme(name) {
-        document.documentElement.setAttribute('data-theme', name);
-        state.settings.theme = name;
-        persist();
-        document.querySelectorAll('#themeOptions .theme-swatch').forEach(b => b.classList.toggle('active', b.dataset.theme === name));
-        const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--app-bg').trim();
-        const meta = document.getElementById('themeColorMeta');
-        if (meta && bgColor) meta.setAttribute('content', bgColor);
-      }
-      document.querySelectorAll('#themeOptions .theme-swatch').forEach(b => {
-        b.addEventListener('click', () => applyTheme(b.dataset.theme));
-      });
-
-      /* ============ FONT FAMILY + TEXT SIZE ============ */
-      const FONT_STACKS = {
-        spaceMono: "'Space Mono', monospace",
-        jetbrainsMono: "'JetBrains Mono', monospace",
-        ibmPlexMono: "'IBM Plex Mono', monospace",
-        vt323: "'VT323', monospace"
-      };
-      const FONT_SCALES = { sm: 0.85, md: 1, lg: 1.2 };
-
-      function applyFontFamily(key) {
-        const stack = FONT_STACKS[key] || FONT_STACKS.spaceMono;
-        document.documentElement.style.setProperty('--app-font', stack);
-        state.settings.fontFamily = key;
-        persist();
-        document.querySelectorAll('#fontOptions .theme-swatch').forEach(b => b.classList.toggle('active', b.dataset.font === key));
-      }
-      function applyFontSize(key) {
-        const scale = FONT_SCALES[key] || 1;
-        document.documentElement.style.setProperty('--word-scale', scale);
-        state.settings.fontSize = key;
-        persist();
-        document.querySelectorAll('#sizeOptions .theme-swatch').forEach(b => b.classList.toggle('active', b.dataset.size === key));
-      }
-      document.querySelectorAll('#fontOptions .theme-swatch').forEach(b => {
-        b.addEventListener('click', () => applyFontFamily(b.dataset.font));
-      });
-      document.querySelectorAll('#sizeOptions .theme-swatch').forEach(b => {
-        b.addEventListener('click', () => applyFontSize(b.dataset.size));
-      });
-
-      /* ============ RESET PROGRESS ============ */
-      $('btnResetProgress').addEventListener('click', () => {
-        const masteredCount = state.cards.filter(c => c.mastered).length;
-        if (masteredCount === 0) { toast('Nothing to reset'); return; }
-        if (!confirm(`Move ${masteredCount} mastered card(s) back into the learning deck?`)) return;
-        state.cards.forEach(c => { c.mastered = false; });
-        persist();
-        rebuildQueue();
-        renderDeck(true);
-        closeSheets();
-        toast('Progress reset');
-      });
-
-      /* ============ LANGUAGE DIRECTION TOGGLE ============ */
-      function updateLangToggleLabel() {
-        $('langToggleLabel').textContent = state.settings.frontLang === 'fr' ? 'FR→EN' : 'EN→FR';
-      }
-      function toggleFrontLang() {
-        state.settings.frontLang = state.settings.frontLang === 'fr' ? 'en' : 'fr';
-        persist();
-        updateLangToggleLabel();
-        renderDeck(true);
-      }
-      $('btnLangToggle').addEventListener('click', toggleFrontLang);
-
-      load().then(() => {
-        applyTheme(state.settings.theme);
-        applyFontFamily(state.settings.fontFamily);
-        applyFontSize(state.settings.fontSize);
-        updateLangToggleLabel();
-        rebuildQueue();
-        renderDeck(true);
-      });
-    })();
-  </script>
-</body>
-
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#000000"><title>Un peu — a little French</title>
+<style>
+:root{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eeeae7;background:#000000;color-scheme:dark}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer;color:inherit;border:0}button:focus-visible,select:focus-visible{outline:2px solid #eed7a4;outline-offset:5px}header{height:90px;padding:25px 36px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:20px;font-weight:550;letter-spacing:-.8px}.brand small{color:#77777c;font-size:11px;letter-spacing:.1px;font-weight:400;margin-left:14px}.session{display:flex;gap:9px;align-items:center;font-size:11px;color:#929296}.session i{width:5px;height:5px;border-radius:50%;background:#cbd4a6}main{display:flex;flex-direction:column;align-items:center;gap:22px;padding:14px 22px 30px;min-height:calc(100svh - 90px);justify-content:center}.deckbar{width:min(410px,87vw);display:flex;justify-content:space-between;align-items:center;padding:0 4px}.deckbar select{appearance:none;background:transparent;border:0;color:#bab9bd;font-size:12px;padding:10px 18px 10px 0;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='m1 1 4 4 4-4' fill='none' stroke='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right center}.deckbar option{background:#232325}.counter{font-size:10px;letter-spacing:1px;color:#77777d;font-variant-numeric:tabular-nums}.stage{width:min(410px,87vw);height:min(510px,calc(100svh - 300px));min-height:340px;position:relative;perspective:1200px}.aura{position:absolute;inset:18%;background:var(--glow,#e67948);opacity:.18;filter:blur(80px);pointer-events:none;transition:background .6s}.card{width:100%;height:100%;border-radius:28.98px;overflow:hidden;position:relative;isolation:isolate;box-shadow:0 28px 65px #0005;transition:transform .5s;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));background:#3d4437}.card:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 1px 1px #ffffff90,inset 1px 0 1px #ffffff38,inset -1px -1px 1px #ffffff38;border:1px solid #ffffff17;z-index:4}.gradient-art{position:absolute;inset:0;width:100%;height:100%}.wash{position:absolute;inset:0;background:linear-gradient(#00000015,#00000012 35%,#00000020);pointer-events:none}.face{position:absolute;inset:0;display:flex;flex-direction:column;padding:29px 30px;cursor:pointer;outline:0}.face:focus-visible{box-shadow:inset 0 0 0 3px #fff8;border-radius:28.98px}.topline{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#fff9;letter-spacing:.1px}.language{font-size:20px;color:#fffffff2;letter-spacing:-.6px;font-weight:550}.center{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:0;position:relative}.dot-word{width:100%;height:auto;max-height:180px;object-fit:contain;filter:drop-shadow(0 2px 8px #0002)}.translation{font-size:clamp(24px,6vw,34px);font-weight:450;text-align:center;letter-spacing:-.8px;line-height:1.15;margin:15px 0;color:#fff}.example{font-size:14px;text-align:center;line-height:1.65;color:#fffc;margin:10px 0 0}.example small{display:block;color:#fff8;font-size:12px}.answer{display:none}.revealed .answer{display:block}.revealed .dot-word{max-height:105px}.cardfoot{display:flex;align-items:center;justify-content:space-between;min-height:34px}.flip-hint{font-size:10px;letter-spacing:.25px;color:#fffa}.icon{width:36px;height:36px;border:0;border-radius:50%;display:grid;place-items:center;background:transparent;color:#aaa9ae;transition:background .2s}.icon:hover{background:#ffffff10;color:white}svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}.sound{color:#fffd;background:#ffffff12;position:absolute;bottom:27px;right:27px;z-index:5}.sound:hover{background:#ffffff24}.sound.speaking{background:#ffffff40}.bottom{width:min(410px,87vw);display:flex;flex-direction:column;gap:20px;align-items:center}.track{height:2px;width:100%;background:#ffffff0b;overflow:hidden;border-radius:2px}.track i{display:block;width:0;height:100%;background:#c4c3b1;transition:width .5s}.actions{height:45px;display:flex;align-items:center;justify-content:center;gap:12px;width:100%}.pill{font-size:12px;border-radius:30px;padding:0 24px;height:43px;background:#eeeae6;color:#252527;transition:transform .15s,background .15s}.pill:hover{background:white;transform:translateY(-1px)}.pill.secondary{color:#cccbd0;background:#ffffff08;min-width:120px}.pill.secondary:hover{background:#ffffff12}.actions[hidden],.pill[hidden],.icon[hidden]{display:none}.hint{font-size:10px;color:#66666d;margin:0;text-align:center;line-height:1.6}.headerRight{display:flex;gap:18px;align-items:center}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:max-content;max-width:90vw;border-radius:25px;padding:12px 18px;background:#343438;font-size:12px;z-index:20;box-shadow:0 5px 15px #0004}.toast[hidden]{display:none}@media(max-width:600px){header{padding:20px;height:76px}.brand small{display:none}.headerRight{gap:10px}main{min-height:calc(100svh - 76px);padding-top:0;gap:18px}.stage{height:min(500px,calc(100svh - 285px))}.face{padding:25px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}.card{transform:none!important}}
+
+/* A three-card stack. The shuffle runs once per answer, never on a timer. */
+body{overflow-x:hidden}header{position:relative;z-index:8}.stage{isolation:isolate;margin-bottom:20px;width:min(410px,calc(100vw - 68px));--stack-step:10px}.deckbar,.bottom{width:min(410px,calc(100vw - 68px))}.card{z-index:3;touch-action:pan-y;backface-visibility:hidden}.stack-back{position:absolute;inset:0;border-radius:28.98px;overflow:hidden;pointer-events:none;border:1px solid #ffffff25;box-shadow:0 12px 30px #0003;background:#494a47}.stack-back canvas{width:100%;height:100%;display:block;filter:none}.back-near{z-index:2;transform:translate(var(--stack-step),var(--stack-step))}.back-far{z-index:1;transform:translate(calc(var(--stack-step)*2),calc(var(--stack-step)*2))}.shuffle-ghost{position:absolute;inset:0;pointer-events:none!important;transition:none!important;will-change:transform;z-index:4}.stage.shuffling #card,.stage.shuffling .back-near{will-change:transform}.stage.shuffling .card{transition:none}.stage.shuffling .face,.stage.shuffling .sound{pointer-events:none}.stage.shuffling .aura{transition:none}.icon,.pill{touch-action:manipulation}.icon{min-width:44px;min-height:44px}.sound{bottom:23px;right:23px}.actions{gap:10px}button:disabled{cursor:default}.actions button:disabled{opacity:.55}.stage[aria-busy=true]{cursor:wait}
+@media(max-width:600px){.stage{--stack-step:8px;margin-bottom:16px;height:min(500px,calc(100svh - 310px))}.card,.stack-back{border-radius:24.84px}.pill{padding-inline:20px}.pill.secondary{min-width:106px}.stage.shuffling .card{box-shadow:0 15px 30px #0004}}
+@media(max-width:360px){.actions{gap:7px}.pill{padding-inline:12px}.pill.secondary{min-width:88px}.face{padding:22px}.topline{gap:10px}.topline #type{font-size:10px;text-align:right}}
+@media(prefers-reduced-motion:reduce){.shuffle-ghost{display:none}.stage.shuffling .card{transform:none!important}}
+
+/* One rotating surface: a simple two-sided card, with no text parallax. */
+.card{--card-radius:28.98px;border-radius:var(--card-radius);overflow:visible;background:transparent;box-shadow:none;isolation:auto;perspective:800px;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}.card:after{display:none}.face{display:block;padding:0!important;border-radius:inherit;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transform:rotateY(0deg);transition:transform .8s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 6px 16px #00000026}.revealed .face{transform:rotateY(180deg)}.side{position:absolute;inset:0;border-radius:var(--card-radius);color:#fff;text-align:center;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:#242426}.side .gradient-art,.side .wash{border-radius:inherit}.side:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;border:1px solid #ffffff25;box-shadow:inset 0 1px 1px #ffffff90,inset 1px 0 1px #ffffff38}.front,.revealed .front{transform:rotateY(0deg)}.back,.revealed .back{transform:rotateY(180deg)}.side .topline{position:absolute;top:29px;left:30px;right:30px;z-index:2}.side .cardfoot{position:absolute;bottom:29px;left:30px;right:76px;z-index:2}.inner{position:absolute;left:0;top:50%;width:100%;padding:0 28px;transform:translateY(-50%);z-index:2}.back-word{font-size:13px;color:#fffa;line-height:1.4;margin:0 0 12px}.side .translation{margin:0 0 22px}.side .example{margin:0}.side .dot-word,.revealed .side .dot-word{max-height:180px}.card.no-flip .face,.shuffle-ghost .face{transition:none!important}.stack-back[hidden]{display:none}.stage.shuffling .card{box-shadow:none}.face:focus-visible{outline:2px solid #fff9;outline-offset:5px}.side .sound{transform:none;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+@media(max-width:600px){.card{--card-radius:24.84px}.side .topline{top:25px;left:25px;right:25px}.side .cardfoot{bottom:25px;left:25px}.inner{padding-inline:24px}.side .translation{font-size:28px;margin-bottom:18px}.side .example{font-size:13px;line-height:1.5}}
+@media(prefers-reduced-motion:reduce){.face{transition:none!important}}
+
+/* Native pointer events cover touch, mouse and pen. */
+.stage{margin-top:30px;margin-bottom:8px}.back-near{transform:scale(.95) translateY(-20px)}.back-far{transform:scale(.9) translateY(-40px)}.card{cursor:grab;touch-action:pan-y;transition:transform .3s ease-out;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.card.moving{transition:none!important;cursor:grabbing;will-change:transform}.card.moving .face{cursor:grabbing}.card canvas{pointer-events:none}.swipe-feedback{position:absolute;left:50%;top:50%;width:100px;height:100px;z-index:7;pointer-events:none;transform:translate(-50%,-50%);transition:transform .15s}.swipe-feedback span{position:absolute;inset:0;text-align:center;font-size:90px;font-weight:600;line-height:100px;opacity:0;transition:opacity .12s;text-shadow:0 3px 20px #0005}#noMark{color:#f16b73}#yesMark{color:#77ce9c}.decision{border-radius:50%;width:60px;height:60px;background:#1b1b1e;display:grid;place-items:center;margin:0 8px;flex:none;touch-action:manipulation;transition:transform .15s,background .15s}.decision svg{width:32px;height:32px;stroke-width:2.7;pointer-events:none}.decision.learning{color:#f16b73}.decision.mastered{color:#77ce9c}.decision:hover{background:#27272b}.decision:active{transform:scale(.92)}.decision[hidden]{display:none}.actions{height:64px;gap:0}.actions .decision:disabled{opacity:.55;background:#1b1b1e}.hint{padding-top:2px}@media(max-width:600px){.stage{margin-top:25px;height:min(500px,calc(100svh - 340px));min-height:320px}.bottom{gap:16px}}@media(prefers-reduced-motion:reduce){.card,.swipe-feedback,.swipe-feedback span{transition:none!important}}
+.dot-symbol{fill:currentColor;stroke:none!important}.decision .dot-symbol{width:32px;height:32px}.swipe-feedback .dot-symbol{width:90px;height:90px}
+</style></head><body>
+<header><div class="brand">un peu<span aria-hidden="true">.</span><small>a little French, every day</small></div><div class="headerRight"><span class="session"><i></i><span id="learned">0 familiar</span></span></div></header>
+<main><div class="deckbar"><select id="deck" aria-label="Choose a French deck"><option value="all">A little of everything</option><option value="basics">First words</option><option value="daily">Everyday life</option><option value="out">Out & about</option><option value="work">At work</option></select><span class="counter" id="counter">01 / 60</span></div><div class="stage" id="stage"><div class="aura"></div><div class="swipe-feedback" id="swipeFeedback" aria-hidden="true"><span id="noMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="1.05"/><circle cx="18" cy="6" r="1.05"/><circle cx="8" cy="8" r="1.05"/><circle cx="16" cy="8" r="1.05"/><circle cx="10" cy="10" r="1.05"/><circle cx="14" cy="10" r="1.05"/><circle cx="12" cy="12" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="10" cy="14" r="1.05"/><circle cx="16" cy="16" r="1.05"/><circle cx="8" cy="16" r="1.05"/><circle cx="18" cy="18" r="1.05"/><circle cx="6" cy="18" r="1.05"/></svg></span><span id="yesMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.05"/><circle cx="7" cy="14" r="1.05"/><circle cx="9" cy="16" r="1.05"/><circle cx="11" cy="18" r="1.05"/><circle cx="12.5" cy="16" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="15.5" cy="12" r="1.05"/><circle cx="17" cy="10" r="1.05"/><circle cx="18.5" cy="8" r="1.05"/><circle cx="20" cy="6" r="1.05"/></svg></span></div><div class="stack-back back-far" aria-hidden="true"><canvas id="backFar" width="960" height="1200"></canvas></div><div class="stack-back back-near" aria-hidden="true"><canvas id="backNear" width="960" height="1200"></canvas></div><article class="card" id="card"><div class="face" id="face" role="group" aria-roledescription="flippable card" tabindex="0" aria-label="Reveal English translation"><section class="side front" id="front"><canvas class="gradient-art" id="art" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language" lang="fr">Français</span><span id="type">greeting</span></div><div class="inner"><canvas class="dot-word" id="dots" width="1200" height="570" role="img" lang="fr" aria-label="Bonjour"></canvas></div><div class="cardfoot"><span class="flip-hint" id="flipHint">tap to discover</span></div><button class="icon sound" id="speak" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section><section class="side back" id="answer" aria-hidden="true"><canvas class="gradient-art" id="artBack" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language">English</span><span>meaning &amp; context</span></div><div class="inner"><p class="back-word" id="backWord" lang="fr"></p><div class="translation" id="translation"></div><p class="example"><span id="example" lang="fr"></span><small id="exampleEn"></small></p></div><div class="cardfoot"><span class="flip-hint">tap to return</span></div><button class="icon sound" id="speakBack" tabindex="-1" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section></div></article></div><div class="bottom"><div class="track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" id="progress"><i id="bar"></i></div><div class="actions"><button class="pill" id="reveal">Reveal meaning</button><button class="decision learning" id="again" aria-label="Learning — swipe left" title="Learning"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="1.05"/><circle cx="18" cy="6" r="1.05"/><circle cx="8" cy="8" r="1.05"/><circle cx="16" cy="8" r="1.05"/><circle cx="10" cy="10" r="1.05"/><circle cx="14" cy="10" r="1.05"/><circle cx="12" cy="12" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="10" cy="14" r="1.05"/><circle cx="16" cy="16" r="1.05"/><circle cx="8" cy="16" r="1.05"/><circle cx="18" cy="18" r="1.05"/><circle cx="6" cy="18" r="1.05"/></svg></button><button class="decision mastered" id="got" aria-label="Mastered — swipe right" title="Mastered"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.05"/><circle cx="7" cy="14" r="1.05"/><circle cx="9" cy="16" r="1.05"/><circle cx="11" cy="18" r="1.05"/><circle cx="12.5" cy="16" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="15.5" cy="12" r="1.05"/><circle cx="17" cy="10" r="1.05"/><circle cx="18.5" cy="8" r="1.05"/><circle cx="20" cy="6" r="1.05"/></svg></button><button class="pill" id="restart" hidden>Another little round</button></div><p class="hint" id="hint">Tap to flip · swipe left to learn, right to master</p></div></main><div class="toast" id="toast" role="status" hidden></div>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id),canvas=$('art'),ctx=canvas.getContext('2d'),stage=$('stage'),card=$('card');
+const palettes=[
+['Persimmon','#f5aa84','#ff7256','#0b310c','#3c7918','#ffe0bd'],
+['Tidal','#83f8b4','#11b6ab','#00336c','#0062a2','#c9ffc8'],
+['Afterglow','#f4a0b8','#de0759','#36051e','#790937','#f6c3f0'],
+['Blue hour','#428bff','#005ff1','#0b1016','#1c3026','#80daff'],
+['Ember','#ff5735','#e6070c','#100313','#4d0024','#ffb778'],
+['Black cherry','#54053a','#8d0028','#0b0414','#270317','#f04431'],
+['Moonstone','#a2b2cb','#8b83af','#1e2435','#42465d','#e4e1cf'],
+['Citron','#e9f3a0','#b8c165','#253c11','#427044','#ffecd2'],
+['Ultraviolet','#db8bf0','#7455de','#18082b','#34205c','#ffa48d'],
+['Apricity','#ffc987','#f3933b','#58201d','#a43c2e','#ffe8a7'],
+['Lagoon','#b8f1de','#43cbb6','#003f43','#07695b','#e7f5bb'],
+['Rosewater','#ffbbb3','#e67588','#592047','#8b295d','#fff1ce']];
+function random(seed){return ()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function blob(c,x,y,rx,ry,color,alpha=1,angle=0){c.save();c.translate(x,y);c.rotate(angle);c.scale(rx,ry);const g=c.createRadialGradient(0,0,0,0,0,1);g.addColorStop(0,color);g.addColorStop(.35,color);g.addColorStop(1,color+'00');c.globalAlpha=alpha;c.fillStyle=g;c.fillRect(-1,-1,2,2);c.restore();}
+function paint(target,s){const ctx=target.getContext('2d'),p=s.p,w=target.width,h=target.height,f=.65;const off=document.createElement('canvas');off.width=480;off.height=Math.round(480*h/w);const c=off.getContext('2d'),W=off.width,H=off.height;c.fillStyle=p[1];c.fillRect(0,0,W,H);blob(c,W*.75,H*.6,W*.95,H*.95,p[2]);blob(c,W*.2,H*.16,W*.8,H*.75,p[5],.55);blob(c,W*s.x,H*s.y,W*(s.rx+.12),H*(s.ry+.07),p[4],1,s.angle);blob(c,W*s.x,H*s.y,W*s.rx,H*s.ry,p[3],1,s.angle);blob(c,W*s.x,H*s.y,W*s.rx*.73,H*s.ry*.78,p[3],.85,s.angle);if(s.mode>.65){blob(c,W*.85,H*.88,W*.64,H*.36,p[2],.75);blob(c,W*.03,H*.94,W*.55,H*.25,p[5],.55);}c.save();c.globalCompositeOperation='screen';blob(c,W*s.light,-H*.08,W*.78,H*.3,p[5],.55);blob(c,W*1.1,H*.65,W*.33,H*.8,p[5],.28);c.restore();ctx.clearRect(0,0,w,h);ctx.filter=`blur(${2+f*18}px)`;ctx.drawImage(off,-18,-18,w+36,h+36);ctx.filter='none';let image=ctx.getImageData(0,0,w,h),d=image.data,rng=random(s.seed),grain=2.8;for(let i=0;i<d.length;i+=4){let n=(rng()-.5)*grain;d[i]+=n;d[i+1]+=n;d[i+2]+=n;}ctx.putImageData(image,0,0);const rim=ctx.createLinearGradient(0,0,w,h);rim.addColorStop(0,'#ffffff75');rim.addColorStop(.35,'#ffffff08');rim.addColorStop(.7,'#ffffff00');rim.addColorStop(1,'#ffffff35');ctx.strokeStyle=rim;ctx.lineWidth=3;ctx.strokeRect(1.5,1.5,w-3,h-3);}
+const source={basics:`Bonjour|Hello|greeting|Bonjour, comment allez-vous ?|Hello, how are you?
+Bonsoir|Good evening|greeting|Bonsoir, bienvenue !|Good evening, welcome!
+Salut|Hi / Bye|informal greeting|Salut, à demain !|Bye, see you tomorrow!
+Merci|Thank you|courtesy|Merci pour votre aide.|Thank you for your help.
+De rien|You're welcome|courtesy|De rien, avec plaisir.|You're welcome, my pleasure.
+S'il vous plaît|Please|polite phrase|Un café, s'il vous plaît.|A coffee, please.
+Pardon|Sorry / Excuse me|courtesy|Pardon, je n'ai pas compris.|Sorry, I didn't understand.
+Oui|Yes|first word|Oui, je suis prêt.|Yes, I'm ready. (male speaker)
+Non|No|first word|Non, merci.|No, thank you.
+À bientôt|See you soon|farewell|Merci et à bientôt !|Thank you and see you soon!
+Comment ça va ?|How are you?|greeting|Salut ! Comment ça va ?|Hi! How are you?
+Ça va bien|I'm doing well|everyday phrase|Ça va bien, merci.|I'm doing well, thank you.
+Je m'appelle…|My name is…|introduction|Je m'appelle Cris.|My name is Cris.
+Enchanté|Nice to meet you|male speaker · enchantée for female|Enchanté de vous rencontrer.|Nice to meet you.
+Au revoir|Goodbye|farewell|Au revoir et bonne journée !|Goodbye and have a good day!`,daily:`Aujourd'hui|Today|time|Aujourd'hui, j'apprends le français.|Today, I'm learning French.
+Demain|Tomorrow|time|À demain !|See you tomorrow!
+Hier|Yesterday|time|Hier, il faisait beau.|Yesterday, the weather was nice.
+Maintenant|Now|time|Je suis prêt maintenant.|I'm ready now. (male speaker)
+La maison|The house / Home|feminine noun|Je suis à la maison.|I'm at home.
+Le matin|The morning|masculine noun|Je lis le matin.|I read in the morning.
+Le soir|The evening|masculine noun|Je cuisine le soir.|I cook in the evening.
+J'ai faim|I'm hungry|literally: I have hunger|J'ai faim. On mange ?|I'm hungry. Shall we eat?
+J'ai soif|I'm thirsty|literally: I have thirst|J'ai soif. Je voudrais de l'eau.|I'm thirsty. I'd like some water.
+Il fait beau|The weather is nice|weather|Il fait beau aujourd'hui.|The weather is nice today.
+Il fait froid|It's cold|weather|Il fait froid ce matin.|It's cold this morning.
+J'aime…|I like…|verb · aimer|J'aime lire.|I like reading.
+Je voudrais…|I would like…|polite request|Je voudrais un thé.|I would like a tea.
+Peut-être|Maybe|adverb|Peut-être demain.|Maybe tomorrow.
+D'accord|Okay / Agreed|everyday phrase|D'accord, à demain.|Okay, see you tomorrow.`,out:`Où est… ?|Where is… ?|question|Où est la gare ?|Where is the train station?
+Combien ?|How much / How many?|question|Combien ça coûte ?|How much does it cost?
+À gauche|To the left|direction|La gare est à gauche.|The train station is on the left.
+À droite|To the right|direction|Tournez à droite.|Turn right.
+Tout droit|Straight ahead|direction|Continuez tout droit.|Keep going straight ahead.
+Le café|Coffee / The café|masculine noun|Je prends un café.|I'm having a coffee.
+De l'eau|Some water|feminine noun · l'eau|Je voudrais de l'eau.|I'd like some water.
+L'addition|The bill|feminine noun|L'addition, s'il vous plaît.|The bill, please.
+Le magasin|The store|masculine noun|Le magasin est ouvert.|The store is open.
+La rue|The street|feminine noun|C'est dans cette rue.|It's on this street.
+Le chemin|The path / Way|masculine noun|Je cherche mon chemin.|I'm trying to find my way.
+C'est combien ?|How much is it?|shopping|Ce livre, c'est combien ?|How much is this book?
+Je cherche…|I'm looking for…|useful phrase|Je cherche la bibliothèque.|I'm looking for the library.
+C'est bon|It's good|useful phrase|Ce café, c'est bon !|This coffee is good!
+Bonne journée|Have a good day|farewell|Merci, bonne journée !|Thank you, have a good day!`,work:`La réunion|The meeting|feminine noun|La réunion commence à neuf heures.|The meeting starts at nine o'clock.
+Le courriel|The email|masculine noun · common in Canada|J'ai reçu votre courriel.|I received your email.
+La question|The question|feminine noun|J'ai une question.|I have a question.
+La réponse|The answer|feminine noun|Merci pour votre réponse.|Thank you for your answer.
+Je comprends|I understand|verb · comprendre|Oui, je comprends.|Yes, I understand.
+Je ne comprends pas|I don't understand|useful phrase|Pardon, je ne comprends pas.|Sorry, I don't understand.
+Répétez, s'il vous plaît|Please repeat|polite request|Répétez, s'il vous plaît.|Please repeat.
+Plus lentement|More slowly|useful phrase|Parlez plus lentement, s'il vous plaît.|Please speak more slowly.
+Un instant|One moment|useful phrase|Un instant, s'il vous plaît.|One moment, please.
+Avec plaisir|With pleasure|courtesy|Oui, avec plaisir !|Yes, with pleasure!
+Je suis disponible|I'm available|useful phrase|Je suis disponible demain.|I'm available tomorrow.
+C'est noté|Noted|useful phrase|Merci, c'est noté.|Thank you, noted.
+Le travail|Work / The work|masculine noun|Je commence le travail à neuf heures.|I start work at nine o'clock.
+J'apprends le français|I'm learning French|useful phrase|J'apprends le français petit à petit.|I'm learning French little by little.
+À tout à l'heure|See you later|later the same day|À tout à l'heure, après la réunion !|See you later, after the meeting!`};
+const cards=Object.entries(source).flatMap(([deck,lines])=>lines.split('\n').map((line,i)=>{const [fr,en,type,ex,exEn]=line.split('|');return {id:deck+i,deck,fr,en,type,ex,exEn};}));
+let shuffling=false,flipping=false,flipTimer,drag=null,suppressClickUntil=0;
+let saved={known:[],deck:'all'},queue=[],total=0,done=0,revealed=false,complete=false,atmosphere,toastTimer,voices=[];
+try{const s=JSON.parse(localStorage.getItem('un-peu-v1'));if(s&&Array.isArray(s.known)){saved.known=s.known.filter(id=>cards.some(c=>c.id===id));if(['all',...Object.keys(source)].includes(s.deck))saved.deck=s.deck;}}catch{}
+const known=new Set(saved.known);$('deck').value=saved.deck;
+function persist(){try{localStorage.setItem('un-peu-v1',JSON.stringify({known:[...known],deck:$('deck').value,accent:'fr-CA'}));}catch{}}
+function toast(t){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const looks=new Map(),rendered=new Map();
+function makeLook(excluded=[]){const choices=palettes.filter(p=>!excluded.includes(p[0]));const p=choices[Math.floor(Math.random()*choices.length)];return {p,x:.4+Math.random()*.2,y:.45+Math.random()*.13,rx:.32+Math.random()*.08,ry:.44+Math.random()*.07,angle:Math.random()*.4-.2,mode:Math.random(),light:Math.random(),seed:Math.random()*1e9};}
+function ensureLooks(){queue.forEach((item,i)=>{if(!looks.has(item.id)){const previous=queue.slice(Math.max(0,i-2),i).map(c=>looks.get(c.id)?.p[0]);looks.set(item.id,makeLook(previous));}});}
+function artwork(item){if(rendered.has(item.id)){const c=rendered.get(item.id);rendered.delete(item.id);rendered.set(item.id,c);return c;}const c=document.createElement('canvas');c.width=960;c.height=1200;paint(c,looks.get(item.id));rendered.set(item.id,c);while(rendered.size>5)rendered.delete(rendered.keys().next().value);return c;}
+function drawArtwork(target,item){const c=target.getContext('2d');c.clearRect(0,0,target.width,target.height);c.drawImage(artwork(item),0,0,target.width,target.height);target.dataset.cardId=item.id;}
+function gradient(){if(!queue[0])return;ensureLooks();const item=queue[0];atmosphere=looks.get(item.id);stage.style.setProperty('--glow',atmosphere.p[2]);drawArtwork(canvas,item);drawArtwork($('artBack'),item);}
+function setFlip(value,instant=false){
+ if(instant)card.classList.add('no-flip');
+ card.classList.toggle('revealed',value);
+ $('front').setAttribute('aria-hidden',String(value));$('answer').setAttribute('aria-hidden',String(!value));$('speak').tabIndex=value?-1:0;$('speakBack').tabIndex=value?0:-1;
+ if(instant){void card.offsetWidth;card.classList.remove('no-flip');}
+}
+// Draw real letterforms as a dot matrix; accents are preserved, with no font download.
+function dotted(text){const out=$('dots'),c=out.getContext('2d'),mask=document.createElement('canvas');mask.width=1200;mask.height=570;const m=mask.getContext('2d');const words=text.split(' ');let size=170,lines=[];while(size>=64){m.font=`500 ${size}px Arial, sans-serif`;lines=[''];for(const word of words){const last=lines.length-1,test=lines[last]?lines[last]+' '+word:word;if(m.measureText(test).width>1100&&lines[last])lines.push(word);else lines[last]=test;}if(lines.length*size*1.27<=490&&lines.every(l=>m.measureText(l).width<=1100))break;size-=4;}m.fillStyle='white';m.textAlign='center';m.textBaseline='middle';lines.forEach((line,i)=>m.fillText(line,600,285+(i-(lines.length-1)/2)*size*1.27));const pixels=m.getImageData(0,0,1200,570).data;c.clearRect(0,0,1200,570);c.fillStyle='#fffef4';const step=8;for(let y=4;y<570;y+=step)for(let x=4;x<1200;x+=step){if(pixels[(y*1200+x)*4+3]>75){c.beginPath();c.arc(x,y,2.6,0,Math.PI*2);c.fill();}}out.setAttribute('aria-label',text);}
+function progress(){$('learned').textContent=known.size+' familiar';$('counter').textContent=String(Math.min(done+1,total)).padStart(2,'0')+' / '+total;$('bar').style.width=done/total*100+'%';$('progress').setAttribute('aria-valuemax',total);$('progress').setAttribute('aria-valuenow',done);}
+const audioButtons=[$('speak'),$('speakBack')];
+function speaking(active){audioButtons.forEach(b=>b.classList.toggle('speaking',active));}
+function stopAudio(){if('speechSynthesis'in window)speechSynthesis.cancel();speaking(false);}
+function show(first=false){stopAudio();complete=false;revealed=false;setFlip(false,true);const item=queue[0];$('backWord').textContent=item.fr;dotted(item.fr);$('type').textContent=item.type;$('translation').textContent=item.en;$('example').textContent=item.ex;$('exampleEn').textContent=item.exEn;$('flipHint').textContent='tap to discover';$('face').setAttribute('aria-label',item.fr+'. Reveal English translation');$('face').setAttribute('aria-expanded','false');$('face').setAttribute('aria-controls','answer');$('reveal').hidden=true;$('again').hidden=false;$('got').hidden=false;$('restart').hidden=true;audioButtons.forEach(b=>b.hidden=false);$('hint').textContent='Tap to flip · swipe left to learn, right to master';progress();gradient(first);}
+function reveal(){if(complete||shuffling||flipping||drag||Date.now()<suppressClickUntil)return;revealed=!revealed;setFlip(revealed);flipping=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;for(const id of ['again','got','reveal','deck'])$(id).disabled=flipping;clearTimeout(flipTimer);if(flipping)flipTimer=setTimeout(()=>{flipping=false;for(const id of ['again','got','reveal','deck'])$(id).disabled=false;},800);$('reveal').hidden=true;$('again').hidden=false;$('got').hidden=false;$('face').setAttribute('aria-expanded',String(revealed));$('face').setAttribute('aria-label',queue[0].fr+(revealed?'. '+queue[0].en+'. Hide translation':'. Reveal English translation'));$('flipHint').textContent=revealed?'a little more, every day':'tap to discover';$('hint').textContent=revealed?'← Learning · Mastered →':'Tap to flip · swipe left to learn, right to master';}
+function finish(){stopAudio();complete=true;revealed=false;setFlip(true,true);$('backWord').textContent='Très bien !';dotted('Très bien !');$('type').textContent='round complete';$('translation').textContent='A little progress.';$('example').textContent='Petit à petit.';$('exampleEn').textContent='Little by little.';$('flipHint').textContent=total+' cards practised';$('face').setAttribute('aria-label','Round complete. '+total+' cards practised.');$('face').setAttribute('aria-expanded','true');for(const id of ['reveal','again','got','speak','speakBack'])$(id).hidden=true;$('restart').hidden=false;$('hint').textContent='Come back for another little round whenever you like.';progress();$('counter').textContent=total+' / '+total;$('restart').focus();}
+function stackPaint(){ensureLooks();['backNear','backFar'].forEach((id,i)=>{const c=$(id),item=queue[i+1];c.parentElement.hidden=!item||complete;if(item&&!complete)drawArtwork(c,item);});}
+function lockShuffle(locked){shuffling=locked;stage.classList.toggle('shuffling',locked);stage.setAttribute('aria-busy',String(locked));for(const id of ['again','got','reveal','restart','deck','speak','speakBack'])$(id).disabled=locked;}
+function snapshot(){const ghost=card.cloneNode(true);ghost.removeAttribute('id');ghost.classList.add('shuffle-ghost');ghost.setAttribute('aria-hidden','true');ghost.setAttribute('inert','');ghost.style.setProperty('--rx','0deg');ghost.style.setProperty('--ry','0deg');ghost.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));ghost.querySelectorAll('[tabindex]').forEach(el=>el.removeAttribute('tabindex'));const originals=card.querySelectorAll('canvas');ghost.querySelectorAll('canvas').forEach((c,i)=>c.getContext('2d').drawImage(originals[i],0,0));stage.appendChild(ghost);return ghost;}
+async function rate(got,from='translate(0,0) rotate(0deg)'){
+ if(complete||shuffling||flipping||drag)return;
+ lockShuffle(true);stopAudio();
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const animate=!reduced&&typeof card.animate==='function';
+ let ghost=null,animations=[];
+ try{
+  if(animate)ghost=snapshot();
+  const item=queue.shift();
+  if(got){known.add(item.id);done++;}else{known.delete(item.id);queue.splice(Math.min(3,queue.length),0,item);}
+  card.style.transform='';card.classList.remove('moving');
+  persist();queue.length?show():finish();stackPaint();
+  card.style.setProperty('--rx','0deg');card.style.setProperty('--ry','0deg');
+  if(animate){
+   const distance=Math.max(window.innerWidth,stage.getBoundingClientRect().width)*1.5;
+   feedback(got?1:-1,1);
+   animations.push(ghost.animate([{transform:from,zIndex:4},{transform:`translate(${got?distance:-distance}px,-100px) rotate(${got?-30:30}deg)`,zIndex:4}],{duration:350,easing:'ease-in',fill:'forwards'}));
+   animations.push(card.animate([{transform:'scale(.95) translateY(-20px)'},{transform:'scale(1) translateY(0)'}],{duration:350,easing:'ease-out',fill:'both'}));
+   animations.push($('backNear').parentElement.animate([{transform:'scale(.9) translateY(-40px)'},{transform:'scale(.95) translateY(-20px)'}],{duration:350,easing:'ease-out',fill:'both'}));
+   await Promise.allSettled(animations.map(a=>a.finished));
+  }
+  stackPaint();
+ }finally{
+  animations.forEach(a=>a.cancel());if(ghost)ghost.remove();feedback(0,0);lockShuffle(false);
+  (complete?$('restart'):$('face')).focus({preventScroll:true});
+ }
+ if(!got)toast('We’ll try that one again in a moment.');
+}
+function start(first=false){if(shuffling||flipping)return;const deck=$('deck').value;queue=cards.filter(c=>deck==='all'||c.deck===deck);queue=shuffle(queue);queue.sort((a,b)=>Number(known.has(a.id))-Number(known.has(b.id)));if(first&&!known.size){const i=queue.findIndex(c=>c.fr==='Bonjour');if(i>=0)queue.unshift(...queue.splice(i,1));}total=queue.length;done=0;persist();show(first);stackPaint();}
+$('face').onclick=e=>{if(!e.target.closest('button'))reveal();};$('face').onkeydown=e=>{if(e.target.closest('button'))return;if(e.key==='Enter'||e.code==='Space'){e.preventDefault();e.stopPropagation();reveal();}};$('reveal').onclick=()=>{reveal();$('face').focus({preventScroll:true});};$('again').onclick=()=>rate(false);$('got').onclick=()=>rate(true);$('restart').onclick=()=>{start();$('face').focus({preventScroll:true});};$('deck').onchange=()=>start();
+if('speechSynthesis'in window){voices=speechSynthesis.getVoices();speechSynthesis.addEventListener('voiceschanged',()=>voices=speechSynthesis.getVoices());}
+function playFrench(e){e.stopPropagation();if(complete||shuffling||flipping)return;if(!('speechSynthesis'in window)){toast('French audio isn’t supported in this browser.');return;}stopAudio();const lang='fr-CA';voices=speechSynthesis.getVoices();const voice=voices.find(v=>v.lang.toLowerCase()===lang.toLowerCase())||voices.find(v=>v.lang.toLowerCase().startsWith('fr'));if(voices.length&&!voice){toast('Add a French voice in your device’s speech settings.');return;}const u=new SpeechSynthesisUtterance(queue[0].fr.replace(/…/g,'').trim());u.lang=lang;if(voice)u.voice=voice;u.rate=.82;u.onstart=()=>speaking(true);u.onend=()=>speaking(false);u.onerror=e=>{speaking(false);if(e.error!=='interrupted'&&e.error!=='canceled')toast('Audio unavailable. Check your device’s French voices.');};speechSynthesis.speak(u);}
+audioButtons.forEach(b=>b.onclick=playFrench);
+document.addEventListener('keydown',e=>{if(/INPUT|SELECT|BUTTON/.test(e.target.tagName)||e.target===$('face')&&e.code==='Space')return;if(e.code==='Space'){e.preventDefault();reveal();}if(e.code==='ArrowLeft')rate(false);if(e.code==='ArrowRight')rate(true);});
+
+function feedback(direction,amount){$('noMark').style.opacity=direction<0?amount:0;$('yesMark').style.opacity=direction>0?amount:0;$('swipeFeedback').style.transform='translate(-50%,-50%) scale('+(0.7+amount*.3)+')';}
+function dragTransform(x,y){return 'translate('+x+'px,'+y+'px) rotate('+Math.max(-25,Math.min(25,x*.025+x*y*.000375))+'deg)';}
+function releaseCapture(id){if(card.hasPointerCapture(id))card.releasePointerCapture(id);}
+function resetDrag(){card.classList.remove('moving');card.style.transform='';feedback(0,0);}
+card.addEventListener('pointerdown',e=>{
+ if(shuffling||flipping||complete||drag||!e.isPrimary||e.button!==0||e.target.closest('button'))return;
+ drag={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0,lastX:e.clientX,lastTime:e.timeStamp,vx:0,moved:false};
+});
+card.addEventListener('pointermove',e=>{
+ if(!drag||drag.id!==e.pointerId)return;
+ const d=drag,x=e.clientX-d.x,y=e.clientY-d.y;
+ if(!d.moved){
+  if(Math.abs(y)>12&&Math.abs(y)>Math.abs(x)){drag=null;return;}
+  if(Math.abs(x)<10)return;
+  d.moved=true;card.setPointerCapture(e.pointerId);card.classList.add('moving');
+ }
+ const dt=e.timeStamp-d.lastTime;
+ if(dt>0)d.vx=(e.clientX-d.lastX)/dt;
+ d.lastX=e.clientX;d.lastTime=e.timeStamp;d.dx=x;d.dy=y;
+ card.style.transform=dragTransform(x,y);
+ feedback(Math.sign(x),Math.min(.8,Math.abs(x)/100));
+});
+function endDrag(e,cancelled=false){
+ if(!drag||drag.id!==e.pointerId)return;
+ const d=drag;drag=null;releaseCapture(d.id);
+ if(!d.moved)return;
+ suppressClickUntil=Date.now()+400;
+ const threshold=Math.min(100,stage.getBoundingClientRect().width*.25);
+ const fast=e.timeStamp-d.lastTime<100&&Math.abs(d.vx)>.55&&Math.abs(d.dx)>35;
+ if(!cancelled&&(Math.abs(d.dx)>threshold||fast))rate(d.dx>0,dragTransform(d.dx,d.dy));
+ else resetDrag();
+}
+card.addEventListener('pointerup',e=>endDrag(e));
+card.addEventListener('pointercancel',e=>endDrag(e,true));
+card.addEventListener('lostpointercapture',e=>endDrag(e,true));
+window.addEventListener('blur',()=>{if(drag){const id=drag.id;drag=null;releaseCapture(id);resetDrag();}});
+start(true);
+})();
+</script></body></html>
