@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#000000"><title>Un peu — a little French</title>
 <style>
-:root{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eeeae7;background:#000000;color-scheme:dark}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer;color:inherit;border:0}button:focus-visible,select:focus-visible{outline:2px solid #eed7a4;outline-offset:5px}header{height:90px;padding:25px 36px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:20px;font-weight:550;letter-spacing:-.8px}.brand small{color:#77777c;font-size:11px;letter-spacing:.1px;font-weight:400;margin-left:14px}.session{display:flex;gap:9px;align-items:center;font-size:11px;color:#929296}.session i{width:5px;height:5px;border-radius:50%;background:#cbd4a6}main{display:flex;flex-direction:column;align-items:center;gap:22px;padding:14px 22px 30px;min-height:calc(100svh - 90px);justify-content:center}.deckbar{width:min(410px,87vw);display:flex;justify-content:space-between;align-items:center;padding:0 4px}.deckbar select{appearance:none;background:transparent;border:0;color:#bab9bd;font-size:12px;padding:10px 18px 10px 0;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='m1 1 4 4 4-4' fill='none' stroke='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right center}.deckbar option{background:#232325}.counter{font-size:10px;letter-spacing:1px;color:#77777d;font-variant-numeric:tabular-nums}.stage{width:min(410px,87vw);height:min(510px,calc(100svh - 300px));min-height:340px;position:relative;perspective:1200px}.aura{position:absolute;inset:18%;background:var(--glow,#e67948);opacity:.18;filter:blur(80px);pointer-events:none;transition:background .6s}.card{width:100%;height:100%;border-radius:28.98px;overflow:hidden;position:relative;isolation:isolate;box-shadow:0 28px 65px #0005;transition:transform .5s;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));background:#3d4437}.card:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 1px 1px #ffffff90,inset 1px 0 1px #ffffff38,inset -1px -1px 1px #ffffff38;border:1px solid #ffffff17;z-index:4}.gradient-art{position:absolute;inset:0;width:100%;height:100%}.wash{position:absolute;inset:0;background:linear-gradient(#00000015,#00000012 35%,#00000020);pointer-events:none}.face{position:absolute;inset:0;display:flex;flex-direction:column;padding:29px 30px;cursor:pointer;outline:0}.face:focus-visible{box-shadow:inset 0 0 0 3px #fff8;border-radius:28.98px}.topline{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#fff9;letter-spacing:.1px}.language{font-size:20px;color:#fffffff2;letter-spacing:-.6px;font-weight:550}.center{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:0;position:relative}.dot-word{width:100%;height:auto;max-height:180px;object-fit:contain;filter:drop-shadow(0 2px 8px #0002)}.translation{font-size:clamp(24px,6vw,34px);font-weight:450;text-align:center;letter-spacing:-.8px;line-height:1.15;margin:15px 0;color:#fff}.example{font-size:14px;text-align:center;line-height:1.65;color:#fffc;margin:10px 0 0}.example small{display:block;color:#fff8;font-size:12px}.answer{display:none}.revealed .answer{display:block}.revealed .dot-word{max-height:105px}.cardfoot{display:flex;align-items:center;justify-content:space-between;min-height:34px}.flip-hint{font-size:10px;letter-spacing:.25px;color:#fffa}.icon{width:36px;height:36px;border:0;border-radius:50%;display:grid;place-items:center;background:transparent;color:#aaa9ae;transition:background .2s}.icon:hover{background:#ffffff10;color:white}svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}.sound{color:#fffd;background:#ffffff12;position:absolute;bottom:27px;right:27px;z-index:5}.sound:hover{background:#ffffff24}.sound.speaking{background:#ffffff40}.bottom{width:min(410px,87vw);display:flex;flex-direction:column;gap:20px;align-items:center}.track{height:2px;width:100%;background:#ffffff0b;overflow:hidden;border-radius:2px}.track i{display:block;width:0;height:100%;background:#c4c3b1;transition:width .5s}.actions{height:45px;display:flex;align-items:center;justify-content:center;gap:12px;width:100%}.pill{font-size:12px;border-radius:30px;padding:0 24px;height:43px;background:#eeeae6;color:#252527;transition:transform .15s,background .15s}.pill:hover{background:white;transform:translateY(-1px)}.pill.secondary{color:#cccbd0;background:#ffffff08;min-width:120px}.pill.secondary:hover{background:#ffffff12}.actions[hidden],.pill[hidden],.icon[hidden]{display:none}.hint{font-size:10px;color:#66666d;margin:0;text-align:center;line-height:1.6}.headerRight{display:flex;gap:18px;align-items:center}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:max-content;max-width:90vw;border-radius:25px;padding:12px 18px;background:#343438;font-size:12px;z-index:20;box-shadow:0 5px 15px #0004}.toast[hidden]{display:none}@media(max-width:600px){header{padding:20px;height:76px}.brand small{display:none}.headerRight{gap:10px}main{min-height:calc(100svh - 76px);padding-top:0;gap:18px}.stage{height:min(500px,calc(100svh - 285px))}.face{padding:25px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}.card{transform:none!important}}
+:root{font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eeeae7;background:#000000;color-scheme:dark}*{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer;color:inherit;border:0}button:focus-visible,select:focus-visible{outline:2px solid #eed7a4;outline-offset:5px}header{height:90px;padding:25px 36px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:20px;font-weight:550;letter-spacing:-.8px}.brand small{color:#77777c;font-size:11px;letter-spacing:.1px;font-weight:400;margin-left:14px}.session{display:flex;gap:9px;align-items:center;font-size:11px;color:#929296}.session i{width:5px;height:5px;border-radius:50%;background:#cbd4a6}main{display:flex;flex-direction:column;align-items:center;gap:22px;padding:14px 22px 30px;min-height:calc(100svh - 90px);justify-content:center}.deckbar{width:min(410px,87vw);display:flex;justify-content:space-between;align-items:center;padding:0 4px}.deckbar select{appearance:none;background:transparent;border:0;color:#bab9bd;font-size:12px;padding:10px 18px 10px 0;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='m1 1 4 4 4-4' fill='none' stroke='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right center}.deckbar option{background:#232325}.counter{font-size:10px;letter-spacing:1px;color:#77777d;font-variant-numeric:tabular-nums}.stage{width:min(410px,87vw);height:min(510px,calc(100svh - 300px));min-height:340px;position:relative;perspective:1200px}.aura{position:absolute;inset:18%;background:var(--glow,#e67948);opacity:.18;filter:blur(80px);pointer-events:none;transition:background .6s}.card{width:100%;height:100%;border-radius:28.98px;overflow:hidden;position:relative;isolation:isolate;box-shadow:0 28px 65px #0005;transition:transform .5s;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));background:#3d4437}.card:after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;box-shadow:inset 0 1px 1px #ffffff90,inset 1px 0 1px #ffffff38,inset -1px -1px 1px #ffffff38;border:1px solid #ffffff17;z-index:4}.gradient-art{position:absolute;inset:0;width:100%;height:100%}.wash{position:absolute;inset:0;background:linear-gradient(#00000015,#00000012 35%,#00000020);pointer-events:none}.face{position:absolute;inset:0;display:flex;flex-direction:column;padding:29px 30px;cursor:pointer;outline:0}.face:focus-visible{box-shadow:inset 0 0 0 3px #fff8;border-radius:28.98px}.topline{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#fff9;letter-spacing:.1px}.language{font-size:20px;color:#fffffff2;letter-spacing:-.6px;font-weight:550}.center{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;min-height:0;position:relative}.dot-word{width:100%;height:auto;max-height:180px;object-fit:contain;filter:drop-shadow(0 2px 8px #0002)}.translation{font-size:clamp(24px,6vw,34px);font-weight:450;text-align:center;letter-spacing:-.8px;line-height:1.15;margin:15px 0;color:#fff}.example{font-size:14px;text-align:center;line-height:1.65;color:#fffc;margin:10px 0 0}.example small{display:block;color:#fff8;font-size:12px}.answer{display:none}.revealed .answer{display:block}.revealed .dot-word{max-height:105px}.cardfoot{display:flex;align-items:center;justify-content:space-between;min-height:34px}.flip-hint{font-size:10px;letter-spacing:.25px;color:#fffa}.icon{width:36px;height:36px;border:0;border-radius:50%;display:grid;place-items:center;background:transparent;color:#aaa9ae;transition:background .2s}.icon:hover{background:#ffffff10;color:white}svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}.sound{color:#fffd;background:#ffffff12;position:absolute;bottom:27px;right:27px;z-index:5}.sound:hover{background:#ffffff24}.sound.speaking{background:#ffffff40}.bottom{width:min(410px,87vw);display:flex;flex-direction:column;gap:20px;align-items:center}.track{height:2px;width:100%;background:#ffffff0b;overflow:hidden;border-radius:2px}.track i{display:block;width:0;height:100%;background:#c4c3b1;transition:width .5s}.actions{height:45px;display:flex;align-items:center;justify-content:center;gap:12px;width:100%}.pill{font-size:12px;border-radius:30px;padding:0 24px;height:43px;background:#eeeae6;color:#252527;transition:transform .15s,background .15s}.pill:hover{background:white;transform:translateY(-1px)}.pill.secondary{color:#cccbd0;background:#ffffff08;min-width:120px}.pill.secondary:hover{background:#ffffff12}.actions[hidden],.pill[hidden],.icon[hidden]{display:none}.hint{font-size:10px;color:#66666d;margin:0;text-align:center;line-height:1.6}.headerRight{display:flex;gap:18px;align-items:center}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);width:max-content;max-width:90vw;border-radius:25px;padding:12px 18px;background:#343438;font-size:12px;z-index:20;box-shadow:0 5px 15px #0004}.toast[hidden]{display:none}@media(max-width:600px){header{padding:20px;height:76px}.brand small{display:none}.headerRight{gap:10px}main{min-height:calc(100svh - 76px);padding-top:0;gap:18px}.stage{height:min(500px,calc(100svh - 285px))}.face{padding:25px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* A three-card stack. The shuffle runs once per answer, never on a timer. */
 body{overflow-x:hidden}header{position:relative;z-index:8}.stage{isolation:isolate;margin-bottom:20px;width:min(410px,calc(100vw - 68px));--stack-step:10px}.deckbar,.bottom{width:min(410px,calc(100vw - 68px))}.card{z-index:3;touch-action:pan-y;backface-visibility:hidden}.stack-back{position:absolute;inset:0;border-radius:28.98px;overflow:hidden;pointer-events:none;border:1px solid #ffffff25;box-shadow:0 12px 30px #0003;background:#494a47}.stack-back canvas{width:100%;height:100%;display:block;filter:none}.back-near{z-index:2;transform:translate(var(--stack-step),var(--stack-step))}.back-far{z-index:1;transform:translate(calc(var(--stack-step)*2),calc(var(--stack-step)*2))}.shuffle-ghost{position:absolute;inset:0;pointer-events:none!important;transition:none!important;will-change:transform;z-index:4}.stage.shuffling #card,.stage.shuffling .back-near{will-change:transform}.stage.shuffling .card{transition:none}.stage.shuffling .face,.stage.shuffling .sound{pointer-events:none}.stage.shuffling .aura{transition:none}.icon,.pill{touch-action:manipulation}.icon{min-width:44px;min-height:44px}.sound{bottom:23px;right:23px}.actions{gap:10px}button:disabled{cursor:default}.actions button:disabled{opacity:.55}.stage[aria-busy=true]{cursor:wait}
@@ -17,6 +17,17 @@ body{overflow-x:hidden}header{position:relative;z-index:8}.stage{isolation:isola
 /* Native pointer events cover touch, mouse and pen. */
 .stage{margin-top:30px;margin-bottom:8px}.back-near{transform:scale(.95) translateY(-20px)}.back-far{transform:scale(.9) translateY(-40px)}.card{cursor:grab;touch-action:pan-y;transition:transform .3s ease-out;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}.card.moving{transition:none!important;cursor:grabbing;will-change:transform}.card.moving .face{cursor:grabbing}.card canvas{pointer-events:none}.swipe-feedback{position:absolute;left:50%;top:50%;width:100px;height:100px;z-index:7;pointer-events:none;transform:translate(-50%,-50%);transition:transform .15s}.swipe-feedback span{position:absolute;inset:0;text-align:center;font-size:90px;font-weight:600;line-height:100px;opacity:0;transition:opacity .12s;text-shadow:0 3px 20px #0005}#noMark{color:#f16b73}#yesMark{color:#77ce9c}.decision{border-radius:50%;width:60px;height:60px;background:#1b1b1e;display:grid;place-items:center;margin:0 8px;flex:none;touch-action:manipulation;transition:transform .15s,background .15s}.decision svg{width:32px;height:32px;stroke-width:2.7;pointer-events:none}.decision.learning{color:#f16b73}.decision.mastered{color:#77ce9c}.decision:hover{background:#27272b}.decision:active{transform:scale(.92)}.decision[hidden]{display:none}.actions{height:64px;gap:0}.actions .decision:disabled{opacity:.55;background:#1b1b1e}.hint{padding-top:2px}@media(max-width:600px){.stage{margin-top:25px;height:min(500px,calc(100svh - 340px));min-height:320px}.bottom{gap:16px}}@media(prefers-reduced-motion:reduce){.card,.swipe-feedback,.swipe-feedback span{transition:none!important}}
 .dot-symbol{fill:currentColor;stroke:none!important}.decision .dot-symbol{width:32px;height:32px}.swipe-feedback .dot-symbol{width:90px;height:90px}
+
+/* Keep the 3D hit surfaces stable in WebKit, including the reverse-side audio button. */
+.card{-webkit-perspective:800px;backface-visibility:visible;-webkit-backface-visibility:visible}
+.face{-webkit-transform-style:preserve-3d;-webkit-transform:rotateY(0deg);will-change:transform}
+.revealed .face{-webkit-transform:rotateY(180deg)}
+.front,.revealed .front{-webkit-transform:rotateY(0deg)}
+.back,.revealed .back{-webkit-transform:rotateY(180deg)}
+.side[aria-hidden="true"]{pointer-events:none}
+.side[aria-hidden="false"]{pointer-events:auto}
+.card.moving{transition:none!important}
+@media(pointer:coarse){.card,.face,.side{touch-action:pan-y pinch-zoom}.decision,.sound{touch-action:manipulation}header{padding-top:max(20px,env(safe-area-inset-top))}main{padding-bottom:max(24px,env(safe-area-inset-bottom))}}
 </style></head><body>
 <header><div class="brand">un peu<span aria-hidden="true">.</span><small>a little French, every day</small></div><div class="headerRight"><span class="session"><i></i><span id="learned">0 familiar</span></span></div></header>
 <main><div class="deckbar"><select id="deck" aria-label="Choose a French deck"><option value="all">A little of everything</option><option value="basics">First words</option><option value="daily">Everyday life</option><option value="out">Out & about</option><option value="work">At work</option></select><span class="counter" id="counter">01 / 60</span></div><div class="stage" id="stage"><div class="aura"></div><div class="swipe-feedback" id="swipeFeedback" aria-hidden="true"><span id="noMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="1.05"/><circle cx="18" cy="6" r="1.05"/><circle cx="8" cy="8" r="1.05"/><circle cx="16" cy="8" r="1.05"/><circle cx="10" cy="10" r="1.05"/><circle cx="14" cy="10" r="1.05"/><circle cx="12" cy="12" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="10" cy="14" r="1.05"/><circle cx="16" cy="16" r="1.05"/><circle cx="8" cy="16" r="1.05"/><circle cx="18" cy="18" r="1.05"/><circle cx="6" cy="18" r="1.05"/></svg></span><span id="yesMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.05"/><circle cx="7" cy="14" r="1.05"/><circle cx="9" cy="16" r="1.05"/><circle cx="11" cy="18" r="1.05"/><circle cx="12.5" cy="16" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="15.5" cy="12" r="1.05"/><circle cx="17" cy="10" r="1.05"/><circle cx="18.5" cy="8" r="1.05"/><circle cx="20" cy="6" r="1.05"/></svg></span></div><div class="stack-back back-far" aria-hidden="true"><canvas id="backFar" width="960" height="1200"></canvas></div><div class="stack-back back-near" aria-hidden="true"><canvas id="backNear" width="960" height="1200"></canvas></div><article class="card" id="card"><div class="face" id="face" role="group" aria-roledescription="flippable card" tabindex="0" aria-label="Reveal English translation"><section class="side front" id="front"><canvas class="gradient-art" id="art" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language" lang="fr">Français</span><span id="type">greeting</span></div><div class="inner"><canvas class="dot-word" id="dots" width="1200" height="570" role="img" lang="fr" aria-label="Bonjour"></canvas></div><div class="cardfoot"><span class="flip-hint" id="flipHint">tap to discover</span></div><button class="icon sound" id="speak" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section><section class="side back" id="answer" aria-hidden="true"><canvas class="gradient-art" id="artBack" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language">English</span><span>meaning &amp; context</span></div><div class="inner"><p class="back-word" id="backWord" lang="fr"></p><div class="translation" id="translation"></div><p class="example"><span id="example" lang="fr"></span><small id="exampleEn"></small></p></div><div class="cardfoot"><span class="flip-hint">tap to return</span></div><button class="icon sound" id="speakBack" tabindex="-1" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section></div></article></div><div class="bottom"><div class="track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" id="progress"><i id="bar"></i></div><div class="actions"><button class="pill" id="reveal">Reveal meaning</button><button class="decision learning" id="again" aria-label="Learning — swipe left" title="Learning"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="1.05"/><circle cx="18" cy="6" r="1.05"/><circle cx="8" cy="8" r="1.05"/><circle cx="16" cy="8" r="1.05"/><circle cx="10" cy="10" r="1.05"/><circle cx="14" cy="10" r="1.05"/><circle cx="12" cy="12" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="10" cy="14" r="1.05"/><circle cx="16" cy="16" r="1.05"/><circle cx="8" cy="16" r="1.05"/><circle cx="18" cy="18" r="1.05"/><circle cx="6" cy="18" r="1.05"/></svg></button><button class="decision mastered" id="got" aria-label="Mastered — swipe right" title="Mastered"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.05"/><circle cx="7" cy="14" r="1.05"/><circle cx="9" cy="16" r="1.05"/><circle cx="11" cy="18" r="1.05"/><circle cx="12.5" cy="16" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="15.5" cy="12" r="1.05"/><circle cx="17" cy="10" r="1.05"/><circle cx="18.5" cy="8" r="1.05"/><circle cx="20" cy="6" r="1.05"/></svg></button><button class="pill" id="restart" hidden>Another little round</button></div><p class="hint" id="hint">Tap to flip · swipe left to learn, right to master</p></div></main><div class="toast" id="toast" role="status" hidden></div>
@@ -147,7 +158,7 @@ async function rate(got,from='translate(0,0) rotate(0deg)'){
    animations.push(ghost.animate([{transform:from,zIndex:4},{transform:`translate(${got?distance:-distance}px,-100px) rotate(${got?-30:30}deg)`,zIndex:4}],{duration:350,easing:'ease-in',fill:'forwards'}));
    animations.push(card.animate([{transform:'scale(.95) translateY(-20px)'},{transform:'scale(1) translateY(0)'}],{duration:350,easing:'ease-out',fill:'both'}));
    animations.push($('backNear').parentElement.animate([{transform:'scale(.9) translateY(-40px)'},{transform:'scale(.95) translateY(-20px)'}],{duration:350,easing:'ease-out',fill:'both'}));
-   await Promise.allSettled(animations.map(a=>a.finished));
+   await Promise.race([Promise.allSettled(animations.map(a=>a.finished)),new Promise(resolve=>setTimeout(resolve,650))]);
   }
   stackPaint();
  }finally{
@@ -165,40 +176,68 @@ document.addEventListener('keydown',e=>{if(/INPUT|SELECT|BUTTON/.test(e.target.t
 
 function feedback(direction,amount){$('noMark').style.opacity=direction<0?amount:0;$('yesMark').style.opacity=direction>0?amount:0;$('swipeFeedback').style.transform='translate(-50%,-50%) scale('+(0.7+amount*.3)+')';}
 function dragTransform(x,y){return 'translate('+x+'px,'+y+'px) rotate('+Math.max(-25,Math.min(25,x*.025+x*y*.000375))+'deg)';}
-function releaseCapture(id){if(card.hasPointerCapture(id))card.releasePointerCapture(id);}
+
+function releaseCapture(id){try{if(typeof id==='number'&&card.hasPointerCapture?.(id))card.releasePointerCapture(id);}catch{}}
 function resetDrag(){card.classList.remove('moving');card.style.transform='';feedback(0,0);}
-card.addEventListener('pointerdown',e=>{
- if(shuffling||flipping||complete||drag||!e.isPrimary||e.button!==0||e.target.closest('button'))return;
- drag={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0,lastX:e.clientX,lastTime:e.timeStamp,vx:0,moved:false};
-});
-card.addEventListener('pointermove',e=>{
- if(!drag||drag.id!==e.pointerId)return;
- const d=drag,x=e.clientX-d.x,y=e.clientY-d.y;
- if(!d.moved){
-  if(Math.abs(y)>12&&Math.abs(y)>Math.abs(x)){drag=null;return;}
-  if(Math.abs(x)<10)return;
-  d.moved=true;card.setPointerCapture(e.pointerId);card.classList.add('moving');
- }
- const dt=e.timeStamp-d.lastTime;
- if(dt>0)d.vx=(e.clientX-d.lastX)/dt;
- d.lastX=e.clientX;d.lastTime=e.timeStamp;d.dx=x;d.dy=y;
- card.style.transform=dragTransform(x,y);
- feedback(Math.sign(x),Math.min(.8,Math.abs(x)/100));
-});
-function endDrag(e,cancelled=false){
- if(!drag||drag.id!==e.pointerId)return;
- const d=drag;drag=null;releaseCapture(d.id);
- if(!d.moved)return;
- suppressClickUntil=Date.now()+400;
- const threshold=Math.min(100,stage.getBoundingClientRect().width*.25);
- const fast=e.timeStamp-d.lastTime<100&&Math.abs(d.vx)>.55&&Math.abs(d.dx)>35;
- if(!cancelled&&(Math.abs(d.dx)>threshold||fast))rate(d.dx>0,dragTransform(d.dx,d.dy));
- else resetDrag();
+function beginGesture(id,x,y,time,target,kind){
+ if(shuffling||flipping||complete||drag||target.closest?.('button'))return false;
+ drag={id,x,y,dx:0,dy:0,lastX:x,lastTime:time,vx:0,moved:false,kind};return true;
 }
-card.addEventListener('pointerup',e=>endDrag(e));
-card.addEventListener('pointercancel',e=>endDrag(e,true));
-card.addEventListener('lostpointercapture',e=>endDrag(e,true));
-window.addEventListener('blur',()=>{if(drag){const id=drag.id;drag=null;releaseCapture(id);resetDrag();}});
+function moveGesture(id,x,y,time){
+ if(!drag||drag.id!==id)return false;
+ const d=drag,dx=x-d.x,dy=y-d.y;
+ if(!d.moved){
+  if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){drag=null;suppressClickUntil=Date.now()+450;return false;}
+  if(Math.abs(dx)<8)return false;
+  d.moved=true;card.classList.add('moving');
+  if(d.kind==='pointer')try{card.setPointerCapture(id);}catch{}
+ }
+ const dt=time-d.lastTime;if(dt>0)d.vx=(x-d.lastX)/dt;
+ d.lastX=x;d.lastTime=time;d.dx=dx;d.dy=dy;
+ card.style.transform=dragTransform(dx,dy);feedback(Math.sign(dx),Math.min(.8,Math.abs(dx)/100));return true;
+}
+function endGesture(id,time,cancelled=false){
+ if(!drag||drag.id!==id)return;
+ const d=drag;drag=null;releaseCapture(id);
+ if(cancelled){suppressClickUntil=Date.now()+450;resetDrag();return;}
+ if(!d.moved){
+  if(d.kind==='touch'){suppressClickUntil=0;reveal();suppressClickUntil=Date.now()+450;}
+  return;
+ }
+ suppressClickUntil=Date.now()+450;
+ const threshold=Math.min(90,stage.getBoundingClientRect().width*.23);
+ const fast=time-d.lastTime<100&&Math.abs(d.vx)>.55&&Math.abs(d.dx)>35;
+ if(Math.abs(d.dx)>threshold||fast)rate(d.dx>0,dragTransform(d.dx,d.dy));else resetDrag();
+}
+// iOS touch input is handled directly; never process its compatibility pointer events twice.
+card.addEventListener('touchstart',e=>{
+ if(e.touches.length!==1){if(drag)endGesture(drag.id,e.timeStamp,true);return;}
+ const t=e.changedTouches[0];beginGesture('touch-'+t.identifier,t.clientX,t.clientY,e.timeStamp,e.target,'touch');
+},{passive:true});
+card.addEventListener('touchmove',e=>{
+ if(!drag||drag.kind!=='touch')return;
+ if(e.touches.length!==1){endGesture(drag.id,e.timeStamp,true);return;}
+ const t=Array.from(e.touches).find(t=>'touch-'+t.identifier===drag.id);
+ if(t&&moveGesture('touch-'+t.identifier,t.clientX,t.clientY,e.timeStamp)&&e.cancelable)e.preventDefault();
+},{passive:false});
+card.addEventListener('touchend',e=>{
+ if(!drag||drag.kind!=='touch')return;
+ const t=Array.from(e.changedTouches).find(t=>'touch-'+t.identifier===drag.id);
+ if(!t)return;
+ if(e.cancelable)e.preventDefault();endGesture('touch-'+t.identifier,e.timeStamp);
+},{passive:false});
+card.addEventListener('touchcancel',e=>{if(drag?.kind==='touch')endGesture(drag.id,e.timeStamp,true);},{passive:true});
+card.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='touch'||e.isPrimary===false||e.button!==0)return;
+ beginGesture(e.pointerId,e.clientX,e.clientY,e.timeStamp,e.target,'pointer');
+});
+window.addEventListener('pointermove',e=>{if(e.pointerType!=='touch')moveGesture(e.pointerId,e.clientX,e.clientY,e.timeStamp);});
+window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch')endGesture(e.pointerId,e.timeStamp);});
+window.addEventListener('pointercancel',e=>{if(e.pointerType!=='touch')endGesture(e.pointerId,e.timeStamp,true);});
+card.addEventListener('lostpointercapture',e=>{if(drag?.kind==='pointer')endGesture(e.pointerId,e.timeStamp,true);});
+function cancelGesture(){if(drag)endGesture(drag.id,performance.now(),true);}
+window.addEventListener('blur',cancelGesture);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelGesture();});
 start(true);
 })();
 </script></body></html>
