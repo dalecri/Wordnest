@@ -7,7 +7,7 @@
 body{overflow-x:hidden}header{position:relative;z-index:8}.stage{isolation:isolate;margin-bottom:20px;width:min(410px,calc(100vw - 68px));--stack-step:10px}.deckbar,.bottom{width:min(410px,calc(100vw - 68px))}.card{z-index:3;touch-action:pan-y;backface-visibility:hidden}.stack-back{position:absolute;inset:0;border-radius:28.98px;overflow:hidden;pointer-events:none;border:1px solid #ffffff25;box-shadow:0 12px 30px #0003;background:#494a47}.stack-back canvas{width:100%;height:100%;display:block;filter:none}.back-near{z-index:2;transform:translate(var(--stack-step),var(--stack-step))}.back-far{z-index:1;transform:translate(calc(var(--stack-step)*2),calc(var(--stack-step)*2))}.shuffle-ghost{position:absolute;inset:0;pointer-events:none!important;transition:none!important;will-change:transform;z-index:4}.stage.shuffling #card,.stage.shuffling .back-near{will-change:transform}.stage.shuffling .card{transition:none}.stage.shuffling .face,.stage.shuffling .sound{pointer-events:none}.stage.shuffling .aura{transition:none}.icon,.pill{touch-action:manipulation}.icon{min-width:44px;min-height:44px}.sound{bottom:23px;right:23px}.actions{gap:10px}button:disabled{cursor:default}.actions button:disabled{opacity:.55}.stage[aria-busy=true]{cursor:wait}
 @media(max-width:600px){.stage{--stack-step:8px;margin-bottom:16px;height:min(500px,calc(100svh - 310px))}.card,.stack-back{border-radius:24.84px}.pill{padding-inline:20px}.pill.secondary{min-width:106px}.stage.shuffling .card{box-shadow:0 15px 30px #0004}}
 @media(max-width:360px){.actions{gap:7px}.pill{padding-inline:12px}.pill.secondary{min-width:88px}.face{padding:22px}.topline{gap:10px}.topline #type{font-size:10px;text-align:right}}
-@media(prefers-reduced-motion:reduce){.shuffle-ghost{display:none}.stage.shuffling .card{transform:none!important}}
+@media(prefers-reduced-motion:reduce){.shuffle-ghost{display:none}}
 
 /* One rotating surface: a simple two-sided card, with no text parallax. */
 .card{--card-radius:28.98px;border-radius:var(--card-radius);overflow:visible;background:transparent;box-shadow:none;isolation:auto;perspective:800px;transform-style:preserve-3d;-webkit-transform-style:preserve-3d}.card:after{display:none}.face{display:block;padding:0!important;border-radius:inherit;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transform:rotateY(0deg);transition:transform .8s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 6px 16px #00000026}.revealed .face{transform:rotateY(180deg)}.side{position:absolute;inset:0;border-radius:var(--card-radius);color:#fff;text-align:center;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:#242426}.side .gradient-art,.side .wash{border-radius:inherit}.side:after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;border:1px solid #ffffff25;box-shadow:inset 0 1px 1px #ffffff90,inset 1px 0 1px #ffffff38}.front,.revealed .front{transform:rotateY(0deg)}.back,.revealed .back{transform:rotateY(180deg)}.side .topline{position:absolute;top:29px;left:30px;right:30px;z-index:2}.side .cardfoot{position:absolute;bottom:29px;left:30px;right:76px;z-index:2}.inner{position:absolute;left:0;top:50%;width:100%;padding:0 28px;transform:translateY(-50%);z-index:2}.back-word{font-size:13px;color:#fffa;line-height:1.4;margin:0 0 12px}.side .translation{margin:0 0 22px}.side .example{margin:0}.side .dot-word,.revealed .side .dot-word{max-height:180px}.card.no-flip .face,.shuffle-ghost .face{transition:none!important}.stack-back[hidden]{display:none}.stage.shuffling .card{box-shadow:none}.face:focus-visible{outline:2px solid #fff9;outline-offset:5px}.side .sound{transform:none;backface-visibility:hidden;-webkit-backface-visibility:hidden}
@@ -77,6 +77,14 @@ main{min-height:100svh;padding:calc(env(safe-area-inset-top,0px) + 60px) 20px ca
 .study-totals b{font-weight:500;color:#d7d7dd;font-variant-numeric:tabular-nums;margin-right:4px}
 .study-totals i{font-style:normal;color:#505056}
 .stage{height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 146px)}
+
+/* Animate one real card and one flip surface; no cloned or competing layers. */
+.face{transition:none!important;-webkit-transition:none!important;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;overflow:visible}
+.stage{perspective:none;-webkit-perspective:none}
+.card{perspective:1000px;-webkit-perspective:1000px;transform-style:flat;-webkit-transform-style:flat}
+.side{-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.front,.revealed .front{transform:rotateY(0deg) translateZ(.1px);-webkit-transform:rotateY(0deg) translateZ(.1px)}
+.back,.revealed .back{transform:rotateY(180deg) translateZ(.1px);-webkit-transform:rotateY(180deg) translateZ(.1px)}
 </style></head><body>
 <button class="filter-toggle" id="filterToggle" aria-controls="filterPanel" aria-expanded="false" aria-label="Show categories"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg></button>
 <main><div class="deckbar" id="filterPanel" hidden><select id="deck" aria-label="Choose a French deck"><option value="all">A little of everything</option><option value="basics">First words</option><option value="daily">Everyday life</option><option value="out">Out & about</option><option value="work">At work</option></select><span id="learned" hidden></span><span class="counter" id="counter">01 / 60</span></div><div class="stage" id="stage"><div class="aura"></div><div class="swipe-feedback" id="swipeFeedback" aria-hidden="true"><span id="noMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="1.05"/><circle cx="18" cy="6" r="1.05"/><circle cx="8" cy="8" r="1.05"/><circle cx="16" cy="8" r="1.05"/><circle cx="10" cy="10" r="1.05"/><circle cx="14" cy="10" r="1.05"/><circle cx="12" cy="12" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="10" cy="14" r="1.05"/><circle cx="16" cy="16" r="1.05"/><circle cx="8" cy="16" r="1.05"/><circle cx="18" cy="18" r="1.05"/><circle cx="6" cy="18" r="1.05"/></svg></span><span id="yesMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.05"/><circle cx="7" cy="14" r="1.05"/><circle cx="9" cy="16" r="1.05"/><circle cx="11" cy="18" r="1.05"/><circle cx="12.5" cy="16" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="15.5" cy="12" r="1.05"/><circle cx="17" cy="10" r="1.05"/><circle cx="18.5" cy="8" r="1.05"/><circle cx="20" cy="6" r="1.05"/></svg></span></div><div class="stack-back back-far" aria-hidden="true"><canvas id="backFar" width="960" height="1200"></canvas></div><div class="stack-back back-near" aria-hidden="true"><canvas id="backNear" width="960" height="1200"></canvas></div><article class="card" id="card"><div class="face" id="face" role="group" aria-roledescription="flippable card" tabindex="0" aria-label="Reveal English translation"><section class="side front" id="front"><canvas class="gradient-art" id="art" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language" lang="fr">Français</span><span id="type">greeting</span></div><div class="inner"><canvas class="dot-word" id="dots" width="1200" height="570" role="img" lang="fr" aria-label="Bonjour"></canvas></div><div class="cardfoot"><span class="flip-hint" id="flipHint">tap to discover</span></div><button class="icon sound" id="speak" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section><section class="side back" id="answer" aria-hidden="true"><canvas class="gradient-art" id="artBack" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language">English</span><span>meaning &amp; context</span></div><div class="inner"><p class="back-word" id="backWord" lang="fr"></p><div class="translation" id="translation"></div><p class="example"><span id="example" lang="fr"></span><small id="exampleEn"></small></p></div><div class="cardfoot"><span class="flip-hint">tap to return</span></div><button class="icon sound" id="speakBack" tabindex="-1" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section></div></article></div><div class="bottom"><p class="study-totals" id="studyTotals" role="status" aria-live="polite"><span><b id="learningCount">0</b> Learning</span><i aria-hidden="true">·</i><span><b id="masteredCount">0</b> Mastered</span></p><div class="track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" id="progress"><i id="bar"></i></div><div class="actions"><button class="pill" id="restart" hidden>Another little round</button></div><p class="hint" id="hint">Tap to flip · swipe left to learn, right to master</p></div></main><div class="toast" id="toast" role="status" hidden></div>
@@ -172,7 +180,7 @@ function drawArtwork(target,item){const c=target.getContext('2d');c.clearRect(0,
 function gradient(){if(!queue[0])return;ensureLooks();const item=queue[0];atmosphere=looks.get(item.id);stage.style.setProperty('--glow',atmosphere.p[2]);drawArtwork(canvas,item);drawArtwork($('artBack'),item);}
 function setFlip(value,instant=false){
  if(instant)card.classList.add('no-flip');
- card.classList.toggle('revealed',value);
+ card.classList.toggle('revealed',value);setTransform($('face'),'rotateY('+(value?180:0)+'deg)');
  $('front').setAttribute('aria-hidden',String(value));$('answer').setAttribute('aria-hidden',String(!value));$('speak').tabIndex=value?-1:0;$('speakBack').tabIndex=value?0:-1;
  if(instant){void card.offsetWidth;card.classList.remove('no-flip');}
 }
@@ -183,35 +191,50 @@ const audioButtons=[$('speak'),$('speakBack')];
 function speaking(active){audioButtons.forEach(b=>b.classList.toggle('speaking',active));}
 function stopAudio(){if('speechSynthesis'in window)speechSynthesis.cancel();speaking(false);}
 function show(first=false){stopAudio();complete=false;revealed=false;setFlip(false,true);const item=queue[0];$('backWord').textContent=item.fr;dotted(item.fr);$('type').textContent=item.type;$('translation').textContent=item.en;$('example').textContent=item.ex;$('exampleEn').textContent=item.exEn;$('flipHint').textContent='tap to discover';$('face').setAttribute('aria-label',item.fr+'. Reveal English translation');$('face').setAttribute('aria-expanded','false');$('face').setAttribute('aria-controls','answer');$('restart').hidden=true;audioButtons.forEach(b=>b.hidden=false);$('hint').textContent='Tap to flip · swipe left to learn, right to master';progress();gradient(first);}
-function reveal(){if(complete||shuffling||flipping||drag||Date.now()<suppressClickUntil)return;revealed=!revealed;setFlip(revealed);flipping=!window.matchMedia('(prefers-reduced-motion: reduce)').matches;for(const id of ['deck'])$(id).disabled=flipping;clearTimeout(flipTimer);if(flipping)flipTimer=setTimeout(()=>{flipping=false;for(const id of ['deck'])$(id).disabled=false;},800);$('face').setAttribute('aria-expanded',String(revealed));$('face').setAttribute('aria-label',queue[0].fr+(revealed?'. '+queue[0].en+'. Hide translation':'. Reveal English translation'));$('flipHint').textContent=revealed?'a little more, every day':'tap to discover';$('hint').textContent=revealed?'← Learning · Mastered →':'Tap to flip · swipe left to learn, right to master';}
+
+function setTransform(el,value){el.style.transform=value;el.style.webkitTransform=value;}
+function animateFrames(duration,draw){
+ return new Promise(resolve=>{
+  let began=null;
+  const frame=time=>{if(began===null)began=time;const p=Math.min(1,(time-began)/duration);draw(p);if(p<1)requestAnimationFrame(frame);else resolve();};
+  requestAnimationFrame(frame);
+ });
+}
+async function reveal(){
+ if(complete||shuffling||flipping||drag||Date.now()<suppressClickUntil)return;
+ flipping=true;$('deck').disabled=true;
+ const next=!revealed,from=revealed?180:0,to=next?180:0;
+ try{
+  await animateFrames(650,p=>{const ease=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;setTransform($('face'),'rotateY('+(from+(to-from)*ease)+'deg)');});
+  revealed=next;setFlip(revealed,true);
+  $('face').setAttribute('aria-expanded',String(revealed));
+  $('face').setAttribute('aria-label',queue[0].fr+(revealed?'. '+queue[0].en+'. Hide translation':'. Reveal English translation'));
+  $('flipHint').textContent=revealed?'a little more, every day':'tap to discover';
+ }finally{flipping=false;$('deck').disabled=false;}
+}
 function finish(){stopAudio();complete=true;revealed=false;setFlip(true,true);$('backWord').textContent='Très bien !';dotted('Très bien !');$('type').textContent='round complete';$('translation').textContent='A little progress.';$('example').textContent='Petit à petit.';$('exampleEn').textContent='Little by little.';$('flipHint').textContent=total+' cards practised';$('face').setAttribute('aria-label','Round complete. '+total+' cards practised.');$('face').setAttribute('aria-expanded','true');for(const id of ['speak','speakBack'])$(id).hidden=true;$('restart').hidden=false;$('hint').textContent='Come back for another little round whenever you like.';progress();$('counter').textContent=total+' / '+total;$('restart').focus();}
 function stackPaint(){ensureLooks();['backNear','backFar'].forEach((id,i)=>{const c=$(id),item=queue[i+1];c.parentElement.hidden=!item||complete;if(item&&!complete)drawArtwork(c,item);});}
 function lockShuffle(locked){shuffling=locked;stage.classList.toggle('shuffling',locked);stage.setAttribute('aria-busy',String(locked));for(const id of ['restart','deck','speak','speakBack'])$(id).disabled=locked;}
-function snapshot(){const ghost=card.cloneNode(true);ghost.removeAttribute('id');ghost.classList.add('shuffle-ghost');ghost.setAttribute('aria-hidden','true');ghost.setAttribute('inert','');ghost.style.setProperty('--rx','0deg');ghost.style.setProperty('--ry','0deg');ghost.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));ghost.querySelectorAll('[tabindex]').forEach(el=>el.removeAttribute('tabindex'));const originals=card.querySelectorAll('canvas');ghost.querySelectorAll('canvas').forEach((c,i)=>c.getContext('2d').drawImage(originals[i],0,0));stage.appendChild(ghost);return ghost;}
+
 async function rate(got,from='translate(0,0) rotate(0deg)'){
  if(complete||shuffling||flipping||drag)return;
- lockShuffle(true);stopAudio();
- const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const animate=!reduced&&typeof card.animate==='function';
- let ghost=null,animations=[];
+ lockShuffle(true);stopAudio();card.classList.add('moving');
+ const numbers=from.match(/-?\d+(?:\.\d+)?/g)||[0,0,0];
+ const x=Number(numbers[0]),y=Number(numbers[1]),angle=Number(numbers[2]);
+ const distance=Math.max(window.innerWidth,stage.getBoundingClientRect().width)*1.5;
+ const endX=got?distance:-distance,endAngle=got?25:-25;
  try{
-  if(animate)ghost=snapshot();
+  feedback(got?1:-1,1);
+  // Move the real card off screen before replacing any of its artwork.
+  await animateFrames(320,p=>{const t=p*p;setTransform(card,'translate3d('+(x+(endX-x)*t)+'px,'+(y+(-90-y)*t)+'px,0) rotate('+(angle+(endAngle-angle)*t)+'deg)');});
   const item=queue.shift();
-  if(got){known.add(item.id);learning.delete(item.id);done++;}else{known.delete(item.id);learning.add(item.id);queue.splice(Math.min(3,queue.length),0,item);}
-  card.style.transform='';card.classList.remove('moving');
-  persist();queue.length?show():finish();stackPaint();
-  card.style.setProperty('--rx','0deg');card.style.setProperty('--ry','0deg');
-  if(animate){
-   const distance=Math.max(window.innerWidth,stage.getBoundingClientRect().width)*1.5;
-   feedback(got?1:-1,1);
-   animations.push(ghost.animate([{transform:from,zIndex:4},{transform:`translate(${got?distance:-distance}px,-100px) rotate(${got?-30:30}deg)`,zIndex:4}],{duration:350,easing:'ease-in',fill:'forwards'}));
-   animations.push(card.animate([{transform:'scale(.95) translateY(-20px)'},{transform:'scale(1) translateY(0)'}],{duration:350,easing:'ease-out',fill:'both'}));
-   animations.push($('backNear').parentElement.animate([{transform:'scale(.9) translateY(-40px)'},{transform:'scale(.95) translateY(-20px)'}],{duration:350,easing:'ease-out',fill:'both'}));
-   await Promise.race([Promise.allSettled(animations.map(a=>a.finished)),new Promise(resolve=>setTimeout(resolve,650))]);
-  }
-  stackPaint();
+  if(got){known.add(item.id);learning.delete(item.id);done++;}
+  else{known.delete(item.id);learning.add(item.id);queue.splice(Math.min(3,queue.length),0,item);}
+  persist();queue.length?show():finish();stackPaint();feedback(0,0);
+  setTransform(card,'translate3d(0,-19px,0) scale(.95)');
+  await animateFrames(200,p=>{const t=1-Math.pow(1-p,3);setTransform(card,'translate3d(0,'+(-19*(1-t))+'px,0) scale('+(.95+.05*t)+')');});
  }finally{
-  animations.forEach(a=>a.cancel());if(ghost)ghost.remove();feedback(0,0);lockShuffle(false);
+  setTransform(card,'translate3d(0,0,0)');card.classList.remove('moving');feedback(0,0);lockShuffle(false);
   (complete?$('restart'):$('face')).focus({preventScroll:true});
  }
  if(!got)toast('We’ll try that one again in a moment.');
@@ -231,7 +254,7 @@ function feedback(direction,amount){$('noMark').style.opacity=direction<0?amount
 function dragTransform(x,y){return 'translate('+x+'px,'+y+'px) rotate('+Math.max(-25,Math.min(25,x*.025+x*y*.000375))+'deg)';}
 
 function releaseCapture(id){try{if(typeof id==='number'&&card.hasPointerCapture?.(id))card.releasePointerCapture(id);}catch{}}
-function resetDrag(){card.classList.remove('moving');card.style.transform='';feedback(0,0);}
+function resetDrag(){card.classList.remove('moving');setTransform(card,'translate3d(0,0,0)');feedback(0,0);}
 function beginGesture(id,x,y,time,target,kind){
  if(shuffling||flipping||complete||drag||target.closest?.('button'))return false;
  drag={id,x,y,dx:0,dy:0,lastX:x,lastTime:time,vx:0,moved:false,kind};return true;
@@ -247,7 +270,7 @@ function moveGesture(id,x,y,time){
  }
  const dt=time-d.lastTime;if(dt>0)d.vx=(x-d.lastX)/dt;
  d.lastX=x;d.lastTime=time;d.dx=dx;d.dy=dy;
- card.style.transform=dragTransform(dx,dy);feedback(Math.sign(dx),Math.min(.8,Math.abs(dx)/100));return true;
+ setTransform(card,dragTransform(dx,dy));feedback(Math.sign(dx),Math.min(.8,Math.abs(dx)/100));return true;
 }
 function endGesture(id,time,cancelled=false){
  if(!drag||drag.id!==id)return;
