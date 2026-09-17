@@ -85,9 +85,14 @@ main{min-height:100svh;padding:calc(env(safe-area-inset-top,0px) + 60px) 20px ca
 .side{-webkit-backface-visibility:hidden;backface-visibility:hidden}
 .front,.revealed .front{transform:rotateY(0deg) translateZ(.1px);-webkit-transform:rotateY(0deg) translateZ(.1px)}
 .back,.revealed .back{transform:rotateY(180deg) translateZ(.1px);-webkit-transform:rotateY(180deg) translateZ(.1px)}
+
+.study-totals{gap:9px;font-size:10px}.study-totals #sessionCount{color:#c2c2c9;font-variant-numeric:tabular-nums}
+.bottom{position:relative;padding-bottom:28px}.undo-swipe{position:absolute;top:40px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:transparent;color:#929299;font-size:11px;min-height:32px;padding:3px 12px;touch-action:manipulation}
+.undo-swipe[hidden]{display:none}.undo-swipe svg{width:16px;height:16px}
+.stage{height:calc(100svh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 174px)}
 </style></head><body>
 <button class="filter-toggle" id="filterToggle" aria-controls="filterPanel" aria-expanded="false" aria-label="Show categories"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg></button>
-<main><div class="deckbar" id="filterPanel" hidden><select id="deck" aria-label="Choose a French deck"><option value="all">A little of everything</option><option value="basics">First words</option><option value="daily">Everyday life</option><option value="out">Out & about</option><option value="work">At work</option></select><span id="learned" hidden></span><span class="counter" id="counter">01 / 60</span></div><div class="stage" id="stage"><div class="aura"></div><div class="swipe-feedback" id="swipeFeedback" aria-hidden="true"><span id="noMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="1.05"/><circle cx="18" cy="6" r="1.05"/><circle cx="8" cy="8" r="1.05"/><circle cx="16" cy="8" r="1.05"/><circle cx="10" cy="10" r="1.05"/><circle cx="14" cy="10" r="1.05"/><circle cx="12" cy="12" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="10" cy="14" r="1.05"/><circle cx="16" cy="16" r="1.05"/><circle cx="8" cy="16" r="1.05"/><circle cx="18" cy="18" r="1.05"/><circle cx="6" cy="18" r="1.05"/></svg></span><span id="yesMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.05"/><circle cx="7" cy="14" r="1.05"/><circle cx="9" cy="16" r="1.05"/><circle cx="11" cy="18" r="1.05"/><circle cx="12.5" cy="16" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="15.5" cy="12" r="1.05"/><circle cx="17" cy="10" r="1.05"/><circle cx="18.5" cy="8" r="1.05"/><circle cx="20" cy="6" r="1.05"/></svg></span></div><div class="stack-back back-far" aria-hidden="true"><canvas id="backFar" width="960" height="1200"></canvas></div><div class="stack-back back-near" aria-hidden="true"><canvas id="backNear" width="960" height="1200"></canvas></div><article class="card" id="card"><div class="face" id="face" role="group" aria-roledescription="flippable card" tabindex="0" aria-label="Reveal English translation"><section class="side front" id="front"><canvas class="gradient-art" id="art" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language" lang="fr">Français</span><span id="type">greeting</span></div><div class="inner"><canvas class="dot-word" id="dots" width="1200" height="570" role="img" lang="fr" aria-label="Bonjour"></canvas></div><div class="cardfoot"><span class="flip-hint" id="flipHint">tap to discover</span></div><button class="icon sound" id="speak" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section><section class="side back" id="answer" aria-hidden="true"><canvas class="gradient-art" id="artBack" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language">English</span><span>meaning &amp; context</span></div><div class="inner"><p class="back-word" id="backWord" lang="fr"></p><div class="translation" id="translation"></div><p class="example"><span id="example" lang="fr"></span><small id="exampleEn"></small></p></div><div class="cardfoot"><span class="flip-hint">tap to return</span></div><button class="icon sound" id="speakBack" tabindex="-1" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section></div></article></div><div class="bottom"><p class="study-totals" id="studyTotals" role="status" aria-live="polite"><span><b id="learningCount">0</b> Learning</span><i aria-hidden="true">·</i><span><b id="masteredCount">0</b> Mastered</span></p><div class="track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" id="progress"><i id="bar"></i></div><div class="actions"><button class="pill" id="restart" hidden>Another little round</button></div><p class="hint" id="hint">Tap to flip · swipe left to learn, right to master</p></div></main><div class="toast" id="toast" role="status" hidden></div>
+<main><div class="deckbar" id="filterPanel" hidden><select id="deck" aria-label="Choose a French deck"><option value="all">A little of everything</option><option value="basics">First words</option><option value="daily">Everyday life</option><option value="out">Out & about</option><option value="work">At work</option></select><span id="learned" hidden></span><span class="counter" id="counter">01 / 60</span></div><div class="stage" id="stage"><div class="aura"></div><div class="swipe-feedback" id="swipeFeedback" aria-hidden="true"><span id="noMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="1.05"/><circle cx="18" cy="6" r="1.05"/><circle cx="8" cy="8" r="1.05"/><circle cx="16" cy="8" r="1.05"/><circle cx="10" cy="10" r="1.05"/><circle cx="14" cy="10" r="1.05"/><circle cx="12" cy="12" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="10" cy="14" r="1.05"/><circle cx="16" cy="16" r="1.05"/><circle cx="8" cy="16" r="1.05"/><circle cx="18" cy="18" r="1.05"/><circle cx="6" cy="18" r="1.05"/></svg></span><span id="yesMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.05"/><circle cx="7" cy="14" r="1.05"/><circle cx="9" cy="16" r="1.05"/><circle cx="11" cy="18" r="1.05"/><circle cx="12.5" cy="16" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="15.5" cy="12" r="1.05"/><circle cx="17" cy="10" r="1.05"/><circle cx="18.5" cy="8" r="1.05"/><circle cx="20" cy="6" r="1.05"/></svg></span></div><div class="stack-back back-far" aria-hidden="true"><canvas id="backFar" width="960" height="1200"></canvas></div><div class="stack-back back-near" aria-hidden="true"><canvas id="backNear" width="960" height="1200"></canvas></div><article class="card" id="card"><div class="face" id="face" role="group" aria-roledescription="flippable card" tabindex="0" aria-label="Reveal English translation"><section class="side front" id="front"><canvas class="gradient-art" id="art" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language" id="frontLanguage" lang="fr">Français</span><span id="type">greeting</span></div><div class="inner"><canvas class="dot-word" id="dots" width="1200" height="570" role="img" lang="fr" aria-label="Bonjour"></canvas></div><div class="cardfoot"><span class="flip-hint" id="flipHint">tap to discover</span></div><button class="icon sound" id="speak" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section><section class="side back" id="answer" aria-hidden="true"><canvas class="gradient-art" id="artBack" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language" id="backLanguage">English</span><span id="backCaption">meaning &amp; context</span></div><div class="inner"><p class="back-word" id="backWord" lang="fr"></p><div class="translation" id="translation"></div><p class="example"><span id="example" lang="fr"></span><small id="exampleEn"></small></p></div><div class="cardfoot"><span class="flip-hint">tap to return</span></div><button class="icon sound" id="speakBack" tabindex="-1" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section></div></article></div><div class="bottom"><p class="study-totals" id="studyTotals" role="status" aria-live="polite"><span id="sessionCount" aria-label="Session progress">0 / 12</span><i aria-hidden="true">·</i><span><b id="learningCount">0</b> Learning</span><i aria-hidden="true">·</i><span><b id="masteredCount">0</b> Mastered</span></p><button id="undoSwipe" class="undo-swipe" hidden aria-label="Undo last swipe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"/></svg><span>Undo</span></button><div class="track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" id="progress"><i id="bar"></i></div><div class="actions"><button class="pill" id="restart" hidden>Another little round</button></div><p class="hint" id="hint">Tap to flip · swipe left to learn, right to master</p></div></main><div class="toast" id="toast" role="status" hidden></div>
 <script>
 (async()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('art'),ctx=canvas.getContext('2d'),stage=$('stage'),card=$('card');
@@ -188,10 +193,42 @@ try{
 finally{clearTimeout(loadTimer);}
 $('deck').replaceChildren(...[{id:'all',label:'A little of everything'},...categories].map(c=>{const option=document.createElement('option');option.value=c.id;option.textContent=c.label;return option;}));
 let shuffling=false,flipping=false,flipTimer,drag=null,suppressClickUntil=0;
-let saved={known:[],learning:[],deck:'all'},queue=[],total=0,done=0,revealed=false,complete=false,atmosphere,toastTimer,voices=[];
-try{const s=JSON.parse(localStorage.getItem('un-peu-v1'));if(s&&Array.isArray(s.known)){saved.known=s.known.filter(id=>typeof id==='string');if(Array.isArray(s.learning))saved.learning=s.learning.filter(id=>typeof id==='string'&&!saved.known.includes(id));if(['all',...categories.map(c=>c.id)].includes(s.deck))saved.deck=s.deck;}}catch{}
+let saved={known:[],learning:[],deck:'all',reviews:{},sessions:{}},queue=[],total=0,done=0,revealed=false,complete=false,atmosphere,toastTimer,voices=[];
+try{const s=JSON.parse(localStorage.getItem('un-peu-v1'));if(s&&Array.isArray(s.known)){saved.known=s.known.filter(id=>typeof id==='string');if(Array.isArray(s.learning))saved.learning=s.learning.filter(id=>typeof id==='string'&&!saved.known.includes(id));if(['all',...categories.map(c=>c.id)].includes(s.deck))saved.deck=s.deck;
+if(s.reviews&&typeof s.reviews==='object')for(const [id,r] of Object.entries(s.reviews))if(r&&Number.isFinite(r.due)&&Number.isInteger(r.streak)&&r.streak>=0)saved.reviews[id]={due:r.due,streak:r.streak,last:r.last||0};
+if(s.sessions&&typeof s.sessions==='object')saved.sessions=s.sessions;}}catch{}
 const known=new Set(saved.known),learning=new Set(saved.learning);$('deck').value=saved.deck;
-function persist(){try{localStorage.setItem('un-peu-v1',JSON.stringify({known:[...known],learning:[...learning],deck:$('deck').value,accent:'fr-CA'}));}catch{}}
+
+const reviews=saved.reviews,sessions=saved.sessions;
+const DAY=86400000,SESSION_SIZE=12,intervals=[3,7,14,30,60,120,180];
+let reverseIds=new Set(),sessionDay='',sessionActive=false,lastSwipe=null,undoTimer;
+function localDay(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+for(const id of [...known,...learning])if(!reviews[id])reviews[id]={due:Date.now(),streak:known.has(id)?1:0,last:0};
+function dueInDays(days){const d=new Date();d.setDate(d.getDate()+days);d.setHours(0,0,0,0);return d.getTime();}
+function isReverse(){return !!queue[0]&&reverseIds.has(queue[0].id);}
+function persist(){
+ if(sessionActive)sessions[$('deck').value]={day:sessionDay,queue:queue.map(c=>c.id),reverse:[...reverseIds],done,total};
+ try{localStorage.setItem('un-peu-v1',JSON.stringify({known:[...known],learning:[...learning],deck:$('deck').value,accent:'fr-CA',reviews,sessions}));}catch{}
+}
+function clearUndo(){lastSwipe=null;clearTimeout(undoTimer);$('undoSwipe').hidden=true;}
+function allowUndo(snapshot){clearUndo();lastSwipe=snapshot;$('undoSwipe').hidden=false;undoTimer=setTimeout(clearUndo,8000);}
+function undoSwipe(){
+ if(!lastSwipe||shuffling||flipping||drag)return;
+ const previous=lastSwipe;clearUndo();stopAudio();
+ queue=previous.queue;done=previous.done;total=previous.total;
+ if(previous.review)reviews[previous.id]=previous.review;else delete reviews[previous.id];
+ previous.known?known.add(previous.id):known.delete(previous.id);
+ previous.learning?learning.add(previous.id):learning.delete(previous.id);
+ complete=false;show();revealed=previous.revealed;setFlip(revealed,true);updateFaceAccess();stackPaint();persist();
+ $('face').focus({preventScroll:true});
+}
+function updateFaceAccess(){
+ const item=queue[0];if(!item)return;
+ const prompt=isReverse()?item.en:item.fr,answer=isReverse()?item.fr:item.en;
+ $('face').setAttribute('aria-expanded',String(revealed));
+ $('face').setAttribute('aria-label',prompt+(revealed?'. '+answer+'. Tap to return':'. Tap to reveal'));
+ $('speak').hidden=isReverse();$('speakBack').hidden=false;
+}
 function toast(t){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 const looks=new Map(),rendered=new Map();
@@ -208,12 +245,23 @@ function setFlip(value,instant=false){
 }
 // Draw real letterforms as a dot matrix; accents are preserved, with no font download.
 function dotted(text){const out=$('dots'),c=out.getContext('2d'),mask=document.createElement('canvas');mask.width=1200;mask.height=570;const m=mask.getContext('2d');const words=text.split(' ');let size=170,lines=[];while(size>=64){m.font=`500 ${size}px Arial, sans-serif`;lines=[''];for(const word of words){const last=lines.length-1,test=lines[last]?lines[last]+' '+word:word;if(m.measureText(test).width>1100&&lines[last])lines.push(word);else lines[last]=test;}if(lines.length*size*1.27<=490&&lines.every(l=>m.measureText(l).width<=1100))break;size-=4;}m.fillStyle='white';m.textAlign='center';m.textBaseline='middle';lines.forEach((line,i)=>m.fillText(line,600,285+(i-(lines.length-1)/2)*size*1.27));const pixels=m.getImageData(0,0,1200,570).data;c.clearRect(0,0,1200,570);c.fillStyle='#fffef4';const step=8;for(let y=4;y<570;y+=step)for(let x=4;x<1200;x+=step){if(pixels[(y*1200+x)*4+3]>75){c.beginPath();c.arc(x,y,2.6,0,Math.PI*2);c.fill();}}out.setAttribute('aria-label',text);}
-function progress(){$('learningCount').textContent=learning.size;$('masteredCount').textContent=known.size;$('learned').textContent=known.size+' familiar';$('counter').textContent=String(Math.min(done+1,total)).padStart(2,'0')+' / '+total;$('bar').style.width=done/total*100+'%';$('progress').setAttribute('aria-valuemax',total);$('progress').setAttribute('aria-valuenow',done);}
+function progress(){$('sessionCount').textContent=done+' / '+total;$('learningCount').textContent=learning.size;$('masteredCount').textContent=known.size;$('learned').textContent=known.size+' familiar';$('counter').textContent=String(Math.min(done+1,total)).padStart(2,'0')+' / '+total;$('bar').style.width=(total?done/total:0)*100+'%';$('progress').setAttribute('aria-valuemax',total);$('progress').setAttribute('aria-valuenow',done);}
 const audioButtons=[$('speak'),$('speakBack')];
 function speaking(active){audioButtons.forEach(b=>b.classList.toggle('speaking',active));}
 function stopAudio(){if('speechSynthesis'in window)speechSynthesis.cancel();speaking(false);}
-function show(first=false){stopAudio();complete=false;revealed=false;setFlip(false,true);const item=queue[0];$('backWord').textContent=item.fr;dotted(item.fr);$('type').textContent=item.type;$('translation').textContent=item.en;$('example').textContent=item.ex;$('exampleEn').textContent=item.exEn;$('example').parentElement.hidden=!item.ex;$('flipHint').textContent='tap to discover';$('face').setAttribute('aria-label',item.fr+'. Reveal English translation');$('face').setAttribute('aria-expanded','false');$('face').setAttribute('aria-controls','answer');$('restart').hidden=true;audioButtons.forEach(b=>b.hidden=false);$('hint').textContent='Tap to flip · swipe left to learn, right to master';progress();gradient(first);}
 
+function show(){
+ stopAudio();complete=false;revealed=false;setFlip(false,true);
+ const item=queue[0],reverse=isReverse();
+ $('frontLanguage').textContent=reverse?'English':'Français';$('frontLanguage').lang=reverse?'en':'fr';
+ $('backLanguage').textContent=reverse?'Français':'English';$('backLanguage').lang=reverse?'fr':'en';$('backCaption').textContent='meaning & context';
+ $('backWord').textContent=reverse?item.en:item.fr;$('backWord').lang=reverse?'en':'fr';
+ dotted(reverse?item.en:item.fr);$('dots').lang=reverse?'en':'fr';$('type').textContent=reverse?'recall the French':item.type;
+ $('translation').textContent=reverse?item.fr:item.en;$('translation').lang=reverse?'fr':'en';
+ $('example').lang='fr';$('example').textContent=item.ex;$('exampleEn').textContent=item.exEn;$('example').parentElement.hidden=!item.ex;
+ $('flipHint').textContent='tap to discover';$('face').setAttribute('aria-controls','answer');$('restart').hidden=true;
+ updateFaceAccess();progress();gradient();
+}
 function setTransform(el,value){el.style.transform=value;el.style.webkitTransform=value;}
 function animateFrames(duration,draw){
  return new Promise(resolve=>{
@@ -229,18 +277,27 @@ async function reveal(){
  try{
   await animateFrames(650,p=>{const ease=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;setTransform($('face'),'rotateY('+(from+(to-from)*ease)+'deg)');});
   revealed=next;setFlip(revealed,true);
-  $('face').setAttribute('aria-expanded',String(revealed));
-  $('face').setAttribute('aria-label',queue[0].fr+(revealed?'. '+queue[0].en+'. Hide translation':'. Reveal English translation'));
+  updateFaceAccess();
   $('flipHint').textContent=revealed?'a little more, every day':'tap to discover';
  }finally{flipping=false;$('deck').disabled=false;}
 }
-function finish(){stopAudio();complete=true;revealed=false;setFlip(true,true);$('backWord').textContent='Très bien !';dotted('Très bien !');$('type').textContent='round complete';$('translation').textContent='A little progress.';$('example').parentElement.hidden=false;$('example').textContent='Petit à petit.';$('exampleEn').textContent='Little by little.';$('flipHint').textContent=total+' cards practised';$('face').setAttribute('aria-label','Round complete. '+total+' cards practised.');$('face').setAttribute('aria-expanded','true');for(const id of ['speak','speakBack'])$(id).hidden=true;$('restart').hidden=false;$('hint').textContent='Come back for another little round whenever you like.';progress();$('counter').textContent=total+' / '+total;$('restart').focus();}
+
+function finish(){
+ stopAudio();complete=true;revealed=false;setFlip(true,true);
+ $('backLanguage').textContent='À demain';$('backCaption').textContent='';$('backWord').textContent='Petit à petit.';$('backWord').lang='fr';
+ $('translation').textContent='Done for today.';$('translation').lang='en';
+ $('example').parentElement.hidden=false;$('example').textContent=total?done+' cards practised.':'Nothing due right now.';$('example').lang='en';
+ $('exampleEn').textContent='Your next reviews are scheduled.';$('face').setAttribute('aria-label','Done for today. '+done+' cards practised.');$('face').setAttribute('aria-expanded','true');
+ audioButtons.forEach(b=>b.hidden=true);$('restart').hidden=true;progress();
+ if(!atmosphere){const look=makeLook();paint(canvas,look);$('artBack').getContext('2d').drawImage(canvas,0,0);}
+}
 function stackPaint(){ensureLooks();['backNear','backFar'].forEach((id,i)=>{const c=$(id),item=queue[i+1];c.parentElement.hidden=!item||complete;if(item&&!complete)drawArtwork(c,item);});}
 function lockShuffle(locked){shuffling=locked;stage.classList.toggle('shuffling',locked);stage.setAttribute('aria-busy',String(locked));for(const id of ['restart','deck','speak','speakBack'])$(id).disabled=locked;}
 
 async function rate(got,from='translate(0,0) rotate(0deg)'){
  if(complete||shuffling||flipping||drag)return;
- lockShuffle(true);stopAudio();card.classList.add('moving');
+ clearUndo();lockShuffle(true);stopAudio();card.classList.add('moving');
+ const current=queue[0],previous={id:current.id,queue:queue.slice(),done,total,review:reviews[current.id]?{...reviews[current.id]}:null,known:known.has(current.id),learning:learning.has(current.id),revealed};
  const numbers=from.match(/-?\d+(?:\.\d+)?/g)||[0,0,0];
  const x=Number(numbers[0]),y=Number(numbers[1]),angle=Number(numbers[2]);
  const distance=Math.max(window.innerWidth,stage.getBoundingClientRect().width)*1.5;
@@ -250,18 +307,34 @@ async function rate(got,from='translate(0,0) rotate(0deg)'){
   // Move the real card off screen before replacing any of its artwork.
   await animateFrames(320,p=>{const t=p*p;setTransform(card,'translate3d('+(x+(endX-x)*t)+'px,'+(y+(-90-y)*t)+'px,0) rotate('+(angle+(endAngle-angle)*t)+'deg)');});
   const item=queue.shift();
-  if(got){known.add(item.id);learning.delete(item.id);done++;}
-  else{known.delete(item.id);learning.add(item.id);queue.splice(Math.min(3,queue.length),0,item);}
+  const prior=reviews[item.id]||{streak:0},now=Date.now();
+  if(got){const streak=prior.streak+1;reviews[item.id]={streak,due:dueInDays(intervals[Math.min(streak-1,intervals.length-1)]),last:now};known.add(item.id);learning.delete(item.id);}
+  else{reviews[item.id]={streak:0,due:dueInDays(1),last:now};known.delete(item.id);learning.add(item.id);}
+  done++;
   persist();queue.length?show():finish();stackPaint();feedback(0,0);
   setTransform(card,'translate3d(0,-19px,0) scale(.95)');
   await animateFrames(200,p=>{const t=1-Math.pow(1-p,3);setTransform(card,'translate3d(0,'+(-19*(1-t))+'px,0) scale('+(.95+.05*t)+')');});
  }finally{
   setTransform(card,'translate3d(0,0,0)');card.classList.remove('moving');feedback(0,0);lockShuffle(false);
-  (complete?$('restart'):$('face')).focus({preventScroll:true});
+  $('face').focus({preventScroll:true});
  }
- if(!got)toast('We’ll try that one again in a moment.');
+ allowUndo(previous);
 }
-function start(first=false){if(shuffling||flipping)return;const deck=$('deck').value;queue=cards.filter(c=>deck==='all'||c.deck===deck);queue=shuffle(queue);queue.sort((a,b)=>Number(known.has(a.id))-Number(known.has(b.id)));if(first&&!known.size){const i=queue.findIndex(c=>c.fr==='Bonjour');if(i>=0)queue.unshift(...queue.splice(i,1));}total=queue.length;done=0;persist();show(first);stackPaint();}
+
+function start(){
+ if(shuffling||flipping||drag)return;clearUndo();sessionDay=localDay();
+ const deck=$('deck').value,pool=cards.filter(c=>deck==='all'||c.deck===deck),byId=new Map(pool.map(c=>[c.id,c])),prior=sessions[deck];
+ const valid=prior&&prior.day===sessionDay&&Array.isArray(prior.queue)&&Array.isArray(prior.reverse)&&Number.isInteger(prior.done)&&Number.isInteger(prior.total)&&prior.done>=0&&prior.total<=SESSION_SIZE&&prior.done+prior.queue.length===prior.total&&new Set(prior.queue).size===prior.queue.length&&prior.queue.every(id=>byId.has(id));
+ if(valid){queue=prior.queue.map(id=>byId.get(id));done=prior.done;total=prior.total;reverseIds=new Set(prior.reverse);}
+ else{
+  const now=Date.now(),due=pool.filter(c=>reviews[c.id]&&reviews[c.id].due<=now).sort((a,b)=>reviews[a.id].due-reviews[b.id].due);
+  const fresh=shuffle(pool.filter(c=>!reviews[c.id]));queue=[...due,...fresh].slice(0,SESSION_SIZE);done=0;total=queue.length;
+  reverseIds=new Set(queue.filter((c,i)=>i%3===2).map(c=>c.id));
+ }
+ sessionActive=true;persist();queue.length?show():finish();stackPaint();
+}
+$('undoSwipe').onclick=undoSwipe;
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&sessionDay!==localDay()&&!shuffling&&!flipping&&!drag)start();});
 $('face').onclick=e=>{if(!e.target.closest('button'))reveal();};$('face').onkeydown=e=>{if(e.target.closest('button'))return;if(e.key==='Enter'||e.code==='Space'){e.preventDefault();e.stopPropagation();reveal();}};$('restart').onclick=()=>{start();$('face').focus({preventScroll:true});};$('deck').onchange=()=>{start();toggleFilters(false);};
 function toggleFilters(open){$('filterPanel').hidden=!open;$('filterToggle').setAttribute('aria-expanded',String(open));$('filterToggle').setAttribute('aria-label',open?'Hide categories':'Show categories');}
 $('filterToggle').onclick=()=>toggleFilters($('filterPanel').hidden);
