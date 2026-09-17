@@ -89,7 +89,7 @@ main{min-height:100svh;padding:calc(env(safe-area-inset-top,0px) + 60px) 20px ca
 <button class="filter-toggle" id="filterToggle" aria-controls="filterPanel" aria-expanded="false" aria-label="Show categories"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M7 12h10M10 17h4"/></svg></button>
 <main><div class="deckbar" id="filterPanel" hidden><select id="deck" aria-label="Choose a French deck"><option value="all">A little of everything</option><option value="basics">First words</option><option value="daily">Everyday life</option><option value="out">Out & about</option><option value="work">At work</option></select><span id="learned" hidden></span><span class="counter" id="counter">01 / 60</span></div><div class="stage" id="stage"><div class="aura"></div><div class="swipe-feedback" id="swipeFeedback" aria-hidden="true"><span id="noMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="1.05"/><circle cx="18" cy="6" r="1.05"/><circle cx="8" cy="8" r="1.05"/><circle cx="16" cy="8" r="1.05"/><circle cx="10" cy="10" r="1.05"/><circle cx="14" cy="10" r="1.05"/><circle cx="12" cy="12" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="10" cy="14" r="1.05"/><circle cx="16" cy="16" r="1.05"/><circle cx="8" cy="16" r="1.05"/><circle cx="18" cy="18" r="1.05"/><circle cx="6" cy="18" r="1.05"/></svg></span><span id="yesMark"><svg class="dot-symbol" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.05"/><circle cx="7" cy="14" r="1.05"/><circle cx="9" cy="16" r="1.05"/><circle cx="11" cy="18" r="1.05"/><circle cx="12.5" cy="16" r="1.05"/><circle cx="14" cy="14" r="1.05"/><circle cx="15.5" cy="12" r="1.05"/><circle cx="17" cy="10" r="1.05"/><circle cx="18.5" cy="8" r="1.05"/><circle cx="20" cy="6" r="1.05"/></svg></span></div><div class="stack-back back-far" aria-hidden="true"><canvas id="backFar" width="960" height="1200"></canvas></div><div class="stack-back back-near" aria-hidden="true"><canvas id="backNear" width="960" height="1200"></canvas></div><article class="card" id="card"><div class="face" id="face" role="group" aria-roledescription="flippable card" tabindex="0" aria-label="Reveal English translation"><section class="side front" id="front"><canvas class="gradient-art" id="art" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language" lang="fr">Français</span><span id="type">greeting</span></div><div class="inner"><canvas class="dot-word" id="dots" width="1200" height="570" role="img" lang="fr" aria-label="Bonjour"></canvas></div><div class="cardfoot"><span class="flip-hint" id="flipHint">tap to discover</span></div><button class="icon sound" id="speak" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section><section class="side back" id="answer" aria-hidden="true"><canvas class="gradient-art" id="artBack" width="960" height="1200" aria-hidden="true"></canvas><div class="wash"></div><div class="topline"><span class="language">English</span><span>meaning &amp; context</span></div><div class="inner"><p class="back-word" id="backWord" lang="fr"></p><div class="translation" id="translation"></div><p class="example"><span id="example" lang="fr"></span><small id="exampleEn"></small></p></div><div class="cardfoot"><span class="flip-hint">tap to return</span></div><button class="icon sound" id="speakBack" tabindex="-1" title="Listen in French" aria-label="Listen in French"><svg viewBox="0 0 24 24"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"/></svg></button></section></div></article></div><div class="bottom"><p class="study-totals" id="studyTotals" role="status" aria-live="polite"><span><b id="learningCount">0</b> Learning</span><i aria-hidden="true">·</i><span><b id="masteredCount">0</b> Mastered</span></p><div class="track" role="progressbar" aria-label="Session progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0" id="progress"><i id="bar"></i></div><div class="actions"><button class="pill" id="restart" hidden>Another little round</button></div><p class="hint" id="hint">Tap to flip · swipe left to learn, right to master</p></div></main><div class="toast" id="toast" role="status" hidden></div>
 <script>
-(()=>{'use strict';
+(async()=>{'use strict';
 const $=id=>document.getElementById(id),canvas=$('art'),ctx=canvas.getContext('2d'),stage=$('stage'),card=$('card');
 const palettes=[
 ['Persimmon','#f5aa84','#ff7256','#0b310c','#3c7918','#ffe0bd'],
@@ -164,10 +164,32 @@ C'est noté|Noted|useful phrase|Merci, c'est noté.|Thank you, noted.
 Le travail|Work / The work|masculine noun|Je commence le travail à neuf heures.|I start work at nine o'clock.
 J'apprends le français|I'm learning French|useful phrase|J'apprends le français petit à petit.|I'm learning French little by little.
 À tout à l'heure|See you later|later the same day|À tout à l'heure, après la réunion !|See you later, after the meeting!`};
-const cards=Object.entries(source).flatMap(([deck,lines])=>lines.split('\n').map((line,i)=>{const [fr,en,type,ex,exEn]=line.split('|');return {id:deck+i,deck,fr,en,type,ex,exEn};}));
+let cards=Object.entries(source).flatMap(([deck,lines])=>lines.split('\n').map((line,i)=>{const [fr,en,type,ex,exEn]=line.split('|');return {id:deck+i,deck,fr,en,type,ex,exEn};}));
+
+const fallbackCategories=[{id:'basics',label:'First words'},{id:'daily',label:'Everyday life'},{id:'out',label:'Out & about'},{id:'work',label:'At work'}];
+let categories=fallbackCategories,loadWarning='';
+function validateVocabulary(data){
+ if(!data||!Array.isArray(data.cards)||!data.cards.length||!Array.isArray(data.categories))throw new Error('Invalid vocabulary format');
+ const ids=new Set(),decks=new Set();
+ for(const group of data.categories){if(!group||typeof group.id!=='string'||!group.id||group.id==='all'||decks.has(group.id)||typeof group.label!=='string'||!group.label.trim())throw new Error('Invalid categories');decks.add(group.id);}
+ const entries=data.cards.map(c=>{
+  if(!c||typeof c.id!=='string'||!c.id||ids.has(c.id)||!decks.has(c.deck)||typeof c.fr!=='string'||!c.fr.trim()||typeof c.en!=='string'||!c.en.trim())throw new Error('Invalid vocabulary card');
+  ids.add(c.id);return{id:c.id,deck:c.deck,fr:c.fr,en:c.en,type:typeof c.type==='string'?c.type:'vocabulary',ex:typeof c.ex==='string'?c.ex:'',exEn:typeof c.exEn==='string'?c.exEn:''};
+ });
+ return{cards:entries,categories:data.categories.map(c=>({id:c.id,label:c.label}))};
+}
+$('flipHint').textContent='Loading vocabulary…';
+const controller=new AbortController(),loadTimer=setTimeout(()=>controller.abort(),6000);
+try{
+ const response=await fetch(new URL('./vocabulary.json',window.location.href),{signal:controller.signal,cache:'no-cache'});
+ if(!response.ok)throw new Error('HTTP '+response.status);
+ const imported=validateVocabulary(await response.json());cards=imported.cards;categories=imported.categories;
+}catch(error){loadWarning='Using 60 built-in cards. Put vocabulary.json beside this HTML file on your website.';}
+finally{clearTimeout(loadTimer);}
+$('deck').replaceChildren(...[{id:'all',label:'A little of everything'},...categories].map(c=>{const option=document.createElement('option');option.value=c.id;option.textContent=c.label;return option;}));
 let shuffling=false,flipping=false,flipTimer,drag=null,suppressClickUntil=0;
 let saved={known:[],learning:[],deck:'all'},queue=[],total=0,done=0,revealed=false,complete=false,atmosphere,toastTimer,voices=[];
-try{const s=JSON.parse(localStorage.getItem('un-peu-v1'));if(s&&Array.isArray(s.known)){saved.known=s.known.filter(id=>cards.some(c=>c.id===id));if(Array.isArray(s.learning))saved.learning=s.learning.filter(id=>cards.some(c=>c.id===id)&&!saved.known.includes(id));if(['all',...Object.keys(source)].includes(s.deck))saved.deck=s.deck;}}catch{}
+try{const s=JSON.parse(localStorage.getItem('un-peu-v1'));if(s&&Array.isArray(s.known)){saved.known=s.known.filter(id=>typeof id==='string');if(Array.isArray(s.learning))saved.learning=s.learning.filter(id=>typeof id==='string'&&!saved.known.includes(id));if(['all',...categories.map(c=>c.id)].includes(s.deck))saved.deck=s.deck;}}catch{}
 const known=new Set(saved.known),learning=new Set(saved.learning);$('deck').value=saved.deck;
 function persist(){try{localStorage.setItem('un-peu-v1',JSON.stringify({known:[...known],learning:[...learning],deck:$('deck').value,accent:'fr-CA'}));}catch{}}
 function toast(t){$('toast').textContent=t;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3500);}
@@ -190,7 +212,7 @@ function progress(){$('learningCount').textContent=learning.size;$('masteredCoun
 const audioButtons=[$('speak'),$('speakBack')];
 function speaking(active){audioButtons.forEach(b=>b.classList.toggle('speaking',active));}
 function stopAudio(){if('speechSynthesis'in window)speechSynthesis.cancel();speaking(false);}
-function show(first=false){stopAudio();complete=false;revealed=false;setFlip(false,true);const item=queue[0];$('backWord').textContent=item.fr;dotted(item.fr);$('type').textContent=item.type;$('translation').textContent=item.en;$('example').textContent=item.ex;$('exampleEn').textContent=item.exEn;$('flipHint').textContent='tap to discover';$('face').setAttribute('aria-label',item.fr+'. Reveal English translation');$('face').setAttribute('aria-expanded','false');$('face').setAttribute('aria-controls','answer');$('restart').hidden=true;audioButtons.forEach(b=>b.hidden=false);$('hint').textContent='Tap to flip · swipe left to learn, right to master';progress();gradient(first);}
+function show(first=false){stopAudio();complete=false;revealed=false;setFlip(false,true);const item=queue[0];$('backWord').textContent=item.fr;dotted(item.fr);$('type').textContent=item.type;$('translation').textContent=item.en;$('example').textContent=item.ex;$('exampleEn').textContent=item.exEn;$('example').parentElement.hidden=!item.ex;$('flipHint').textContent='tap to discover';$('face').setAttribute('aria-label',item.fr+'. Reveal English translation');$('face').setAttribute('aria-expanded','false');$('face').setAttribute('aria-controls','answer');$('restart').hidden=true;audioButtons.forEach(b=>b.hidden=false);$('hint').textContent='Tap to flip · swipe left to learn, right to master';progress();gradient(first);}
 
 function setTransform(el,value){el.style.transform=value;el.style.webkitTransform=value;}
 function animateFrames(duration,draw){
@@ -212,7 +234,7 @@ async function reveal(){
   $('flipHint').textContent=revealed?'a little more, every day':'tap to discover';
  }finally{flipping=false;$('deck').disabled=false;}
 }
-function finish(){stopAudio();complete=true;revealed=false;setFlip(true,true);$('backWord').textContent='Très bien !';dotted('Très bien !');$('type').textContent='round complete';$('translation').textContent='A little progress.';$('example').textContent='Petit à petit.';$('exampleEn').textContent='Little by little.';$('flipHint').textContent=total+' cards practised';$('face').setAttribute('aria-label','Round complete. '+total+' cards practised.');$('face').setAttribute('aria-expanded','true');for(const id of ['speak','speakBack'])$(id).hidden=true;$('restart').hidden=false;$('hint').textContent='Come back for another little round whenever you like.';progress();$('counter').textContent=total+' / '+total;$('restart').focus();}
+function finish(){stopAudio();complete=true;revealed=false;setFlip(true,true);$('backWord').textContent='Très bien !';dotted('Très bien !');$('type').textContent='round complete';$('translation').textContent='A little progress.';$('example').parentElement.hidden=false;$('example').textContent='Petit à petit.';$('exampleEn').textContent='Little by little.';$('flipHint').textContent=total+' cards practised';$('face').setAttribute('aria-label','Round complete. '+total+' cards practised.');$('face').setAttribute('aria-expanded','true');for(const id of ['speak','speakBack'])$(id).hidden=true;$('restart').hidden=false;$('hint').textContent='Come back for another little round whenever you like.';progress();$('counter').textContent=total+' / '+total;$('restart').focus();}
 function stackPaint(){ensureLooks();['backNear','backFar'].forEach((id,i)=>{const c=$(id),item=queue[i+1];c.parentElement.hidden=!item||complete;if(item&&!complete)drawArtwork(c,item);});}
 function lockShuffle(locked){shuffling=locked;stage.classList.toggle('shuffling',locked);stage.setAttribute('aria-busy',String(locked));for(const id of ['restart','deck','speak','speakBack'])$(id).disabled=locked;}
 
@@ -314,6 +336,6 @@ card.addEventListener('lostpointercapture',e=>{if(drag?.kind==='pointer')endGest
 function cancelGesture(){if(drag)endGesture(drag.id,performance.now(),true);}
 window.addEventListener('blur',cancelGesture);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)cancelGesture();});
-start(true);
+start(true);if(loadWarning)toast(loadWarning);
 })();
 </script></body></html>
