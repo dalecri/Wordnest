@@ -1,0 +1,10 @@
+html,body{height:100%}
+body{margin:0;background:#0a0a0b;color:#eeeae7;font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden;-webkit-text-size-adjust:100%}
+button{font:inherit;border:0;cursor:pointer;color:inherit}
+button:focus-visible{outline:2px solid #eed7a4;outline-offset:4px}
+a{color:#eed7a4}a:hover{color:#fff}
+@keyframes wn-tap{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.9}50%{transform:translate(-50%,-50%) scale(.82);opacity:.55}}
+@keyframes wn-swl{0%{transform:translate(0,-50%);opacity:0}25%{opacity:.95}100%{transform:translate(-64px,-50%);opacity:0}}
+@keyframes wn-swr{0%{transform:translate(0,-50%);opacity:0}25%{opacity:.95}100%{transform:translate(64px,-50%);opacity:0}}
+@keyframes wn-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes wn-pop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
