@@ -26,6 +26,7 @@ class Component extends DCLogic {
     super(props);
     this.cardRef = React.createRef();
     this.dotsRef = React.createRef();
+    this.heroRef = React.createRef();
     const size = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
     this.state = {
       screen: (this.props.startScreen ?? "tutorial") === "home" ? "home" : "study",
@@ -41,9 +42,12 @@ class Component extends DCLogic {
   card(){ return DECK[this.state.idx % DECK.length]; }
 
   paintDots(){
-    const out = this.dotsRef.current; if(!out) return;
-    const text = this.card().fr;
-    if(out.dataset.word === text) return;
+    this.paintWord(this.dotsRef.current, this.card().fr);
+    this.paintWord(this.heroRef.current, DECK[this.state.idx % DECK.length].fr);
+  }
+
+  paintWord(out, text){
+    if(!out || out.dataset.word === text) return;
     out.dataset.word = text;
     const c = out.getContext("2d"), mask = document.createElement("canvas");
     mask.width = 1200; mask.height = 570;
@@ -139,9 +143,8 @@ class Component extends DCLogic {
     this.flip();
   };
 
-  speak = (e) => {
-    e.stopPropagation();
-    const text = this.card().fr.replace(/…/g,"").trim();
+  say(word){
+    const text = word.replace(/…/g,"").trim();
     if("speechSynthesis" in window){
       speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(text);
@@ -150,8 +153,13 @@ class Component extends DCLogic {
       if(v) u.voice = v;
       speechSynthesis.speak(u);
     }
+  }
+  speak = (e) => {
+    e.stopPropagation();
+    this.say(this.card().fr);
     if(this.state.coach === 3) this.setState({ coach: 4 });
   };
+  speakNext = () => this.say(DECK[this.state.idx % DECK.length].fr);
 
   coachAdvance = () => {
     const c = this.state.coach;
@@ -205,6 +213,13 @@ class Component extends DCLogic {
       learning: quiet ? "—" : s.learning, mastered: quiet ? "—" : s.mastered,
       doneLine: s.doneToday + " cards practised. Your next reviews are scheduled.",
       week,
+      nest: Array.from({length: s.size}, (_,i) => {
+        const d = DECK[(s.idx + i) % DECK.length], first = i === 0;
+        return { art: artFor(d.p), op: first ? 1 : .55, scale: first ? 1.12 : 1,
+                 ring: first ? "0 0 0 2px #0a0a0b, 0 0 0 3.5px #eeeae7" : "none" };
+      }),
+      nestCols: Math.min(s.size, 12),
+      heroRef: this.heroRef, speakNext: this.speakNext,
       coachOn: s.coach >= 0, coachDim: s.coach === 4 ? "#000000b8" : "#00000059",
       coachStepLabel: step ? step.label : "", coachTitle: step ? step.title : "",
       coachBody: step ? step.body : "", coachWaitLabel: step ? step.wait : "",

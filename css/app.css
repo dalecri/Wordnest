@@ -8,3 +8,6 @@ a{color:#eed7a4}a:hover{color:#fff}
 @keyframes wn-swr{0%{transform:translate(0,-50%);opacity:0}25%{opacity:.95}100%{transform:translate(64px,-50%);opacity:0}}
 @keyframes wn-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes wn-pop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes wn-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes wn-breathe{0%,100%{opacity:.34;transform:scale(1)}50%{opacity:.48;transform:scale(1.05)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}

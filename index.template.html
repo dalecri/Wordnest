@@ -39,17 +39,26 @@
     </sc-for>
   </div>
 
-  <div style="flex:1;min-height:0;display:grid;place-items:center;padding:14px 0 6px">
-    <div style="position:relative;height:100%;max-height:250px;aspect-ratio:212/250;min-height:96px">
-      <div style="position:absolute;inset:0;transform:translate(16px,16px) scale(.93);border-radius:24px;background:#2a2b2e;border:1px solid #ffffff12"></div>
-      <div style="position:absolute;inset:0;transform:translate(8px,8px) scale(.965);border-radius:24px;background:#3a3b3d;border:1px solid #ffffff18"></div>
-      <div style="position:absolute;inset:0;border-radius:24px;overflow:hidden;border:1px solid #ffffff20;box-shadow:0 22px 45px #0008;background:{{ previewArt }}">
-        <div style="position:absolute;inset:0;padding:20px;display:flex;flex-direction:column;justify-content:space-between">
-          <div style="display:flex;justify-content:space-between;font-size:10.5px;color:#ffffffb8"><span>Français</span><span>{{ previewType }}</span></div>
-          <div style="font-size:29px;font-weight:500;letter-spacing:-1px;color:#fff;line-height:1.05">{{ previewWord }}</div>
-          <div style="font-size:10px;color:#ffffffa8">{{ dueLine }}</div>
-        </div>
-      </div>
+  <button sc-camel-on-click="{{ speakNext }}" aria-label="Hear the next word" style="flex:1;min-height:150px;position:relative;margin-top:clamp(10px,2vh,18px);background:transparent;padding:0;display:flex;flex-direction:column;justify-content:center;text-align:left;cursor:pointer">
+    <div style="position:absolute;inset:6% 4%;background:{{ previewArt }};border-radius:50%;filter:blur(52px);opacity:.36;pointer-events:none;animation:wn-breathe 6s ease-in-out infinite"></div>
+    <div style="position:relative;display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1.4px;color:#77777d">
+      <span>UP NEXT</span>
+      <span style="display:flex;align-items:center;gap:6px;letter-spacing:.2px;color:#8d8d95">
+        <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8"></path></svg>tap to hear</span>
+    </div>
+    <canvas ref="{{ heroRef }}" width="1200" height="570" style="position:relative;width:100%;height:auto;max-height:100%;display:block;margin:-7% 0 -9%;animation:wn-float 7s ease-in-out infinite;filter:drop-shadow(0 4px 18px #0006)"></canvas>
+    <div style="position:relative;font-size:12px;color:#8d8d95;text-align:center">{{ previewType }}</div>
+  </button>
+
+  <div style="margin:clamp(12px,2.4vh,22px) 0 clamp(14px,2.6vh,22px);flex:none">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+      <span style="font-size:10px;letter-spacing:1.4px;color:#77777d">TODAY'S NEST</span>
+      <span style="font-size:10.5px;color:#6d6d74">{{ dueLine }}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat({{ nestCols }},1fr);gap:7px">
+      <sc-for list="{{ nest }}" as="n" hint-placeholder-count="12">
+        <span style="aspect-ratio:1;border-radius:50%;background:{{ n.art }};opacity:{{ n.op }};box-shadow:{{ n.ring }};transform:scale({{ n.scale }});transition:transform .4s cubic-bezier(.4,0,.2,1),opacity .4s"></span>
+      </sc-for>
     </div>
   </div>
 
