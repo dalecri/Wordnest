@@ -14,111 +14,108 @@
 </head>
 <body>
 <x-dc>
-<div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#efe9df;color:#1d1b18;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
+<div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
 <div style="flex:none;padding:calc(env(safe-area-inset-top,0px) + 16px) 18px 0;display:flex;align-items:center;justify-content:space-between;gap:10px">
-  <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#e4ddd1">
-    <button sc-camel-on-click="{{ pickToday }}" style="padding:9px 15px;border-radius:999px;background:{{ todayBg }};color:{{ todayFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Today <span style="opacity:.6">{{ goal }}</span></button>
-    <button sc-camel-on-click="{{ pickShuffle }}" style="padding:9px 15px;border-radius:999px;background:{{ shuffleBg }};color:{{ shuffleFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Shuffle <span style="opacity:.6">{{ deckSize }}</span></button>
+  <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d">
+    <button sc-camel-on-click="{{ pickToday }}" style="padding:9px 15px;border-radius:999px;background:{{ todayBg }};color:{{ todayFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Today <span style="opacity:.55">{{ goal }}</span></button>
+    <button sc-camel-on-click="{{ pickShuffle }}" style="padding:9px 15px;border-radius:999px;background:{{ shuffleBg }};color:{{ shuffleFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Shuffle <span style="opacity:.55">{{ deckSize }}</span></button>
   </div>
-  <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:#f7f3ec;box-shadow:0 1px 0 #ddd5c8;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#fff">
-    <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:#c7812f"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
+  <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
+    <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
   </button>
 </div>
 
 <sc-if value="{{ isStudy }}" hint-placeholder-val="{{ true }}">
 <div style="flex:1;min-height:0;display:flex;flex-direction:column">
   <div style="flex:none;padding:16px 22px 0;display:flex;align-items:center;gap:12px">
-    <span style="font-size:12px;color:#6f6a62;font-variant-numeric:tabular-nums;min-width:44px">{{ count }}</span>
-    <div style="flex:1;height:4px;border-radius:2px;background:#ddd5c8;overflow:hidden"><div style="height:100%;width:{{ pct }};background:#1d1b18;border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)"></div></div>
-    <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:30px;height:30px;border-radius:50%;background:transparent;color:#1d1b18;opacity:{{ undoOp }};display:grid;place-items:center">
+    <span style="font-size:12px;color:#77777d;font-variant-numeric:tabular-nums;min-width:44px">{{ count }}</span>
+    <div style="flex:1;height:3px;border-radius:2px;background:#ffffff14;overflow:hidden"><div style="height:100%;width:{{ pct }};background:#eeeae7;border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)"></div></div>
+    <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:30px;height:30px;border-radius:50%;background:transparent;color:#c2c2c9;opacity:{{ undoOp }};display:grid;place-items:center">
       <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
     </button>
   </div>
 
-  <div sc-camel-on-pointer-down="{{ onDown }}" sc-camel-on-pointer-move="{{ onMove }}" sc-camel-on-pointer-up="{{ onUp }}" sc-camel-on-pointer-cancel="{{ onUp }}" sc-camel-on-click="{{ onTap }}" style="flex:1;min-height:0;position:relative;touch-action:pan-y;cursor:pointer">
-    <div style="position:absolute;left:18px;top:50%;transform:translateY(-50%);opacity:{{ againOp }};font-size:11px;letter-spacing:1px;color:#b4533f;pointer-events:none">AGAIN</div>
-    <div style="position:absolute;right:18px;top:50%;transform:translateY(-50%);opacity:{{ gotOp }};font-size:11px;letter-spacing:1px;color:#4f7a3a;pointer-events:none">GOT IT</div>
-    <div style="height:100%;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px 26px;transform:{{ move }};transition:{{ moveT }};opacity:{{ moveOp }}">
-      <div style="animation:{{ enter }} .45s cubic-bezier(.2,.8,.3,1) both;display:flex;flex-direction:column;align-items:center;width:100%">
-        <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#6f6a62;margin-bottom:14px"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tag }}</div>
-        <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ wordSize }};line-height:1.04;letter-spacing:-.03em;text-wrap:balance;overflow-wrap:anywhere">{{ word }}</div>
-        <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="margin-top:18px;display:flex;align-items:center;gap:9px;padding:9px 16px;border-radius:999px;background:#f7f3ec;box-shadow:0 1px 0 #d8cfc1,0 8px 20px -12px #1d1b1855;color:#1d1b18" style-hover="background:#fff" style-active="transform:scale(.96)">
-          <span style="font-size:17px;font-family:ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.2px">{{ ipa }}</span>
-          <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
-        </button>
+  <div style="flex:1;min-height:0;position:relative;margin:16px 18px 0">
+    <div style="position:absolute;inset:14% 12%;background:{{ glow }};opacity:.22;filter:blur(70px);pointer-events:none"></div>
+    <div style="position:absolute;inset:0;transform:scale(.92) translateY(-24px);border-radius:28px;background:#232427;border:1px solid #ffffff12"></div>
+    <div style="position:absolute;inset:0;transform:scale(.96) translateY(-12px);border-radius:28px;background:#323438;border:1px solid #ffffff18"></div>
 
-        <div style="position:relative;width:100%;margin-top:26px">
-          <div style="position:absolute;inset:0;display:flex;justify-content:center;padding-top:10px;opacity:{{ hintOp }};transition:opacity .25s;font-size:12.5px;color:#9b9387;pointer-events:none">Tap to see the meaning</div>
-          <div style="opacity:{{ revealOp }};transform:translateY({{ revealY }});transition:opacity .35s cubic-bezier(.4,0,.2,1),transform .35s cubic-bezier(.4,0,.2,1);pointer-events:{{ revealPE }};display:flex;flex-direction:column;align-items:center;gap:16px">
-            <div style="font-size:18px;line-height:1.35"><span style="color:#6f6a62">({{ pos }})</span> {{ meaning }}</div>
-            <div style="font-size:14.5px;line-height:1.5;max-width:30ch">{{ example }}<span style="display:block;margin-top:3px;font-size:12.5px;color:#8a8378">{{ exampleEn }}</span></div>
-            <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ true }}">
-              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px">
-                <sc-for list="{{ chips }}" as="c" hint-placeholder-count="2">
-                  <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;border:1px solid #d8cfc1;font-size:12px;color:#3d3a35;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:{{ c.dot }};display:{{ c.show }}"></span>{{ c.t }}</span>
-                </sc-for>
-              </div>
-            </sc-if>
-            <sc-if value="{{ hasNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#6f6a62">{{ note }}</div></sc-if>
-            <sc-if value="{{ hasTrap }}" hint-placeholder-val="{{ false }}">
-              <div style="max-width:320px;padding:10px 14px;border-radius:14px;background:#f3e3c8;color:#5b3d17;font-size:12.5px;line-height:1.45;text-align:left"><b style="font-weight:600">{{ trapLabel }}.</b> {{ trapText }}</div>
-            </sc-if>
-            <div style="font-size:12px;color:#9b9387">say it: {{ say }}</div>
-          </div>
+    <div sc-camel-on-pointer-down="{{ onDown }}" sc-camel-on-pointer-move="{{ onMove }}" sc-camel-on-pointer-up="{{ onUp }}" sc-camel-on-pointer-cancel="{{ onUp }}" style="position:absolute;inset:0;touch-action:none;cursor:grab;transform:{{ cardMove }};transition:{{ cardT }};opacity:{{ cardOp }}">
+      <section style="position:absolute;inset:0;border-radius:28px;overflow:hidden;background:{{ art }};box-shadow:0 26px 60px #0009;animation:{{ enter }} .45s cubic-bezier(.2,.8,.3,1) both">
+        <div style="position:absolute;inset:0;border-radius:28px;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35;border:1px solid #ffffff1f;pointer-events:none"></div>
+
+        <sc-if value="{{ hasGender }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;top:20px;right:20px;display:flex;align-items:center;gap:7px;padding:6px 12px 6px 10px;border-radius:999px;background:#0000003a;color:#fffffff0;font-size:12px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)"><span style="width:7px;height:7px;border-radius:50%;background:{{ gDot }}"></span>{{ gender }}</div>
+        </sc-if>
+
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 22px;transform:{{ wordY }};transition:{{ liveT }}">
+          <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ wordSize }};line-height:1.04;letter-spacing:-.03em;text-align:center;color:#fffef6;text-shadow:{{ wordShadow }};text-wrap:balance;overflow-wrap:anywhere">{{ word }}</div>
+          <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="margin-top:18px;display:flex;align-items:center;gap:9px;padding:9px 16px;border-radius:999px;background:#ffffff2e;color:#fff;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:inset 0 1px 0 #ffffff40" style-hover="background:#ffffff42" style-active="transform:scale(.95)">
+            <span style="font-size:16px;font-family:ui-monospace,'SF Mono',Menlo,monospace">{{ ipa }}</span>
+            <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
+          </button>
         </div>
-      </div>
+
+        <div style="position:absolute;left:0;right:0;bottom:22px;display:flex;flex-direction:column;align-items:center;gap:2px;color:#ffffffc0;font-size:11px;opacity:{{ hintOp }};transition:{{ liveT }};pointer-events:none">
+          <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;animation:wn-nudge 1.8s ease-in-out infinite"><path d="m6 9 6 6 6-6"></path></svg>
+          swipe down for the meaning
+        </div>
+
+        <div style="position:absolute;left:12px;right:12px;bottom:12px;padding:20px 20px 22px;border-radius:22px;background:#00000045;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 #ffffff26;text-align:center;transform:{{ panelY }};opacity:{{ panelOp }};transition:{{ liveT }};pointer-events:none">
+          <div style="font-size:10px;letter-spacing:1.4px;color:#ffffffa0;margin-bottom:6px">ENGLISH</div>
+          <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;letter-spacing:-.02em;line-height:1.15;color:#fff">{{ meaning }}</div>
+          <div style="margin-top:12px;font-size:14px;line-height:1.45;color:#ffffffd8;font-style:italic">« {{ example }} »</div>
+        </div>
+      </section>
     </div>
+
+    <div style="position:absolute;left:14px;top:50%;transform:translateY(-50%);opacity:{{ againOp }};pointer-events:none"><span style="display:block;padding:7px 14px;border-radius:20px;border:1px solid #f16b7366;color:#f16b73;font-size:11px;letter-spacing:.5px;background:#1b0f10cc">AGAIN</span></div>
+    <div style="position:absolute;right:14px;top:50%;transform:translateY(-50%);opacity:{{ gotOp }};pointer-events:none"><span style="display:block;padding:7px 14px;border-radius:20px;border:1px solid #77ce9c66;color:#77ce9c;font-size:11px;letter-spacing:.5px;background:#0d1a13cc">GOT IT</span></div>
   </div>
 
-  <div style="flex:none;position:relative;z-index:2;padding:10px 18px calc(env(safe-area-inset-bottom,0px) + 18px)">
-    <sc-if value="{{ showReveal }}" hint-placeholder-val="{{ true }}">
-      <button sc-camel-on-click="{{ reveal }}" style="width:100%;height:56px;border-radius:999px;background:#1d1b18;color:#f4efe7;font-size:15px;font-weight:500" style-active="transform:scale(.98)">Show meaning</button>
-    </sc-if>
-    <sc-if value="{{ showRate }}" hint-placeholder-val="{{ false }}">
-      <div style="display:flex;gap:10px">
-        <button sc-camel-on-click="{{ again }}" style="flex:1;height:56px;border-radius:999px;background:transparent;border:1.5px solid #cfc6b8;color:#1d1b18;font-size:15px;font-weight:500" style-hover="background:#e7e0d5" style-active="transform:scale(.98)">Again</button>
-        <button sc-camel-on-click="{{ gotIt }}" style="flex:1;height:56px;border-radius:999px;background:#1d1b18;color:#f4efe7;font-size:15px;font-weight:500" style-active="transform:scale(.98)">Got it</button>
-      </div>
-    </sc-if>
+  <div style="flex:none;display:flex;justify-content:center;gap:18px;padding:16px 18px calc(env(safe-area-inset-bottom,0px) + 18px);font-size:11px;color:#5f5f67">
+    <span>← again</span><span>↓ meaning</span><span>got it →</span>
   </div>
 </div>
 </sc-if>
 
 <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
-<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px 28px calc(env(safe-area-inset-bottom,0px) + 24px);animation:wn-inA .5s cubic-bezier(.2,.8,.3,1) both">
-  <div style="font-size:12px;color:#6f6a62">à demain</div>
-  <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:44px;letter-spacing:-.03em;margin:10px 0 12px">{{ doneTitle }}</div>
-  <div style="font-size:14px;color:#6f6a62;max-width:28ch;line-height:1.5">{{ doneLine }}</div>
-  <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:36px">
-    <button sc-camel-on-click="{{ shuffleAgain }}" style="height:54px;border-radius:999px;background:#1d1b18;color:#f4efe7;font-size:15px;font-weight:500">Shuffle all {{ deckSize }}</button>
-    <button sc-camel-on-click="{{ openStats }}" style="height:54px;border-radius:999px;border:1.5px solid #cfc6b8;background:transparent;color:#1d1b18;font-size:15px;font-weight:500">See progress</button>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px 28px calc(env(safe-area-inset-bottom,0px) + 24px)">
+  <div style="width:100%;max-width:320px;border-radius:28px;padding:34px 24px;background:{{ art }};box-shadow:0 26px 60px #0009;animation:wn-pop .5s cubic-bezier(.2,.9,.3,1.3) both">
+    <div style="font-size:11px;letter-spacing:.4px;color:#ffffffc0">{{ doneKicker }}</div>
+    <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:36px;letter-spacing:-.03em;color:#fff;margin:12px 0 10px;text-shadow:0 2px 18px #0006">{{ doneTitle }}</div>
+    <div style="font-size:13px;color:#ffffffd8;line-height:1.5">{{ doneLine }}</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:30px">
+    <button sc-camel-on-click="{{ shuffleAgain }}" style="height:54px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500">Shuffle all {{ deckSize }}</button>
+    <button sc-camel-on-click="{{ openStats }}" style="height:54px;border-radius:999px;background:#17171a;border:1px solid #ffffff12;color:#e6e3e0;font-size:15px">See progress</button>
   </div>
 </div>
 </sc-if>
 
 <div sc-camel-on-click="{{ closeStats }}" style="position:absolute;inset:0;z-index:10;background:{{ sheetBg }};transition:background .3s;pointer-events:{{ sheetPE }}"></div>
-<div style="position:absolute;left:0;right:0;bottom:0;z-index:11;transform:translateY({{ sheetY }});transition:transform .38s cubic-bezier(.2,.8,.3,1);background:#f7f3ec;border-radius:28px 28px 0 0;padding:12px 22px calc(env(safe-area-inset-bottom,0px) + 26px);box-shadow:0 -10px 40px -20px #1d1b1866">
-  <div style="width:36px;height:4px;border-radius:2px;background:#d8cfc1;margin:0 auto 18px"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:11;transform:translateY({{ sheetY }});transition:transform .38s cubic-bezier(.2,.8,.3,1);background:#141416;border-top:1px solid #ffffff12;border-radius:28px 28px 0 0;padding:12px 22px calc(env(safe-area-inset-bottom,0px) + 26px)">
+  <div style="width:36px;height:4px;border-radius:2px;background:#ffffff22;margin:0 auto 18px"></div>
   <div style="display:flex;align-items:flex-end;justify-content:space-between">
     <div style="display:flex;align-items:flex-end;gap:10px">
       <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:56px;line-height:.82;letter-spacing:-.04em">{{ streak }}</div>
-      <div><div style="font-size:14px">day streak</div><div style="font-size:11.5px;color:#8a8378;margin-top:1px">best: 21 days</div></div>
+      <div><div style="font-size:14px;color:#c2c2c9">day streak</div><div style="font-size:11.5px;color:#6d6d74;margin-top:1px">best: 21 days</div></div>
     </div>
-    <button sc-camel-on-click="{{ closeStats }}" aria-label="Close" style="width:34px;height:34px;border-radius:50%;background:#e7e0d5;color:#6f6a62;display:grid;place-items:center;font-size:16px">×</button>
+    <button sc-camel-on-click="{{ closeStats }}" aria-label="Close" style="width:34px;height:34px;border-radius:50%;background:#ffffff10;color:#9a9aa2;display:grid;place-items:center;font-size:16px">×</button>
   </div>
   <div style="margin-top:20px;display:flex;gap:7px">
     <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
       <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
-        <div style="width:100%;height:32px;border-radius:10px;background:{{ d.fill }};box-shadow:0 0 0 1.5px {{ d.ring }};display:grid;place-items:center"><span style="width:5px;height:5px;border-radius:50%;background:{{ d.dot }}"></span></div>
-        <span style="font-size:10px;color:#8a8378">{{ d.label }}</span>
+        <div style="width:100%;height:32px;border-radius:10px;background:{{ d.fill }};border:1px solid {{ d.ring }};display:grid;place-items:center"><span style="width:5px;height:5px;border-radius:50%;background:{{ d.dot }}"></span></div>
+        <span style="font-size:10px;color:#5e5e66">{{ d.label }}</span>
       </div>
     </sc-for>
   </div>
-  <div style="margin-top:8px;font-size:11.5px;color:#8a8378">{{ weekLine }}</div>
+  <div style="margin-top:8px;font-size:11.5px;color:#6d6d74">{{ weekLine }}</div>
   <div style="margin-top:22px">
-    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px"><span><b style="font-weight:600">{{ mastered }}</b> <span style="color:#6f6a62">mastered</span></span><span><b style="font-weight:600">{{ learning }}</b> <span style="color:#6f6a62">still learning</span></span></div>
-    <div style="height:6px;border-radius:3px;background:#e4ddd1;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#1d1b18;border-radius:3px"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px;color:#77777d"><span><b style="font-weight:600;color:#eeeae7">{{ mastered }}</b> mastered</span><span><b style="font-weight:600;color:#eeeae7">{{ learning }}</b> still learning</span></div>
+    <div style="height:6px;border-radius:3px;background:#ffffff12;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#cbd4a6;border-radius:3px"></div></div>
   </div>
 </div>
 
