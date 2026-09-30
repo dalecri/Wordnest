@@ -125,7 +125,7 @@ class Component extends DCLogic {
   openStats = () => this.setState({ stats: true });
   closeStats = () => this.setState({ stats: false });
 
-  // gestures: down reveals the meaning, up hides it, left = again, right = got it
+  // gestures: tap flips the card, left = again, right = got it
   onDown = (e) => {
     if(this.state.fly || e.target.closest("button")) return;
     this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, axis: "" };
@@ -140,15 +140,12 @@ class Component extends DCLogic {
       this.setState({ axis: d.axis });
     }
     if(d.axis === "x") this.setState({ dx });
-    else this.setState({ dy });
   };
   onUp = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
     this.drag = null;
     const { dx, dy, revealed } = this.state;
     if(d.axis === "x" && Math.abs(dx) > 80) return this.rate(dx > 0);
-    if(d.axis === "y" && !revealed && dy > 50) return this.setState({ revealed: true, dy: 0, axis: "" });
-    if(d.axis === "y" && revealed && dy < -50) return this.setState({ revealed: false, dy: 0, axis: "" });
     if(!d.axis) return this.setState({ revealed: !revealed });
     this.setState({ dx: 0, dy: 0, axis: "" });
   };
@@ -172,7 +169,7 @@ class Component extends DCLogic {
       ...(() => { const h = highlight(d); return { exPre: h.pre, exHit: h.hit, exPost: h.post }; })(),
       hitColor: d.p[4], gotBg: d.p[4], gotFg: "#141414",
       back1: artFor(DECK[s.order[(s.idx + 1) % s.order.length]].p), back2: artFor(DECK[s.order[(s.idx + 2) % s.order.length]].p),
-      enBlur: p > .5 ? "blur(0)" : "blur(9px)", enOp: p > .5 ? 1 : .55, tapOp: p > .5 ? 0 : 1,
+      faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enSize: fitSize(d.en),
       modeLabel: s.mode === "shuffle" ? "Shuffle" : "Today",
       menuOp: s.menu ? 1 : 0, menuY: s.menu ? "0" : "-6px", menuPE: s.menu ? "auto" : "none",
       toggleMenu: this.toggleMenu, closeMenu: this.closeMenu, pickTodayM: this.pickTodayM, pickShuffleM: this.pickShuffleM,

@@ -52,7 +52,9 @@
       <div style="position:absolute;inset:0;transform-origin:50% 0;transform:translateY(-11px) scale(.93);border-radius:26px;background:{{ back1 }};opacity:.6"></div>
 
       <div sc-camel-on-pointer-down="{{ onDown }}" sc-camel-on-pointer-move="{{ onMove }}" sc-camel-on-pointer-up="{{ onUp }}" sc-camel-on-pointer-cancel="{{ onUp }}" style="position:absolute;inset:0;touch-action:none;cursor:grab;transform:{{ cardMove }};transition:{{ cardT }};opacity:{{ cardOp }}">
-        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;background:{{ art }};box-shadow:0 24px 50px #0009;animation:{{ enter }} .45s cubic-bezier(.2,.8,.3,1) both;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+        <div style="position:absolute;inset:0;perspective:1200px;animation:{{ enter }} .45s cubic-bezier(.2,.8,.3,1) both">
+        <div style="position:absolute;inset:0;transform-style:preserve-3d;transform:{{ faceT }};transition:transform .6s cubic-bezier(.2,.85,.25,1)">
+        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;background:{{ art }};box-shadow:0 24px 50px #0009;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
           <div style="position:absolute;inset:0;border-radius:26px;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35;border:1px solid #ffffff1f;pointer-events:none"></div>
           <sc-if value="{{ hasGender }}" hint-placeholder-val="{{ true }}">
             <div style="position:absolute;top:16px;left:16px;display:flex;align-items:center;gap:6px;padding:5px 11px 5px 9px;border-radius:999px;background:#0000003a;color:#fffffff0;font-size:11.5px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)"><span style="width:6px;height:6px;border-radius:50%;background:{{ gDot }}"></span>{{ gender }}</div>
@@ -61,12 +63,18 @@
             <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
           </button>
           <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ wordSize }};line-height:1.04;letter-spacing:-.03em;color:#fffef6;text-shadow:{{ wordShadow }};text-wrap:balance;overflow-wrap:anywhere">{{ word }}</div>
-          <div style="position:relative;margin-top:10px">
-            <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:500;font-size:21px;color:#fff;text-shadow:{{ wordShadow }};filter:{{ enBlur }};opacity:{{ enOp }};transition:filter .35s,opacity .35s">{{ meaning }}</div>
-            <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;font-size:11px;letter-spacing:.3px;color:#ffffffd8;opacity:{{ tapOp }};transition:opacity .25s;pointer-events:none">tap or swipe down</div>
-          </div>
           <div style="margin-top:8px;font-size:14px;font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#ffffffc8">{{ ipa }}</div>
+          <div style="position:absolute;left:0;right:0;bottom:18px;font-size:11px;letter-spacing:.3px;color:#ffffffc8;pointer-events:none">tap to flip</div>
         </section>
+        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;background:{{ art }};box-shadow:0 24px 50px #0009;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+          <div style="position:absolute;inset:0;background:#00000026;pointer-events:none"></div>
+          <div style="position:absolute;inset:0;border-radius:26px;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35;border:1px solid #ffffff1f;pointer-events:none"></div>
+          <div style="position:relative;font-size:10px;letter-spacing:1.4px;color:#ffffffb8">ENGLISH</div>
+          <div style="position:relative;margin-top:10px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ enSize }};line-height:1.06;letter-spacing:-.03em;color:#fffef6;text-shadow:{{ wordShadow }};text-wrap:balance">{{ meaning }}</div>
+          <div style="position:relative;margin-top:12px;font-size:14px;color:#ffffffd0">{{ word }} <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;color:#ffffffa8">{{ ipa }}</span></div>
+        </section>
+        </div>
+        </div>
       </div>
 
       <div style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:{{ againOp }};pointer-events:none;z-index:3"><span style="display:block;padding:7px 14px;border-radius:20px;border:1px solid #f16b7366;color:#f16b73;font-size:11px;letter-spacing:.5px;background:#1b0f10dd">AGAIN</span></div>
@@ -259,7 +267,7 @@ class Component extends DCLogic {
   openStats = () => this.setState({ stats: true });
   closeStats = () => this.setState({ stats: false });
 
-  // gestures: down reveals the meaning, up hides it, left = again, right = got it
+  // gestures: tap flips the card, left = again, right = got it
   onDown = (e) => {
     if(this.state.fly || e.target.closest("button")) return;
     this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, axis: "" };
@@ -274,15 +282,12 @@ class Component extends DCLogic {
       this.setState({ axis: d.axis });
     }
     if(d.axis === "x") this.setState({ dx });
-    else this.setState({ dy });
   };
   onUp = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
     this.drag = null;
     const { dx, dy, revealed } = this.state;
     if(d.axis === "x" && Math.abs(dx) > 80) return this.rate(dx > 0);
-    if(d.axis === "y" && !revealed && dy > 50) return this.setState({ revealed: true, dy: 0, axis: "" });
-    if(d.axis === "y" && revealed && dy < -50) return this.setState({ revealed: false, dy: 0, axis: "" });
     if(!d.axis) return this.setState({ revealed: !revealed });
     this.setState({ dx: 0, dy: 0, axis: "" });
   };
@@ -306,7 +311,7 @@ class Component extends DCLogic {
       ...(() => { const h = highlight(d); return { exPre: h.pre, exHit: h.hit, exPost: h.post }; })(),
       hitColor: d.p[4], gotBg: d.p[4], gotFg: "#141414",
       back1: artFor(DECK[s.order[(s.idx + 1) % s.order.length]].p), back2: artFor(DECK[s.order[(s.idx + 2) % s.order.length]].p),
-      enBlur: p > .5 ? "blur(0)" : "blur(9px)", enOp: p > .5 ? 1 : .55, tapOp: p > .5 ? 0 : 1,
+      faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enSize: fitSize(d.en),
       modeLabel: s.mode === "shuffle" ? "Shuffle" : "Today",
       menuOp: s.menu ? 1 : 0, menuY: s.menu ? "0" : "-6px", menuPE: s.menu ? "auto" : "none",
       toggleMenu: this.toggleMenu, closeMenu: this.closeMenu, pickTodayM: this.pickTodayM, pickShuffleM: this.pickShuffleM,
