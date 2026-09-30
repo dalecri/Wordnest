@@ -51,13 +51,14 @@ function shuffled(n){
   for(let i=n-1;i>0;i--){ const k = Math.floor(Math.random()*(i+1)); [a[i],a[k]] = [a[k],a[i]]; }
   return a;
 }
+function wordOfDay(){ const d = new Date(), start = new Date(d.getFullYear(),0,0); return DECK[Math.floor((d - start) / 864e5) % DECK.length]; }
+function fitSize(text){ const longest = Math.max(...text.split(/\s+/).map(w => w.length)); return Math.max(34, Math.min(58, Math.floor(300 / (longest * .6)))) + "px"; }
 const IDENTITY = DECK.map((_,i) => i);
 
 class Component extends DCLogic {
   constructor(props){
     super(props);
     this.cardRef = React.createRef();
-    this.dotsRef = React.createRef();
     const size = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
     this.state = {
       screen: (this.props.startScreen ?? "tutorial") === "home" ? "home" : "study",
@@ -67,47 +68,8 @@ class Component extends DCLogic {
     };
     this.drag = null;
   }
-  componentDidMount(){ this.paintDots(); }
-  componentDidUpdate(){ this.paintDots(); }
 
   card(){ const o = this.state.order; return DECK[o[this.state.idx % o.length]]; }
-
-  paintDots(){
-    const d = this.card();
-    this.paintWord(this.dotsRef.current, d.fr, brightness(d.p));
-  }
-
-  paintWord(out, text, bright){
-    // white dots always; the halo behind them gets stronger the brighter the card is
-    const halo = Math.min(.8, .32 + bright * .9), key = text + "|" + halo.toFixed(2);
-    if(!out || out.dataset.word === key) return;
-    out.dataset.word = key;
-    const c = out.getContext("2d"), mask = document.createElement("canvas");
-    mask.width = 1200; mask.height = 570;
-    const m = mask.getContext("2d"), words = text.split(" ");
-    let size = 170, lines = [];
-    while(size >= 60){
-      m.font = "600 " + size + "px Arial, sans-serif";
-      lines = [""];
-      for(const w of words){
-        const last = lines.length - 1, test = lines[last] ? lines[last] + " " + w : w;
-        if(m.measureText(test).width > 1080 && lines[last]) lines.push(w); else lines[last] = test;
-      }
-      if(lines.length * size * 1.27 <= 470 && lines.every(l => m.measureText(l).width <= 1080)) break;
-      size -= 4;
-    }
-    m.fillStyle = "white"; m.textAlign = "center"; m.textBaseline = "middle";
-    lines.forEach((l,i) => m.fillText(l, 600, 285 + (i - (lines.length-1)/2) * size * 1.27));
-    const px = m.getImageData(0,0,1200,570).data;
-    c.clearRect(0,0,1200,570);
-    // soft backplate: a blurred shadow of the word (drawn off-canvas so only the shadow lands) keeps the dots readable on any card
-    c.save(); c.shadowColor = "rgba(0,0,0," + halo.toFixed(2) + ")"; c.shadowBlur = 30; c.shadowOffsetX = 3000;
-    c.drawImage(mask, -3000, 0); c.drawImage(mask, -3000, 0); c.restore();
-    c.fillStyle = "#fffef4";
-    for(let y=4;y<570;y+=8) for(let x=4;x<1200;x+=8){
-      if(px[(y*1200+x)*4+3] > 75){ c.beginPath(); c.arc(x,y,3.4,0,Math.PI*2); c.fill(); }
-    }
-  }
 
   flip = () => {
     if(this.state.fly) return;
@@ -191,6 +153,7 @@ class Component extends DCLogic {
       speechSynthesis.speak(u);
     }
   }
+  speakWotd = () => this.say(wordOfDay().fr);
   speak = (e) => {
     e.stopPropagation();
     this.say(this.card().fr);
@@ -225,7 +188,7 @@ class Component extends DCLogic {
     const days = ["M","T","W","T","F","S","S"];
     const week = days.map((label,i) => {
       const done = i < 5, today = i === 5;
-      return { label, fill: done ? "#22231f" : "#151517", ring: today ? "#cbd4a6" : "#ffffff0d",
+      return { label, done, fill: done ? "#24261f" : "#1a1a1d", ring: today ? "#cbd4a6" : "#ffffff0d",
                dot: done ? "#cbd4a6" : (today ? "#cbd4a666" : "#2e2e34") };
     });
     const pips = Array.from({length: s.size}, (_,i) => ({
@@ -245,7 +208,13 @@ class Component extends DCLogic {
       todaySub: s.goal + " cards · about 4 min · keeps your streak",
       practiceSub: "All " + DECK.length + " cards, shuffled · no pressure",
       ink: isLight(item.p) ? "#1c1712" : "#fffffff2", inkSoft: isLight(item.p) ? "#1c1712b8" : "#ffffffc8",
-      dotShadow: "none",
+      wordSize: fitSize(item.fr),
+      wordShadow: (h => "0 1px 2px rgba(0,0,0," + (h*.9).toFixed(2) + "), 0 6px 28px rgba(0,0,0," + h.toFixed(2) + ")")(Math.min(.75, .28 + brightness(item.p) * .9)),
+      wotdWord: wordOfDay().fr, wotdMeaning: wordOfDay().en, wotdSay: wordOfDay().say || "", wotdArt: artFor(wordOfDay().p),
+      wotdExample: wordOfDay().ex, wotdTag: wordOfDay().g ? G[wordOfDay().g].label : wordOfDay().type, wotdDot: wordOfDay().g ? G[wordOfDay().g].dot : "#6d6d74",
+      speakWotd: this.speakWotd, goal: s.goal, deckSize: DECK.length,
+      masteredPct: Math.round(100 * s.mastered / Math.max(1, s.mastered + s.learning)) + "%",
+      weekLine: week.filter(d => d.done).length + " of 7 days",
       backScrim: isLight(item.p) ? "#00000066" : "#00000014",
       counter: String(Math.min(s.doneToday + 1, s.size)).padStart(2,"0") + " / " + String(s.size).padStart(2,"0"),
       pips,
@@ -269,7 +238,7 @@ class Component extends DCLogic {
       coachBottom: s.coach === 3 ? "auto" : (s.coach === 4 ? "120px" : "24px"),
       coachTop: s.coach === 3 ? "calc(env(safe-area-inset-top,0px) + 18px)" : "auto",
       skipLabel: s.coach === 4 ? "" : "Skip tutorial",
-      cardRef: this.cardRef, dotsRef: this.dotsRef,
+      cardRef: this.cardRef,
       flip: this.flip, undo: this.undo, speak: this.speak,
       onDown: this.onDown, onMove: this.onMove, onUp: this.onUp, onCardClick: this.onCardClick,
       coachAdvance: this.coachAdvance, skipTutorial: this.skipTutorial, replayTutorial: this.replayTutorial,
