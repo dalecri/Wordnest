@@ -101,29 +101,46 @@
           <div style="position:absolute;inset:0;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35,inset -1px -1px 1px #ffffff30;border:1px solid #ffffff1f;border-radius:26px;pointer-events:none"></div>
           <div style="position:absolute;top:24px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:#fffffff2">Français</span>
-            <span style="font-size:10.5px;color:#ffffffb0">{{ type }}</span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#ffffffd0;padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
           </div>
           <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);padding:0 22px">
             <canvas ref="{{ dotsRef }}" width="1200" height="570" style="width:100%;height:auto;display:block;filter:drop-shadow(0 2px 8px #0003)"></canvas>
           </div>
-          <div style="position:absolute;bottom:26px;left:24px;font-size:10px;letter-spacing:.3px;color:#ffffffb5">tap to discover</div>
+          <div style="position:absolute;bottom:26px;left:24px;font-size:12px;letter-spacing:.3px;color:#ffffffc8;font-family:ui-monospace,Menlo,monospace">{{ ipa }}</div>
           <button sc-camel-on-click="{{ speak }}" aria-label="Listen in French" style="position:absolute;bottom:20px;right:20px;width:38px;height:38px;border-radius:50%;background:#ffffff1f;color:#fffffff0;display:grid;place-items:center" style-hover="background:#ffffff33">
             <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
           </button>
         </section>
 
-        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 26px 60px #0009;background:{{ art }}">
+        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 26px 60px #0009;background:{{ art }};display:flex;flex-direction:column">
           <div style="position:absolute;inset:0;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35;border:1px solid #ffffff1f;border-radius:26px;pointer-events:none"></div>
-          <div style="position:absolute;top:24px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center">
+          <div style="flex:none;padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:#fffffff2">English</span>
-            <span style="font-size:10.5px;color:#ffffffb0">meaning &amp; context</span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#ffffffd0;padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
           </div>
-          <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);padding:0 26px;text-align:center">
-            <p style="font-size:13px;color:#ffffffaa;margin:0 0 12px">{{ word }}</p>
-            <div style="font-size:31px;font-weight:450;letter-spacing:-.9px;line-height:1.15;color:#fff;margin-bottom:20px">{{ meaning }}</div>
-            <p style="font-size:13.5px;line-height:1.6;color:#ffffffd6;margin:0">{{ example }}<span style="display:block;color:#ffffff96;font-size:12px;margin-top:4px">{{ exampleEn }}</span></p>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:14px 24px 20px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:14px">
+            <div>
+              <p style="font-size:13px;color:#ffffffc0;margin:0 0 6px">{{ word }} <span style="color:#ffffff88">· {{ say }}</span></p>
+              <div style="font-size:clamp(24px,7.5vw,30px);font-weight:450;letter-spacing:-.9px;line-height:1.12;color:#fff">{{ meaning }}</div>
+            </div>
+            <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px">
+                <sc-for list="{{ chips }}" as="c" hint-placeholder-count="2">
+                  <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;background:#00000033;border:1px solid #ffffff22;font-size:11.5px;color:#fffffff0;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:{{ c.dot }};display:{{ c.show }}"></span>{{ c.t }}</span>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasNote }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;font-size:12px;color:#ffffffc8">{{ note }}</p>
+            </sc-if>
+            <p style="font-size:13.5px;line-height:1.55;color:#ffffffe0;margin:0">{{ example }}<span style="display:block;color:#ffffff99;font-size:12px;margin-top:3px">{{ exampleEn }}</span></p>
+            <sc-if value="{{ hasTrap }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:left;padding:10px 13px;border-radius:14px;background:#0000004d;border:1px solid #ffffff1f">
+                <div style="font-size:9.5px;letter-spacing:1.3px;color:#f2c98a;margin-bottom:3px">⚠ {{ trapLabel }}</div>
+                <div style="font-size:12.5px;line-height:1.45;color:#fffffff0">{{ trapText }}</div>
+              </div>
+            </sc-if>
           </div>
-          <div style="position:absolute;bottom:26px;left:24px;font-size:10px;letter-spacing:.3px;color:#ffffffb5">a little more, every day</div>
         </section>
       </div>
     </div>
@@ -209,19 +226,37 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:920},&quot;dailyGoal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:4,&quot;max&quot;:20,&quot;section&quot;:&quot;Session&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;tutorial&quot;,&quot;options&quot;:[&quot;tutorial&quot;,&quot;home&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Session&quot;},&quot;quietMode&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Session&quot;}}">
 const DECK = [
-  {fr:"Bonjour", en:"Hello", type:"greeting", ex:"Bonjour, comment allez-vous ?", exEn:"Hello, how are you?", p:["#f5aa84","#ff7256","#0b310c","#3c7918","#ffe0bd"]},
-  {fr:"Merci", en:"Thank you", type:"courtesy", ex:"Merci pour votre aide.", exEn:"Thank you for your help.", p:["#83f8b4","#11b6ab","#00336c","#0062a2","#c9ffc8"]},
-  {fr:"J'ai faim", en:"I'm hungry", type:"literally: I have hunger", ex:"J'ai faim. On mange ?", exEn:"I'm hungry. Shall we eat?", p:["#f4a0b8","#de0759","#36051e","#790937","#f6c3f0"]},
-  {fr:"À gauche", en:"To the left", type:"direction", ex:"La gare est à gauche.", exEn:"The station is on the left.", p:["#428bff","#005ff1","#0b1016","#1c3026","#80daff"]},
-  {fr:"Je voudrais…", en:"I would like…", type:"polite request", ex:"Je voudrais un thé.", exEn:"I would like a tea.", p:["#ffc987","#f3933b","#58201d","#a43c2e","#ffe8a7"]},
-  {fr:"L'addition", en:"The bill", type:"feminine noun", ex:"L'addition, s'il vous plaît.", exEn:"The bill, please.", p:["#db8bf0","#7455de","#18082b","#34205c","#ffa48d"]},
-  {fr:"Il fait beau", en:"The weather is nice", type:"weather", ex:"Il fait beau aujourd'hui.", exEn:"The weather is nice today.", p:["#b8f1de","#43cbb6","#003f43","#07695b","#e7f5bb"]},
-  {fr:"Demain", en:"Tomorrow", type:"time", ex:"À demain !", exEn:"See you tomorrow!", p:["#e9f3a0","#b8c165","#253c11","#427044","#ffecd2"]},
-  {fr:"Je comprends", en:"I understand", type:"verb · comprendre", ex:"Oui, je comprends.", exEn:"Yes, I understand.", p:["#a2b2cb","#8b83af","#1e2435","#42465d","#e4e1cf"]},
-  {fr:"D'accord", en:"Okay / Agreed", type:"everyday phrase", ex:"D'accord, à demain.", exEn:"Okay, see you tomorrow.", p:["#ffbbb3","#e67588","#592047","#8b295d","#fff1ce"]},
-  {fr:"La réunion", en:"The meeting", type:"feminine noun", ex:"La réunion commence à neuf heures.", exEn:"The meeting starts at nine.", p:["#ff5735","#e6070c","#100313","#4d0024","#ffb778"]},
-  {fr:"Bonne journée", en:"Have a good day", type:"farewell", ex:"Merci, bonne journée !", exEn:"Thank you, have a good day!", p:["#54053a","#8d0028","#0b0414","#270317","#f04431"]}
+  {fr:"Bonjour", en:"Hello", type:"greeting", ipa:"/bɔ̃.ʒuʁ/", say:"bohn-ZHOOR", ex:"Bonjour, comment allez-vous ?", exEn:"Hello, how are you?", p:["#f5aa84","#ff7256","#0b310c","#3c7918","#ffe0bd"]},
+  {fr:"La mer", en:"The sea", type:"noun", g:"f", un:"une mer", pl:"les mers", rule:"+s", ipa:"/la mɛʁ/", say:"lah MEHR", trap:{k:"es", t:"Spanish flips it: el mar is masculine."}, ex:"On va à la mer cet été.", exEn:"We're going to the sea this summer.", p:["#7fd3e8","#1c7fa6","#062334","#0e4f6b","#c8f3ff"]},
+  {fr:"Merci", en:"Thank you", type:"courtesy", ipa:"/mɛʁ.si/", say:"mehr-SEE", ex:"Merci pour votre aide.", exEn:"Thank you for your help.", p:["#83f8b4","#11b6ab","#00336c","#0062a2","#c9ffc8"]},
+  {fr:"Le journal", en:"The newspaper", type:"noun", g:"m", un:"un journal", pl:"les journaux", rule:"-al → -aux", ipa:"/lə ʒuʁ.nal/", say:"luh zhoor-NAL", ex:"Je lis le journal le matin.", exEn:"I read the newspaper in the morning.", p:["#e8d9b0","#a88a4a","#2b2112","#5e4a25","#fff1c9"]},
+  {fr:"J'ai faim", en:"I'm hungry", type:"literally: I have hunger", ipa:"/ʒe fɛ̃/", say:"zhay FAN (nasal)", trap:{k:"es", t:"Like tengo hambre: French uses avoir, not être."}, ex:"J'ai faim. On mange ?", exEn:"I'm hungry. Shall we eat?", p:["#f4a0b8","#de0759","#36051e","#790937","#f6c3f0"]},
+  {fr:"Le lait", en:"Milk", type:"noun", g:"m", un:"du lait", pl:"", rule:"", ipa:"/lə lɛ/", say:"luh LEH", trap:{k:"es", t:"Spanish flips it: la leche is feminine."}, ex:"Un café au lait, s'il vous plaît.", exEn:"A coffee with milk, please.", p:["#f3e9d6","#c9b48f","#3a2c1c","#7a6242","#fff6e6"]},
+  {fr:"À gauche", en:"To the left", type:"direction", ipa:"/a ɡoʃ/", say:"ah GOHSH", ex:"La gare est à gauche.", exEn:"The station is on the left.", p:["#428bff","#005ff1","#0b1016","#1c3026","#80daff"]},
+  {fr:"La couleur", en:"The colour", type:"noun", g:"f", un:"une couleur", pl:"les couleurs", rule:"+s", ipa:"/la ku.lœʁ/", say:"lah koo-LUHR", trap:{k:"es", t:"Spanish flips it: el color is masculine."}, ex:"Quelle est ta couleur préférée ?", exEn:"What's your favourite colour?", p:["#ffb3e1","#c443a8","#2a0b2e","#6d1f73","#ffe0a8"]},
+  {fr:"Je voudrais…", en:"I would like…", type:"polite request", ipa:"/ʒə vu.dʁɛ/", say:"zhuh voo-DREH", ex:"Je voudrais un thé.", exEn:"I would like a tea.", p:["#ffc987","#f3933b","#58201d","#a43c2e","#ffe8a7"]},
+  {fr:"Fier / fière", en:"Proud", type:"adjective", adj:["fier","fière","fiers","fières"], ipa:"/fjɛʁ/", say:"FYEHR (both forms)", note:"Same sound, different spelling.", ex:"Elle est fière de son travail.", exEn:"She's proud of her work.", p:["#ffd27a","#e2861b","#3d1a05","#8a3f0e","#fff0c2"]},
+  {fr:"L'addition", en:"The bill", type:"noun", g:"f", un:"une addition", pl:"les additions", rule:"+s", ipa:"/la.di.sjɔ̃/", say:"lah-dee-SYOHN", trap:{k:"faux", t:"At a restaurant it's the bill (la cuenta), not just maths."}, ex:"L'addition, s'il vous plaît.", exEn:"The bill, please.", p:["#db8bf0","#7455de","#18082b","#34205c","#ffa48d"]},
+  {fr:"Le bateau", en:"The boat", type:"noun", g:"m", un:"un bateau", pl:"les bateaux", rule:"-eau → -eaux", ipa:"/lə ba.to/", say:"luh bah-TOH", ex:"Le bateau part à midi.", exEn:"The boat leaves at noon.", p:["#9ad0ff","#3b6fd6","#0b1638","#223f8a","#dff1ff"]},
+  {fr:"Il fait beau", en:"The weather is nice", type:"weather", ipa:"/il fɛ bo/", say:"eel feh BOH", trap:{k:"es", t:"Like hace buen tiempo: faire, not être."}, ex:"Il fait beau aujourd'hui.", exEn:"The weather is nice today.", p:["#b8f1de","#43cbb6","#003f43","#07695b","#e7f5bb"]},
+  {fr:"La dent", en:"The tooth", type:"noun", g:"f", un:"une dent", pl:"les dents", rule:"+s", ipa:"/la dɑ̃/", say:"lah DAHN", trap:{k:"es", t:"Spanish flips it: el diente is masculine."}, ex:"J'ai mal à une dent.", exEn:"I have a toothache.", p:["#e6e1f5","#9c93c9","#221c3a","#4d4577","#fbf8ff"]},
+  {fr:"Demain", en:"Tomorrow", type:"time", ipa:"/də.mɛ̃/", say:"duh-MAN (nasal)", ex:"À demain !", exEn:"See you tomorrow!", p:["#e9f3a0","#b8c165","#253c11","#427044","#ffecd2"]},
+  {fr:"Attendre", en:"To wait", type:"verb", aux:"avoir", pp:"attendu", fut:"attendr-", ipa:"/a.tɑ̃dʁ/", say:"ah-TAHN-dr", trap:{k:"faux", t:"Means esperar, not atender. To attend is assister à."}, ex:"J'attends le bus depuis vingt minutes.", exEn:"I've been waiting for the bus for twenty minutes.", p:["#b6e3c3","#4f9a6f","#0f2a1b","#2a5c3f","#e9ffe0"]},
+  {fr:"Je comprends", en:"I understand", type:"verb · comprendre", aux:"avoir", pp:"compris", fut:"comprendr-", ipa:"/ʒə kɔ̃.pʁɑ̃/", say:"zhuh kohm-PRAHN", ex:"Oui, je comprends.", exEn:"Yes, I understand.", p:["#a2b2cb","#8b83af","#1e2435","#42465d","#e4e1cf"]},
+  {fr:"D'accord", en:"Okay / Agreed", type:"everyday phrase", ipa:"/da.kɔʁ/", say:"dah-KOR", ex:"D'accord, à demain.", exEn:"Okay, see you tomorrow.", p:["#ffbbb3","#e67588","#592047","#8b295d","#fff1ce"]},
+  {fr:"La réunion", en:"The meeting", type:"noun", g:"f", un:"une réunion", pl:"les réunions", rule:"+s", ipa:"/la ʁe.y.njɔ̃/", say:"lah ray-ew-NYOHN", ex:"La réunion commence à neuf heures.", exEn:"The meeting starts at nine.", p:["#ff5735","#e6070c","#100313","#4d0024","#ffb778"]},
+  {fr:"Bonne journée", en:"Have a good day", type:"farewell", g:"f", un:"une journée", note:"bonne agrees with journée (f).", ipa:"/bɔn ʒuʁ.ne/", say:"bun zhoor-NAY", ex:"Merci, bonne journée !", exEn:"Thank you, have a good day!", p:["#54053a","#8d0028","#0b0414","#270317","#f04431"]}
 ];
+
+const G = { m:{ label:"masculin", dot:"#cbd4a6" }, f:{ label:"féminin", dot:"#f2c98a" } };
+
+function gramChips(d){
+  const out = [];
+  if(d.g){ out.push({ t: d.un, dot: G[d.g].dot }); if(d.pl) out.push({ t: "pl. " + d.pl + (d.rule ? "  ·  " + d.rule : ""), dot: "" }); }
+  if(d.adj){ out.push({ t: "m. " + d.adj[0], dot: G.m.dot }, { t: "f. " + d.adj[1], dot: G.f.dot }, { t: "pl. " + d.adj[2] + " / " + d.adj[3], dot: "" }); }
+  if(d.aux){ out.push({ t: "aux. " + d.aux, dot: "" }, { t: "p.p. " + d.pp, dot: "" }, { t: "futur " + d.fut, dot: "" }); }
+  return out.map(c => ({ ...c, show: c.dot ? "block" : "none" }));
+}
 
 function artFor(p){
   return "radial-gradient(70% 55% at 22% 14%, " + p[4] + "cc 0%, " + p[4] + "00 62%)," +
@@ -407,7 +442,13 @@ class Component extends DCLogic {
     }));
     return {
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
-      word: item.fr, meaning: item.en, type: item.type, example: item.ex, exampleEn: item.exEn,
+      word: item.fr, meaning: item.en, type: item.type,
+      tagLabel: item.g ? G[item.g].label : item.type, tagDot: item.g ? G[item.g].dot : "transparent",
+      tagPad: item.g ? "4px 10px 4px 8px" : "0", tagBg: item.g ? "#0000002e" : "transparent",
+      ipa: item.ipa || "", say: item.say || "",
+      chips: gramChips(item), hasChips: gramChips(item).length > 0,
+      note: item.note || "", hasNote: !!item.note,
+      hasTrap: !!item.trap, trapLabel: item.trap ? (item.trap.k === "es" ? "SPANISH TRAP" : "FAUX AMI") : "", trapText: item.trap ? item.trap.t : "", example: item.ex, exampleEn: item.exEn,
       art: artFor(item.p), glow: item.p[2],
       previewArt: artFor(next.p), previewWord: next.fr, previewType: next.type,
       dueLine: (s.size) + " cards due · about 4 minutes",

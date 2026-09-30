@@ -101,29 +101,46 @@
           <div style="position:absolute;inset:0;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35,inset -1px -1px 1px #ffffff30;border:1px solid #ffffff1f;border-radius:26px;pointer-events:none"></div>
           <div style="position:absolute;top:24px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:#fffffff2">Français</span>
-            <span style="font-size:10.5px;color:#ffffffb0">{{ type }}</span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#ffffffd0;padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
           </div>
           <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);padding:0 22px">
             <canvas ref="{{ dotsRef }}" width="1200" height="570" style="width:100%;height:auto;display:block;filter:drop-shadow(0 2px 8px #0003)"></canvas>
           </div>
-          <div style="position:absolute;bottom:26px;left:24px;font-size:10px;letter-spacing:.3px;color:#ffffffb5">tap to discover</div>
+          <div style="position:absolute;bottom:26px;left:24px;font-size:12px;letter-spacing:.3px;color:#ffffffc8;font-family:ui-monospace,Menlo,monospace">{{ ipa }}</div>
           <button sc-camel-on-click="{{ speak }}" aria-label="Listen in French" style="position:absolute;bottom:20px;right:20px;width:38px;height:38px;border-radius:50%;background:#ffffff1f;color:#fffffff0;display:grid;place-items:center" style-hover="background:#ffffff33">
             <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
           </button>
         </section>
 
-        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 26px 60px #0009;background:{{ art }}">
+        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 26px 60px #0009;background:{{ art }};display:flex;flex-direction:column">
           <div style="position:absolute;inset:0;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35;border:1px solid #ffffff1f;border-radius:26px;pointer-events:none"></div>
-          <div style="position:absolute;top:24px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center">
+          <div style="flex:none;padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:#fffffff2">English</span>
-            <span style="font-size:10.5px;color:#ffffffb0">meaning &amp; context</span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#ffffffd0;padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
           </div>
-          <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);padding:0 26px;text-align:center">
-            <p style="font-size:13px;color:#ffffffaa;margin:0 0 12px">{{ word }}</p>
-            <div style="font-size:31px;font-weight:450;letter-spacing:-.9px;line-height:1.15;color:#fff;margin-bottom:20px">{{ meaning }}</div>
-            <p style="font-size:13.5px;line-height:1.6;color:#ffffffd6;margin:0">{{ example }}<span style="display:block;color:#ffffff96;font-size:12px;margin-top:4px">{{ exampleEn }}</span></p>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:14px 24px 20px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:14px">
+            <div>
+              <p style="font-size:13px;color:#ffffffc0;margin:0 0 6px">{{ word }} <span style="color:#ffffff88">· {{ say }}</span></p>
+              <div style="font-size:clamp(24px,7.5vw,30px);font-weight:450;letter-spacing:-.9px;line-height:1.12;color:#fff">{{ meaning }}</div>
+            </div>
+            <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px">
+                <sc-for list="{{ chips }}" as="c" hint-placeholder-count="2">
+                  <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;background:#00000033;border:1px solid #ffffff22;font-size:11.5px;color:#fffffff0;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:{{ c.dot }};display:{{ c.show }}"></span>{{ c.t }}</span>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasNote }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;font-size:12px;color:#ffffffc8">{{ note }}</p>
+            </sc-if>
+            <p style="font-size:13.5px;line-height:1.55;color:#ffffffe0;margin:0">{{ example }}<span style="display:block;color:#ffffff99;font-size:12px;margin-top:3px">{{ exampleEn }}</span></p>
+            <sc-if value="{{ hasTrap }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:left;padding:10px 13px;border-radius:14px;background:#0000004d;border:1px solid #ffffff1f">
+                <div style="font-size:9.5px;letter-spacing:1.3px;color:#f2c98a;margin-bottom:3px">⚠ {{ trapLabel }}</div>
+                <div style="font-size:12.5px;line-height:1.45;color:#fffffff0">{{ trapText }}</div>
+              </div>
+            </sc-if>
           </div>
-          <div style="position:absolute;bottom:26px;left:24px;font-size:10px;letter-spacing:.3px;color:#ffffffb5">a little more, every day</div>
         </section>
       </div>
     </div>
