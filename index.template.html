@@ -81,10 +81,17 @@
       <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);opacity:{{ gotOp }};pointer-events:none;z-index:3"><span style="display:block;padding:7px 14px;border-radius:20px;border:1px solid #77ce9c66;color:#77ce9c;font-size:11px;letter-spacing:.5px;background:#0d1a13dd">GOT IT</span></div>
     </div>
 
+    <div style="flex:none;overflow:hidden;max-height:{{ exMax }};opacity:{{ exOp }};transform:translateY({{ exY }});transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .3s,transform .4s cubic-bezier(.2,.8,.3,1)">
     <div style="flex:none;border-radius:22px;background:#141416;border:1px solid #ffffff0d;padding:16px 18px 18px">
-      <div style="font-size:11.5px;font-style:italic;color:#77777d;margin-bottom:6px">Word in use:</div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px"><span style="font-size:11.5px;font-style:italic;color:#77777d">Word in use:</span><span style="font-size:10.5px;color:#4f4f56">swipe down to hide</span></div>
       <div style="font-size:15px;line-height:1.5;color:#dcdce2">{{ exPre }}<span style="color:{{ hitColor }};font-weight:600">{{ exHit }}</span>{{ exPost }}</div>
     </div>
+    </div>
+    <sc-if value="{{ exHidden }}" hint-placeholder-val="{{ false }}">
+      <button sc-camel-on-click="{{ toggleEx }}" style="align-self:center;display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:transparent;border:1px solid #ffffff14;color:#8d8d95;font-size:11.5px" style-hover="color:#eeeae7">
+        <svg sc-camel-view-box="0 0 24 24" style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="m6 9 6 6 6-6"></path></svg>show example
+      </button>
+    </sc-if>
   <div style="flex:none;display:flex;justify-content:center;gap:10px;margin-top:10px">
       <button sc-camel-on-click="{{ again }}" style="display:flex;align-items:center;gap:9px;height:50px;padding:0 22px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:15px;font-weight:500" style-hover="background:#1f1f23" style-active="transform:scale(.96)">Again
         <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M17 2l4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>

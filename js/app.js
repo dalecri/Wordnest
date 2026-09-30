@@ -63,7 +63,7 @@ class Component extends DCLogic {
     this.state = {
       screen: "study", mode: "today", order: IDENTITY, idx: 0, size: goal, goal,
       revealed: false, done: 0, history: [], dx: 0, dy: 0, axis: "", fly: 0,
-      learning: 18, mastered: 42, streak: 5, stats: false, menu: false, flip: 0
+      learning: 18, mastered: 42, streak: 5, stats: false, menu: false, showEx: true, flip: 0
     };
     this.drag = null;
   }
@@ -119,13 +119,14 @@ class Component extends DCLogic {
   closeMenu = () => this.setState({ menu: false });
   pickTodayM = () => { this.setState({ menu: false }); this.start("today"); };
   pickShuffleM = () => { this.setState({ menu: false }); this.start("shuffle"); };
+  toggleEx = () => this.setState(s => ({ showEx: !s.showEx }));
   reveal = () => this.setState(s => ({ revealed: !s.revealed }));
   again = () => this.rate(false);
   gotIt = () => this.rate(true);
   openStats = () => this.setState({ stats: true });
   closeStats = () => this.setState({ stats: false });
 
-  // gestures: tap flips the card, left = again, right = got it
+  // gestures: tap flips the card, swipe down hides/shows the example (up shows it), left = again, right = got it
   onDown = (e) => {
     if(this.state.fly || e.target.closest("button")) return;
     this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, axis: "" };
@@ -139,13 +140,15 @@ class Component extends DCLogic {
       d.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
       this.setState({ axis: d.axis });
     }
-    if(d.axis === "x") this.setState({ dx });
+    if(d.axis === "x") this.setState({ dx }); else this.setState({ dy });
   };
   onUp = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
     this.drag = null;
     const { dx, dy, revealed } = this.state;
     if(d.axis === "x" && Math.abs(dx) > 80) return this.rate(dx > 0);
+    if(d.axis === "y" && dy > 50) return this.setState(s => ({ showEx: !s.showEx, dy: 0, axis: "" }));
+    if(d.axis === "y" && dy < -50) return this.setState({ showEx: true, dy: 0, axis: "" });
     if(!d.axis) return this.setState({ revealed: !revealed });
     this.setState({ dx: 0, dy: 0, axis: "" });
   };
@@ -169,6 +172,7 @@ class Component extends DCLogic {
       ...(() => { const h = highlight(d); return { exPre: h.pre, exHit: h.hit, exPost: h.post }; })(),
       hitColor: d.p[4], gotBg: d.p[4], gotFg: "#141414",
       back1: artFor(DECK[s.order[(s.idx + 1) % s.order.length]].p), back2: artFor(DECK[s.order[(s.idx + 2) % s.order.length]].p),
+      exMax: s.showEx ? "200px" : "0px", exOp: s.showEx ? 1 : 0, exY: s.showEx ? "0" : "-10px", exHidden: !s.showEx, toggleEx: this.toggleEx,
       faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enSize: fitSize(d.en),
       modeLabel: s.mode === "shuffle" ? "Shuffle" : "Today",
       menuOp: s.menu ? 1 : 0, menuY: s.menu ? "0" : "-6px", menuPE: s.menu ? "auto" : "none",
