@@ -14,230 +14,117 @@
 </head>
 <body>
 <x-dc>
-<div style="width:100%;max-width:460px;margin:0 auto;min-height:100svh;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none;box-shadow:0 0 0 1px #ffffff0a">
+<div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#efe9df;color:#1d1b18;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
-<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
-<div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:calc(env(safe-area-inset-top,0px) + 20px) clamp(18px,5.5vw,26px) calc(env(safe-area-inset-bottom,0px) + 22px);overflow-y:auto">
-
-  <div style="display:flex;align-items:center;justify-content:space-between;flex:none;padding:0 4px 4px">
-    <div>
-      <div style="font-size:21px;font-weight:600;letter-spacing:-.6px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif">Wordnest</div>
-      <div style="font-size:11px;color:#6d6d74;margin-top:1px">un peu de français</div>
-    </div>
-    <button sc-camel-on-click="{{ replayTutorial }}" aria-label="Replay tutorial" style="width:36px;height:36px;border-radius:50%;background:#ffffff0a;color:#8d8d95;font-size:14px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;display:grid;place-items:center" style-hover="background:#ffffff14;color:#eeeae7">?</button>
+<div style="flex:none;padding:calc(env(safe-area-inset-top,0px) + 16px) 18px 0;display:flex;align-items:center;justify-content:space-between;gap:10px">
+  <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#e4ddd1">
+    <button sc-camel-on-click="{{ pickToday }}" style="padding:9px 15px;border-radius:999px;background:{{ todayBg }};color:{{ todayFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Today <span style="opacity:.6">{{ goal }}</span></button>
+    <button sc-camel-on-click="{{ pickShuffle }}" style="padding:9px 15px;border-radius:999px;background:{{ shuffleBg }};color:{{ shuffleFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Shuffle <span style="opacity:.6">{{ deckSize }}</span></button>
   </div>
-
-  <div style="flex:none;border-radius:24px;background:#131315;border:1px solid #ffffff0c;padding:18px 18px 16px">
-    <div style="display:flex;align-items:flex-end;justify-content:space-between">
-      <div style="display:flex;align-items:flex-end;gap:10px">
-        <div style="font-size:54px;line-height:.82;font-weight:500;letter-spacing:-2.5px;font-variant-numeric:tabular-nums;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif">{{ streak }}</div>
-        <div style="padding-bottom:2px">
-          <div style="font-size:13px;color:#c2c2c9">day streak</div>
-          <div style="font-size:11px;color:#6d6d74;margin-top:1px">{{ streakNote }}</div>
-        </div>
-      </div>
-      <div style="font-size:11px;color:#8d8d95;text-align:right;line-height:1.35">{{ weekLine }}<br><span style="color:#5e5e66">this week</span></div>
-    </div>
-    <div style="margin-top:16px;display:flex;gap:7px">
-      <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
-        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
-          <div style="width:100%;height:30px;border-radius:10px;background:{{ d.fill }};border:1px solid {{ d.ring }};display:grid;place-items:center">
-            <span style="width:5px;height:5px;border-radius:50%;background:{{ d.dot }}"></span>
-          </div>
-          <span style="font-size:9.5px;letter-spacing:.6px;color:#5e5e66">{{ d.label }}</span>
-        </div>
-      </sc-for>
-    </div>
-  </div>
-
-  <div style="flex:1;min-height:170px;position:relative;border-radius:24px;overflow:hidden;background:#131315;border:1px solid #ffffff0c;display:flex;flex-direction:column;padding:18px">
-    <div style="position:absolute;right:-30%;top:-40%;width:90%;aspect-ratio:1;border-radius:50%;background:{{ wotdArt }};filter:blur(40px);opacity:.33;pointer-events:none"></div>
-    <div style="position:relative;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-size:10px;letter-spacing:1.4px;color:#77777d">MOT DU JOUR</span>
-      <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#a3a3aa"><span style="width:6px;height:6px;border-radius:50%;background:{{ wotdDot }}"></span>{{ wotdTag }}</span>
-    </div>
-    <div style="position:relative;flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:14px 0 12px">
-      <div style="font-size:clamp(34px,10.5vw,46px);font-weight:600;letter-spacing:-1.2px;line-height:1.02;color:#f3f0ec;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif">{{ wotdWord }}</div>
-      <div style="margin-top:8px;font-size:13px;color:#9a9aa2">{{ wotdSay }} <span style="color:#5e5e66">·</span> {{ wotdMeaning }}</div>
-    </div>
-    <div style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px">
-      <span style="font-size:12px;line-height:1.45;color:#77777d;flex:1">{{ wotdExample }}</span>
-      <button sc-camel-on-click="{{ speakWotd }}" aria-label="Hear it in French" style="width:40px;height:40px;flex:none;border-radius:50%;background:#ffffff10;color:#eeeae7;display:grid;place-items:center" style-hover="background:#ffffff1c">
-        <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
-      </button>
-    </div>
-  </div>
-
-  <div style="flex:none;padding:2px 4px">
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:#77777d;margin-bottom:7px">
-      <span><b style="font-weight:500;color:#d7d7dd">{{ mastered }}</b> mastered</span>
-      <span><b style="font-weight:500;color:#d7d7dd">{{ learning }}</b> still learning</span>
-    </div>
-    <div style="height:5px;border-radius:3px;background:#ffffff12;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#cbd4a6;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)"></div></div>
-  </div>
-
-  <div style="display:flex;gap:10px;flex:none;margin-top:2px">
-    <button sc-camel-on-click="{{ startSession }}" style="flex:1.5;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:16px 18px;border-radius:22px;background:#eeeae6;color:#1b1b1e;text-align:left;transition:transform .2s cubic-bezier(.4,0,.2,1)" style-hover="background:#ffffff" style-active="transform:scale(.97)">
-      <span style="font-size:16px;font-weight:600;letter-spacing:-.3px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif">Today's {{ goal }} →</span>
-      <span style="font-size:11px;color:#5c5c63">about 4 min · keeps streak</span>
-    </button>
-    <button sc-camel-on-click="{{ startPractice }}" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:16px 16px;border-radius:22px;background:#17171a;border:1px solid #ffffff12;color:#e6e3e0;text-align:left;transition:transform .2s cubic-bezier(.4,0,.2,1)" style-hover="background:#1d1d21" style-active="transform:scale(.97)">
-      <span style="font-size:15px;font-weight:500;letter-spacing:-.3px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif">Shuffle all</span>
-      <span style="font-size:11px;color:#77777d">all {{ deckSize }}, any order</span>
-    </button>
-  </div>
+  <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;background:#f7f3ec;box-shadow:0 1px 0 #ddd5c8;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#fff">
+    <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:#c7812f"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
+  </button>
 </div>
-</sc-if>
 
-<sc-if value="{{ isStudy }}" hint-placeholder-val="{{ false }}">
-<div style="flex:1;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 14px) clamp(16px,4.5vw,24px) calc(env(safe-area-inset-bottom,0px) + 20px);min-height:0">
-  <div style="height:40px;display:flex;align-items:center;justify-content:space-between;flex:none">
-    <button sc-camel-on-click="{{ goHome }}" aria-label="Back" style="width:40px;height:40px;border-radius:50%;background:transparent;color:#8d8d95;display:grid;place-items:center" style-hover="background:#ffffff0f;color:#fff">
-      <svg sc-camel-view-box="0 0 24 24" style="width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m14 6-6 6 6 6"></path></svg>
-    </button>
-    <div style="font-size:10px;letter-spacing:1.4px;color:#6f6f77;font-variant-numeric:tabular-nums">{{ counter }}</div>
-    <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:40px;height:40px;border-radius:50%;background:transparent;color:{{ undoColor }};display:grid;place-items:center" style-hover="background:#ffffff0f">
-      <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
+<sc-if value="{{ isStudy }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+  <div style="flex:none;padding:16px 22px 0;display:flex;align-items:center;gap:12px">
+    <span style="font-size:12px;color:#6f6a62;font-variant-numeric:tabular-nums;min-width:44px">{{ count }}</span>
+    <div style="flex:1;height:4px;border-radius:2px;background:#ddd5c8;overflow:hidden"><div style="height:100%;width:{{ pct }};background:#1d1b18;border-radius:2px;transition:width .4s cubic-bezier(.4,0,.2,1)"></div></div>
+    <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:30px;height:30px;border-radius:50%;background:transparent;color:#1d1b18;opacity:{{ undoOp }};display:grid;place-items:center">
+      <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
     </button>
   </div>
 
-  <div style="position:relative;flex:1;min-height:0;margin-top:6px;display:flex;flex-direction:column">
-    <div style="position:absolute;inset:14% 12%;background:{{ glow }};opacity:.2;filter:blur(70px);pointer-events:none"></div>
-    <div style="position:absolute;inset:0;transform:scale(.9) translateY(-38px);border-radius:26px;background:#232427;border:1px solid #ffffff14"></div>
-    <div style="position:absolute;inset:0;transform:scale(.95) translateY(-19px);border-radius:26px;background:#34363a;border:1px solid #ffffff1c"></div>
+  <div sc-camel-on-pointer-down="{{ onDown }}" sc-camel-on-pointer-move="{{ onMove }}" sc-camel-on-pointer-up="{{ onUp }}" sc-camel-on-pointer-cancel="{{ onUp }}" sc-camel-on-click="{{ onTap }}" style="flex:1;min-height:0;position:relative;touch-action:pan-y;cursor:pointer">
+    <div style="position:absolute;left:18px;top:50%;transform:translateY(-50%);opacity:{{ againOp }};font-size:11px;letter-spacing:1px;color:#b4533f;pointer-events:none">AGAIN</div>
+    <div style="position:absolute;right:18px;top:50%;transform:translateY(-50%);opacity:{{ gotOp }};font-size:11px;letter-spacing:1px;color:#4f7a3a;pointer-events:none">GOT IT</div>
+    <div style="height:100%;overflow-y:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:20px 26px;transform:{{ move }};transition:{{ moveT }};opacity:{{ moveOp }}">
+      <div style="animation:{{ enter }} .45s cubic-bezier(.2,.8,.3,1) both;display:flex;flex-direction:column;align-items:center;width:100%">
+        <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#6f6a62;margin-bottom:14px"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tag }}</div>
+        <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ wordSize }};line-height:1.04;letter-spacing:-.03em;text-wrap:balance;overflow-wrap:anywhere">{{ word }}</div>
+        <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="margin-top:18px;display:flex;align-items:center;gap:9px;padding:9px 16px;border-radius:999px;background:#f7f3ec;box-shadow:0 1px 0 #d8cfc1,0 8px 20px -12px #1d1b1855;color:#1d1b18" style-hover="background:#fff" style-active="transform:scale(.96)">
+          <span style="font-size:17px;font-family:ui-monospace,'SF Mono',Menlo,monospace;letter-spacing:.2px">{{ ipa }}</span>
+          <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
+        </button>
 
-    <div ref="{{ cardRef }}" sc-camel-on-pointer-down="{{ onDown }}" sc-camel-on-pointer-move="{{ onMove }}" sc-camel-on-pointer-up="{{ onUp }}" sc-camel-on-pointer-cancel="{{ onUp }}" sc-camel-on-click="{{ onCardClick }}" style="position:absolute;inset:0;perspective:1100px;cursor:grab;touch-action:pan-y;transform:{{ cardTransform }};transition:{{ cardTransition }}">
-      <div style="position:absolute;inset:0;transform-style:preserve-3d;transition:transform .72s cubic-bezier(.2,.85,.25,1);transform:{{ faceTransform }}">
-
-        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 26px 60px #0009;background:{{ art }}">
-          <div style="position:absolute;inset:0;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35,inset -1px -1px 1px #ffffff30;border:1px solid #ffffff1f;border-radius:26px;pointer-events:none"></div>
-          <div style="position:absolute;top:24px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:{{ ink }}">Français</span>
-            <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:{{ inkSoft }};padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
-          </div>
-          <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);padding:0 22px">
-            <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:{{ wordSize }};line-height:1.06;letter-spacing:-.025em;text-align:center;color:#fffef6;text-shadow:{{ wordShadow }};text-wrap:balance;overflow-wrap:anywhere">{{ word }}</div>
-          </div>
-          <div style="position:absolute;bottom:26px;left:24px;font-size:12px;letter-spacing:.3px;color:{{ inkSoft }};font-family:ui-monospace,Menlo,monospace">{{ ipa }}</div>
-          <button sc-camel-on-click="{{ speak }}" aria-label="Listen in French" style="position:absolute;bottom:20px;right:20px;width:38px;height:38px;border-radius:50%;background:#ffffff1f;color:#fffffff0;display:grid;place-items:center" style-hover="background:#ffffff33">
-            <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
-          </button>
-        </section>
-
-        <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 26px 60px #0009;background:{{ art }};display:flex;flex-direction:column">
-          <div style="position:absolute;inset:0;background:{{ backScrim }};pointer-events:none"></div>
-          <div style="position:absolute;inset:0;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35;border:1px solid #ffffff1f;border-radius:26px;pointer-events:none"></div>
-          <div style="position:relative;flex:none;padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:#fffffff2">English</span>
-            <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#ffffffd0;padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
-          </div>
-          <div style="position:relative;flex:1;min-height:0;overflow-y:auto;padding:14px 24px 20px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:14px">
-            <div>
-              <p style="font-size:13px;color:#ffffffc0;margin:0 0 6px"><span style="font-family:'Space Grotesk',ui-sans-serif,sans-serif;font-weight:600;font-size:14px;color:#fffffff0">{{ word }}</span> <span style="color:#ffffff88">· {{ say }}</span></p>
-              <div style="font-size:clamp(24px,7.5vw,30px);font-weight:450;letter-spacing:-.9px;line-height:1.12;color:#fff">{{ meaning }}</div>
-            </div>
+        <div style="position:relative;width:100%;margin-top:26px">
+          <div style="position:absolute;inset:0;display:flex;justify-content:center;padding-top:10px;opacity:{{ hintOp }};transition:opacity .25s;font-size:12.5px;color:#9b9387;pointer-events:none">Tap to see the meaning</div>
+          <div style="opacity:{{ revealOp }};transform:translateY({{ revealY }});transition:opacity .35s cubic-bezier(.4,0,.2,1),transform .35s cubic-bezier(.4,0,.2,1);pointer-events:{{ revealPE }};display:flex;flex-direction:column;align-items:center;gap:16px">
+            <div style="font-size:18px;line-height:1.35"><span style="color:#6f6a62">({{ pos }})</span> {{ meaning }}</div>
+            <div style="font-size:14.5px;line-height:1.5;max-width:30ch">{{ example }}<span style="display:block;margin-top:3px;font-size:12.5px;color:#8a8378">{{ exampleEn }}</span></div>
             <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:6px">
                 <sc-for list="{{ chips }}" as="c" hint-placeholder-count="2">
-                  <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:20px;background:#00000033;border:1px solid #ffffff22;font-size:11.5px;color:#fffffff0;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:{{ c.dot }};display:{{ c.show }}"></span>{{ c.t }}</span>
+                  <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;border:1px solid #d8cfc1;font-size:12px;color:#3d3a35;white-space:nowrap"><span style="width:6px;height:6px;border-radius:50%;background:{{ c.dot }};display:{{ c.show }}"></span>{{ c.t }}</span>
                 </sc-for>
               </div>
             </sc-if>
-            <sc-if value="{{ hasNote }}" hint-placeholder-val="{{ false }}">
-              <p style="margin:0;font-size:12px;color:#ffffffc8">{{ note }}</p>
-            </sc-if>
-            <p style="font-size:13.5px;line-height:1.55;color:#ffffffe0;margin:0">{{ example }}<span style="display:block;color:#ffffff99;font-size:12px;margin-top:3px">{{ exampleEn }}</span></p>
+            <sc-if value="{{ hasNote }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#6f6a62">{{ note }}</div></sc-if>
             <sc-if value="{{ hasTrap }}" hint-placeholder-val="{{ false }}">
-              <div style="text-align:left;padding:10px 13px;border-radius:14px;background:#0000004d;border:1px solid #ffffff1f">
-                <div style="font-size:9.5px;letter-spacing:1.3px;color:#f2c98a;margin-bottom:3px">⚠ {{ trapLabel }}</div>
-                <div style="font-size:12.5px;line-height:1.45;color:#fffffff0">{{ trapText }}</div>
-              </div>
+              <div style="max-width:320px;padding:10px 14px;border-radius:14px;background:#f3e3c8;color:#5b3d17;font-size:12.5px;line-height:1.45;text-align:left"><b style="font-weight:600">{{ trapLabel }}.</b> {{ trapText }}</div>
             </sc-if>
+            <div style="font-size:12px;color:#9b9387">say it: {{ say }}</div>
           </div>
-        </section>
+        </div>
       </div>
-    </div>
-
-    <div style="position:absolute;left:22px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:{{ noOpacity }};transition:opacity .12s">
-      <span style="display:block;padding:7px 14px;border-radius:20px;border:1px solid #f16b7355;color:#f16b73;font-size:11px;letter-spacing:.4px;background:#1b0f1080">LEARNING</span>
-    </div>
-    <div style="position:absolute;right:22px;top:50%;transform:translateY(-50%);pointer-events:none;opacity:{{ yesOpacity }};transition:opacity .12s">
-      <span style="display:block;padding:7px 14px;border-radius:20px;border:1px solid #77ce9c55;color:#77ce9c;font-size:11px;letter-spacing:.4px;background:#0d1a1380">MASTERED</span>
     </div>
   </div>
 
-  <div style="flex:none;padding-top:18px;display:flex;flex-direction:column;align-items:center;gap:12px">
-    <div style="display:flex;gap:5px">
-      <sc-for list="{{ pips }}" as="p" hint-placeholder-count="12">
-        <span style="width:{{ p.w }};height:3px;border-radius:2px;background:{{ p.bg }};transition:background .3s"></span>
-      </sc-for>
-    </div>
-    <p style="margin:0;font-size:10.5px;color:#66666d;letter-spacing:.2px">Tap to flip · swipe left to keep learning, right to master</p>
+  <div style="flex:none;position:relative;z-index:2;padding:10px 18px calc(env(safe-area-inset-bottom,0px) + 18px)">
+    <sc-if value="{{ showReveal }}" hint-placeholder-val="{{ true }}">
+      <button sc-camel-on-click="{{ reveal }}" style="width:100%;height:56px;border-radius:999px;background:#1d1b18;color:#f4efe7;font-size:15px;font-weight:500" style-active="transform:scale(.98)">Show meaning</button>
+    </sc-if>
+    <sc-if value="{{ showRate }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;gap:10px">
+        <button sc-camel-on-click="{{ again }}" style="flex:1;height:56px;border-radius:999px;background:transparent;border:1.5px solid #cfc6b8;color:#1d1b18;font-size:15px;font-weight:500" style-hover="background:#e7e0d5" style-active="transform:scale(.98)">Again</button>
+        <button sc-camel-on-click="{{ gotIt }}" style="flex:1;height:56px;border-radius:999px;background:#1d1b18;color:#f4efe7;font-size:15px;font-weight:500" style-active="transform:scale(.98)">Got it</button>
+      </div>
+    </sc-if>
   </div>
 </div>
 </sc-if>
 
 <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
-<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 30px) clamp(22px,7vw,34px) calc(env(safe-area-inset-bottom,0px) + 34px);gap:0;text-align:center">
-  <div style="width:100%;max-width:300px;border-radius:26px;padding:34px 26px;background:{{ art }};box-shadow:0 26px 60px #0009;border:1px solid #ffffff1f;animation:wn-pop .5s cubic-bezier(.2,.9,.3,1.3) both">
-    <div style="font-size:11px;letter-spacing:.4px;color:#ffffffb5">{{ doneKicker }}</div>
-    <div style="font-size:33px;font-weight:450;letter-spacing:-1px;color:#fff;margin:14px 0 10px">Petit à petit.</div>
-    <div style="font-size:13px;color:#ffffffd0;line-height:1.6">{{ doneLine }}</div>
-  </div>
-  <div style="margin-top:30px;display:flex;align-items:center;gap:11px;animation:wn-rise .5s .25s both">
-    <span style="font-size:42px;line-height:1;font-weight:400;letter-spacing:-2px;color:#eeeae7;font-variant-numeric:tabular-nums">{{ streak }}</span>
-    <span style="font-size:12px;color:#8b8b92;text-align:left;line-height:1.4">day streak<br><span style="color:#5f5f67">{{ streakCaption }}</span></span>
-  </div>
-  <div style="margin-top:34px;display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;animation:wn-rise .5s .35s both">
-    <button sc-camel-on-click="{{ goHome }}" style="height:52px;border-radius:28px;background:#eeeae6;color:#1b1b1e;font-size:14.5px;font-weight:500" style-hover="background:#fff">Done for today</button>
-    <button sc-camel-on-click="{{ startPractice }}" style="height:52px;border-radius:28px;background:#1b1b1e;color:#cfcfd6;font-size:14px" style-hover="background:#26262b">Practice all, shuffled</button>
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px 28px calc(env(safe-area-inset-bottom,0px) + 24px);animation:wn-inA .5s cubic-bezier(.2,.8,.3,1) both">
+  <div style="font-size:12px;color:#6f6a62">à demain</div>
+  <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:44px;letter-spacing:-.03em;margin:10px 0 12px">{{ doneTitle }}</div>
+  <div style="font-size:14px;color:#6f6a62;max-width:28ch;line-height:1.5">{{ doneLine }}</div>
+  <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:36px">
+    <button sc-camel-on-click="{{ shuffleAgain }}" style="height:54px;border-radius:999px;background:#1d1b18;color:#f4efe7;font-size:15px;font-weight:500">Shuffle all {{ deckSize }}</button>
+    <button sc-camel-on-click="{{ openStats }}" style="height:54px;border-radius:999px;border:1.5px solid #cfc6b8;background:transparent;color:#1d1b18;font-size:15px;font-weight:500">See progress</button>
   </div>
 </div>
 </sc-if>
 
-<sc-if value="{{ coachOn }}" hint-placeholder-val="{{ false }}">
-<div style="position:absolute;inset:0;z-index:20;pointer-events:none">
-  <div style="position:absolute;inset:0;background:{{ coachDim }};transition:background .4s"></div>
-
-  <sc-if value="{{ showTapHint }}" hint-placeholder-val="{{ false }}">
-    <div style="position:absolute;left:50%;top:46%;width:58px;height:58px;border-radius:50%;border:1.5px solid #ffffffcc;animation:wn-tap 1.4s ease-in-out infinite"></div>
-  </sc-if>
-  <sc-if value="{{ showLeftHint }}" hint-placeholder-val="{{ false }}">
-    <div style="position:absolute;left:52%;top:46%;display:flex;align-items:center;gap:6px;color:#f16b73;animation:wn-swl 1.5s ease-in-out infinite">
-      <svg sc-camel-view-box="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m13 6-6 6 6 6"></path></svg>
-      <span style="width:42px;height:42px;border-radius:50%;border:1.5px solid currentColor"></span>
+<div sc-camel-on-click="{{ closeStats }}" style="position:absolute;inset:0;z-index:10;background:{{ sheetBg }};transition:background .3s;pointer-events:{{ sheetPE }}"></div>
+<div style="position:absolute;left:0;right:0;bottom:0;z-index:11;transform:translateY({{ sheetY }});transition:transform .38s cubic-bezier(.2,.8,.3,1);background:#f7f3ec;border-radius:28px 28px 0 0;padding:12px 22px calc(env(safe-area-inset-bottom,0px) + 26px);box-shadow:0 -10px 40px -20px #1d1b1866">
+  <div style="width:36px;height:4px;border-radius:2px;background:#d8cfc1;margin:0 auto 18px"></div>
+  <div style="display:flex;align-items:flex-end;justify-content:space-between">
+    <div style="display:flex;align-items:flex-end;gap:10px">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:56px;line-height:.82;letter-spacing:-.04em">{{ streak }}</div>
+      <div><div style="font-size:14px">day streak</div><div style="font-size:11.5px;color:#8a8378;margin-top:1px">best: 21 days</div></div>
     </div>
-  </sc-if>
-  <sc-if value="{{ showRightHint }}" hint-placeholder-val="{{ false }}">
-    <div style="position:absolute;left:44%;top:46%;display:flex;align-items:center;gap:6px;color:#77ce9c;animation:wn-swr 1.5s ease-in-out infinite">
-      <span style="width:42px;height:42px;border-radius:50%;border:1.5px solid currentColor"></span>
-      <svg sc-camel-view-box="0 0 24 24" style="width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m11 6 6 6-6 6"></path></svg>
-    </div>
-  </sc-if>
-
-  <div style="position:absolute;left:20px;right:20px;bottom:{{ coachBottom }};top:{{ coachTop }};max-height:calc(100% - 40px);overflow:auto;pointer-events:auto;border-radius:22px;padding:20px 22px;background:#151517f2;border:1px solid #ffffff16;box-shadow:0 18px 40px #000a;animation:wn-rise .4s both">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-      <span style="font-size:9.5px;letter-spacing:1.5px;color:#6f6f77">{{ coachStepLabel }}</span>
-      <button sc-camel-on-click="{{ skipTutorial }}" style="background:transparent;color:#6f6f77;font-size:11px;padding:0" style-hover="color:#c2c2c9">{{ skipLabel }}</button>
-    </div>
-    <div style="font-size:19px;font-weight:500;letter-spacing:-.5px;color:#f1eeeb;line-height:1.25">{{ coachTitle }}</div>
-    <p style="margin:8px 0 0;font-size:13px;line-height:1.55;color:#9a9aa2">{{ coachBody }}</p>
-    <sc-if value="{{ coachHasButton }}" hint-placeholder-val="{{ false }}">
-      <button sc-camel-on-click="{{ coachAdvance }}" style="margin-top:18px;width:100%;height:48px;border-radius:26px;background:#eeeae6;color:#1b1b1e;font-size:14px;font-weight:500" style-hover="background:#fff">{{ coachButton }}</button>
-    </sc-if>
-    <sc-if value="{{ coachWaiting }}" hint-placeholder-val="{{ false }}">
-      <div style="margin-top:16px;display:flex;align-items:center;gap:8px;font-size:11px;color:#5f5f67">
-        <span style="width:5px;height:5px;border-radius:50%;background:#cbd4a6"></span>
-        <span>{{ coachWaitLabel }}</span>
+    <button sc-camel-on-click="{{ closeStats }}" aria-label="Close" style="width:34px;height:34px;border-radius:50%;background:#e7e0d5;color:#6f6a62;display:grid;place-items:center;font-size:16px">×</button>
+  </div>
+  <div style="margin-top:20px;display:flex;gap:7px">
+    <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px">
+        <div style="width:100%;height:32px;border-radius:10px;background:{{ d.fill }};box-shadow:0 0 0 1.5px {{ d.ring }};display:grid;place-items:center"><span style="width:5px;height:5px;border-radius:50%;background:{{ d.dot }}"></span></div>
+        <span style="font-size:10px;color:#8a8378">{{ d.label }}</span>
       </div>
-    </sc-if>
+    </sc-for>
+  </div>
+  <div style="margin-top:8px;font-size:11.5px;color:#8a8378">{{ weekLine }}</div>
+  <div style="margin-top:22px">
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px"><span><b style="font-weight:600">{{ mastered }}</b> <span style="color:#6f6a62">mastered</span></span><span><b style="font-weight:600">{{ learning }}</b> <span style="color:#6f6a62">still learning</span></span></div>
+    <div style="height:6px;border-radius:3px;background:#e4ddd1;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#1d1b18;border-radius:3px"></div></div>
   </div>
 </div>
-</sc-if>
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:920},&quot;dailyGoal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:4,&quot;max&quot;:20,&quot;section&quot;:&quot;Session&quot;},&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;tutorial&quot;,&quot;options&quot;:[&quot;tutorial&quot;,&quot;home&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Session&quot;},&quot;quietMode&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Session&quot;}}">
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:920},&quot;dailyGoal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:4,&quot;max&quot;:20,&quot;section&quot;:&quot;Session&quot;},}">
 const DECK = [
   {fr:"Bonjour", en:"Hello", type:"greeting", ipa:"/bɔ̃.ʒuʁ/", say:"bohn-ZHOOR", ex:"Bonjour, comment allez-vous ?", exEn:"Hello, how are you?", p:["#f5aa84","#ff7256","#0b310c","#3c7918","#ffe0bd"]},
   {fr:"La mer", en:"The sea", type:"noun", g:"f", un:"une mer", pl:"les mers", rule:"+s", ipa:"/la mɛʁ/", say:"lah MEHR", trap:{k:"es", t:"Spanish flips it: el mar is masculine."}, ex:"On va à la mer cet été.", exEn:"We're going to the sea this summer.", p:["#7fd3e8","#1c7fa6","#062334","#0e4f6b","#c8f3ff"]},
@@ -261,228 +148,157 @@ const DECK = [
   {fr:"Bonne journée", en:"Have a good day", type:"farewell", g:"f", un:"une journée", note:"bonne agrees with journée (f).", ipa:"/bɔn ʒuʁ.ne/", say:"bun zhoor-NAY", ex:"Merci, bonne journée !", exEn:"Thank you, have a good day!", p:["#54053a","#8d0028","#0b0414","#270317","#f04431"]}
 ];
 
-const G = { m:{ label:"masculin", dot:"#cbd4a6" }, f:{ label:"féminin", dot:"#f2c98a" } };
+const G = { m:{ label:"masculin", abbr:"n. m.", dot:"#6f8a4e" }, f:{ label:"féminin", abbr:"n. f.", dot:"#c7812f" } };
 
 function gramChips(d){
   const out = [];
-  if(d.g){ out.push({ t: d.un, dot: G[d.g].dot }); if(d.pl) out.push({ t: "pl. " + d.pl + (d.rule ? "  ·  " + d.rule : ""), dot: "" }); }
-  if(d.adj){ out.push({ t: "m. " + d.adj[0], dot: G.m.dot }, { t: "f. " + d.adj[1], dot: G.f.dot }, { t: "pl. " + d.adj[2] + " / " + d.adj[3], dot: "" }); }
+  if(d.g && d.un){ out.push({ t: d.un, dot: G[d.g].dot }); if(d.pl) out.push({ t: d.pl + (d.rule ? "  ·  " + d.rule : ""), dot: "" }); }
+  if(d.adj){ out.push({ t: "m. " + d.adj[0], dot: G.m.dot }, { t: "f. " + d.adj[1], dot: G.f.dot }, { t: d.adj[2] + " / " + d.adj[3], dot: "" }); }
   if(d.aux){ out.push({ t: "aux. " + d.aux, dot: "" }, { t: "p.p. " + d.pp, dot: "" }, { t: "futur " + d.fut, dot: "" }); }
   return out.map(c => ({ ...c, show: c.dot ? "block" : "none" }));
 }
-
-function artFor(p){
-  return "radial-gradient(70% 55% at 22% 14%, " + p[4] + "cc 0%, " + p[4] + "00 62%)," +
-         "radial-gradient(62% 48% at 78% 86%, " + p[2] + "e6 0%, " + p[2] + "00 70%)," +
-         "radial-gradient(52% 44% at 46% 52%, " + p[3] + " 0%, " + p[3] + "00 78%)," +
-         "radial-gradient(38% 32% at 44% 50%, " + p[0] + "cc 0%, " + p[0] + "00 80%)," +
-         p[1];
+function posLabel(d){
+  if(d.g && d.type === "noun") return G[d.g].abbr;
+  if(d.type === "adjective") return "adj.";
+  if(d.type === "verb" || /^verb/.test(d.type)) return "v.";
+  return "expr.";
 }
-
-function lum(hex){
-  const n = parseInt(hex.slice(1,7),16), ch = [n>>16&255, n>>8&255, n&255].map(v => { v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); });
-  return .2126*ch[0] + .7152*ch[1] + .0722*ch[2];
-}
-// brightness behind the word: the centre blobs of the card art sit on top of the base colour
-function brightness(p){ return .45*lum(p[0]) + .35*lum(p[3]) + .2*lum(p[1]); }
-function isLight(p){ return brightness(p) > .5; }
 function shuffled(n){
   const a = Array.from({length:n}, (_,i) => i);
   for(let i=n-1;i>0;i--){ const k = Math.floor(Math.random()*(i+1)); [a[i],a[k]] = [a[k],a[i]]; }
   return a;
 }
-function wordOfDay(){ const d = new Date(), start = new Date(d.getFullYear(),0,0); return DECK[Math.floor((d - start) / 864e5) % DECK.length]; }
-function fitSize(text){ const longest = Math.max(...text.split(/\s+/).map(w => w.length)); return Math.max(34, Math.min(58, Math.floor(300 / (longest * .6)))) + "px"; }
+function fitSize(text){ const longest = Math.max(...text.split(/\s+/).map(w => w.length)); return Math.max(36, Math.min(60, Math.floor(310 / (longest * .6)))) + "px"; }
 const IDENTITY = DECK.map((_,i) => i);
 
 class Component extends DCLogic {
   constructor(props){
     super(props);
-    this.cardRef = React.createRef();
-    const size = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
+    const goal = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
     this.state = {
-      screen: (this.props.startScreen ?? "tutorial") === "home" ? "home" : "study",
-      coach: (this.props.startScreen ?? "tutorial") === "home" ? -1 : 0,
-      idx: 0, size, goal: size, mode: "today", order: IDENTITY, revealed: false, dx: 0, dy: 0, dragging: false, fly: 0,
-      learning: 18, mastered: 42, streak: 5, doneToday: 0, history: []
+      screen: "study", mode: "today", order: IDENTITY, idx: 0, size: goal, goal,
+      revealed: false, done: 0, history: [], dx: 0, dragging: false, fly: 0,
+      learning: 18, mastered: 42, streak: 5, stats: false, flip: 0
     };
     this.drag = null;
   }
 
   card(){ const o = this.state.order; return DECK[o[this.state.idx % o.length]]; }
 
-  flip = () => {
-    if(this.state.fly) return;
-    this.setState(s => ({ revealed: !s.revealed }), () => {
-      if(this.state.coach === 0 && this.state.revealed) this.setState({ coach: 1 });
-    });
-  };
+  say(word){
+    const text = word.replace(/…/g,"").trim();
+    if(!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "fr-CA"; u.rate = .82;
+    const v = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith("fr"));
+    if(v) u.voice = v;
+    speechSynthesis.speak(u);
+  }
+  speak = (e) => { if(e) e.stopPropagation(); this.say(this.card().fr); };
+
+  reveal = () => { if(!this.state.revealed && !this.state.fly) this.setState({ revealed: true }); };
 
   rate = (got) => {
-    if(this.state.fly) return;
-    const c = this.state.coach;
-    if(c === 1 && got) return this.snapBack();
-    if(c === 2 && !got) return this.snapBack();
+    if(this.state.fly || !this.state.revealed) return;
     this.setState({ fly: got ? 1 : -1, dragging: false });
-    setTimeout(() => {
-      this.setState(s => {
-        const done = s.doneToday + 1, last = { idx: s.idx, learning: s.learning, mastered: s.mastered, doneToday: s.doneToday };
-        const finished = done >= s.size && s.coach < 0;
-        return {
-          fly: 0, dx: 0, dy: 0, revealed: false,
-          idx: s.idx + 1, doneToday: done,
-          learning: got ? s.learning : s.learning + 1,
-          mastered: got ? s.mastered + 1 : s.mastered,
-          history: [last, ...s.history].slice(0,5),
-          screen: finished ? "done" : "study",
-          streak: finished && s.mode === "today" ? s.streak + 1 : s.streak,
-          coach: c === 1 ? 2 : (c === 2 ? 3 : c)
-        };
-      });
-    }, 300);
+    setTimeout(() => this.setState(s => {
+      const done = s.done + 1, finished = done >= s.size;
+      return {
+        fly: 0, dx: 0, revealed: false, flip: 1 - s.flip,
+        history: [{ idx: s.idx, done: s.done, learning: s.learning, mastered: s.mastered }, ...s.history].slice(0,5),
+        idx: s.idx + 1, done,
+        learning: got ? s.learning : s.learning + 1,
+        mastered: got ? s.mastered + 1 : s.mastered,
+        screen: finished ? "done" : "study",
+        streak: finished && s.mode === "today" ? s.streak + 1 : s.streak
+      };
+    }), 260);
   };
+  again = () => this.rate(false);
+  gotIt = () => this.rate(true);
 
-  snapBack = () => this.setState({ dx: 0, dy: 0, dragging: false });
+  undo = () => this.setState(s => {
+    if(!s.history.length) return null;
+    const [h, ...rest] = s.history;
+    return { ...h, history: rest, revealed: true, screen: "study", flip: 1 - s.flip };
+  });
 
-  undo = () => {
-    if(this.state.coach >= 0) return;
-    this.setState(s => {
-      if(!s.history.length) return null;
-      const [h, ...rest] = s.history;
-      return { ...h, history: rest, revealed: false, screen: "study" };
-    });
-  };
+  start(mode){
+    this.setState(s => ({
+      screen: "study", mode, idx: 0, done: 0, history: [], revealed: false, dx: 0, flip: 1 - s.flip,
+      order: mode === "shuffle" ? shuffled(DECK.length) : IDENTITY,
+      size: mode === "shuffle" ? DECK.length : s.goal
+    }));
+  }
+  pickToday = () => { if(this.state.mode !== "today" || this.state.screen === "done") this.start("today"); };
+  pickShuffle = () => { if(this.state.mode !== "shuffle" || this.state.screen === "done") this.start("shuffle"); };
+  shuffleAgain = () => this.start("shuffle");
+  openStats = () => this.setState({ stats: true });
+  closeStats = () => this.setState({ stats: false });
 
   onDown = (e) => {
-    if(this.state.fly || e.target.closest("button")) return;
-    this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+    if(this.state.fly || !this.state.revealed || e.target.closest("button")) return;
+    this.drag = { id: e.pointerId, x: e.clientX, moved: false };
   };
   onMove = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
-    const dx = e.clientX - d.x, dy = e.clientY - d.y;
-    if(!d.moved){
-      if(Math.abs(dx) < 8) return;
-      d.moved = true;
-      try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {}
-      this.setState({ dragging: true });
-    }
-    this.setState({ dx, dy: dy * 0.35 });
+    const dx = e.clientX - d.x;
+    if(!d.moved){ if(Math.abs(dx) < 10) return; d.moved = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {} this.setState({ dragging: true }); }
+    this.setState({ dx });
   };
   onUp = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
     this.drag = null;
     if(!d.moved) return;
-    const dx = this.state.dx;
-    if(Math.abs(dx) > 78) this.rate(dx > 0); else this.snapBack();
     this.suppress = Date.now() + 300;
+    if(Math.abs(this.state.dx) > 80) this.rate(this.state.dx > 0); else this.setState({ dx: 0, dragging: false });
   };
-  onCardClick = (e) => {
+  onTap = (e) => {
     if(e.target.closest("button")) return;
     if(this.suppress && Date.now() < this.suppress) return;
-    this.flip();
+    this.reveal();
   };
-
-  say(word){
-    const text = word.replace(/…/g,"").trim();
-    if("speechSynthesis" in window){
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "fr-CA"; u.rate = .82;
-      const v = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith("fr"));
-      if(v) u.voice = v;
-      speechSynthesis.speak(u);
-    }
-  }
-  speakWotd = () => this.say(wordOfDay().fr);
-  speak = (e) => {
-    e.stopPropagation();
-    this.say(this.card().fr);
-    if(this.state.coach === 3) this.setState({ coach: 4 });
-  };
-
-
-  coachAdvance = () => {
-    const c = this.state.coach;
-    if(c === 4) this.setState({ coach: -1, screen: "home", revealed: false, doneToday: 0, idx: 0 });
-  };
-  skipTutorial = () => this.setState(s => ({ coach: -1, screen: "home", mode: "today", order: IDENTITY, size: s.goal, revealed: false, doneToday: 0, idx: 0 }));
-  replayTutorial = () => this.setState(s => ({ coach: 0, screen: "study", mode: "today", order: IDENTITY, size: s.goal, revealed: false, idx: 0, doneToday: 0, dx: 0, dy: 0 }));
-  startSession = () => this.setState(s => ({ screen: "study", mode: "today", order: IDENTITY, size: s.goal, doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] }));
-  startPractice = () => this.setState({ screen: "study", mode: "practice", order: shuffled(DECK.length), idx: 0, size: DECK.length, doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] });
-  goHome = () => this.setState({ screen: "home", revealed: false, dx: 0, dy: 0 });
 
   renderVals(){
-    const s = this.state, item = this.card(), quiet = this.props.quietMode ?? false;
-    const flyX = s.fly ? s.fly * 520 : 0;
-    const x = s.fly ? flyX : s.dx, y = s.fly ? -90 : s.dy;
-    const rot = Math.max(-22, Math.min(22, x * .035));
-    const amount = Math.min(.95, Math.abs(s.dx) / 90);
-    const steps = [
-      { label:"STEP 1 OF 4", title:"Tap the card", body:"Every card shows the French first. Tap it to see the meaning and an example sentence.", wait:"Waiting for a tap…" },
-      { label:"STEP 2 OF 4", title:"Swipe left to keep learning", body:"Not landed yet? Send it left and Wordnest brings it back tomorrow.", wait:"Swipe the card left…" },
-      { label:"STEP 3 OF 4", title:"Swipe right when you've got it", body:"Right means mastered. The card returns in three days, then a week, then a month.", wait:"Swipe the card right…" },
-      { label:"STEP 4 OF 4", title:"Hear it spoken", body:"Tap the speaker on any card for a slow French reading.", wait:"Tap the speaker…" },
-      { label:"READY", title:"Twelve cards a day", body:"That's all of it. A dozen cards, four minutes, and the streak takes care of itself.", button:"Commençons" }
-    ];
-    const step = s.coach >= 0 ? steps[Math.min(s.coach, 4)] : null;
+    const s = this.state, d = this.card(), chips = gramChips(d);
+    const x = s.fly ? s.fly * 480 : s.dx;
     const days = ["M","T","W","T","F","S","S"];
     const week = days.map((label,i) => {
       const done = i < 5, today = i === 5;
-      return { label, done, fill: done ? "#24261f" : "#1a1a1d", ring: today ? "#cbd4a6" : "#ffffff0d",
-               dot: done ? "#cbd4a6" : (today ? "#cbd4a666" : "#2e2e34") };
+      return { label, fill: done ? "#1d1b18" : "#e4ddd1", ring: today ? "#1d1b18" : "transparent",
+               dot: done ? "#efe9df" : (today ? "#1d1b1880" : "#cfc6b8") };
     });
-    const pips = Array.from({length: s.size}, (_,i) => ({
-      w: i === s.doneToday ? "16px" : "7px",
-      bg: i < s.doneToday ? "#c4c3b1" : (i === s.doneToday ? "#eeeae7" : "#ffffff17")
-    }));
+    const pct = Math.round(100 * Math.min(s.done, s.size) / s.size);
     return {
-      isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
-      word: item.fr, meaning: item.en, type: item.type,
-      tagLabel: item.g ? G[item.g].label : item.type, tagDot: item.g ? G[item.g].dot : "transparent",
-      tagPad: item.g ? "4px 10px 4px 8px" : "0", tagBg: item.g ? "#0000002e" : "transparent",
-      ipa: item.ipa || "", say: item.say || "",
-      chips: gramChips(item), hasChips: gramChips(item).length > 0,
-      note: item.note || "", hasNote: !!item.note,
-      hasTrap: !!item.trap, trapLabel: item.trap ? (item.trap.k === "es" ? "SPANISH TRAP" : "FAUX AMI") : "", trapText: item.trap ? item.trap.t : "", example: item.ex, exampleEn: item.exEn,
-      art: artFor(item.p), glow: item.p[2],
-      todaySub: s.goal + " cards · about 4 min · keeps your streak",
-      practiceSub: "All " + DECK.length + " cards, shuffled · no pressure",
-      ink: isLight(item.p) ? "#1c1712" : "#fffffff2", inkSoft: isLight(item.p) ? "#1c1712b8" : "#ffffffc8",
-      wordSize: fitSize(item.fr),
-      wordShadow: (h => "0 1px 2px rgba(0,0,0," + (h*.9).toFixed(2) + "), 0 6px 28px rgba(0,0,0," + h.toFixed(2) + ")")(Math.min(.75, .28 + brightness(item.p) * .9)),
-      wotdWord: wordOfDay().fr, wotdMeaning: wordOfDay().en, wotdSay: wordOfDay().say || "", wotdArt: artFor(wordOfDay().p),
-      wotdExample: wordOfDay().ex, wotdTag: wordOfDay().g ? G[wordOfDay().g].label : wordOfDay().type, wotdDot: wordOfDay().g ? G[wordOfDay().g].dot : "#6d6d74",
-      speakWotd: this.speakWotd, goal: s.goal, deckSize: DECK.length,
-      masteredPct: Math.round(100 * s.mastered / Math.max(1, s.mastered + s.learning)) + "%",
-      weekLine: week.filter(d => d.done).length + " of 7 days",
-      backScrim: isLight(item.p) ? "#00000066" : "#00000014",
-      counter: String(Math.min(s.doneToday + 1, s.size)).padStart(2,"0") + " / " + String(s.size).padStart(2,"0"),
-      pips,
-      faceTransform: "rotateY(" + (s.revealed ? 180 : 0) + "deg)",
-      cardTransform: "translate3d(" + x + "px," + y + "px,0) rotate(" + rot + "deg)",
-      cardTransition: s.dragging ? "none" : (s.fly ? "transform .3s cubic-bezier(.4,0,1,1)" : "transform .35s cubic-bezier(.2,.8,.3,1)"),
-      noOpacity: s.dx < -10 ? amount : 0, yesOpacity: s.dx > 10 ? amount : 0,
-      undoColor: s.history.length && s.coach < 0 ? "#8d8d95" : "#3a3a41",
-      streak: s.streak, streakNote: quiet ? "" : "best: 21 days",
-      learning: quiet ? "—" : s.learning, mastered: quiet ? "—" : s.mastered,
-      doneLine: s.mode === "practice" ? "Whole deck, done. " + s.doneToday + " cards shuffled through." : s.doneToday + " cards practised. Your next reviews are scheduled.",
-      doneKicker: s.mode === "practice" ? "Practice complete" : "À demain",
-      streakCaption: s.mode === "practice" ? "streak unchanged" : "kept alive",
-      week,
-      startPractice: this.startPractice,
-      coachOn: s.coach >= 0, coachDim: s.coach === 4 ? "#000000b8" : "#00000059",
-      coachStepLabel: step ? step.label : "", coachTitle: step ? step.title : "",
-      coachBody: step ? step.body : "", coachWaitLabel: step ? step.wait : "",
-      coachHasButton: !!(step && step.button), coachButton: step ? step.button : "",
-      coachWaiting: !!(step && !step.button),
-      coachBottom: s.coach === 3 ? "auto" : (s.coach === 4 ? "120px" : "24px"),
-      coachTop: s.coach === 3 ? "calc(env(safe-area-inset-top,0px) + 18px)" : "auto",
-      skipLabel: s.coach === 4 ? "" : "Skip tutorial",
-      cardRef: this.cardRef,
-      flip: this.flip, undo: this.undo, speak: this.speak,
-      onDown: this.onDown, onMove: this.onMove, onUp: this.onUp, onCardClick: this.onCardClick,
-      coachAdvance: this.coachAdvance, skipTutorial: this.skipTutorial, replayTutorial: this.replayTutorial,
-      startSession: this.startSession, goHome: this.goHome
+      isStudy: s.screen === "study", isDone: s.screen === "done",
+      todayBg: s.mode === "today" ? "#1d1b18" : "transparent", todayFg: s.mode === "today" ? "#f4efe7" : "#6f6a62",
+      shuffleBg: s.mode === "shuffle" ? "#1d1b18" : "transparent", shuffleFg: s.mode === "shuffle" ? "#f4efe7" : "#6f6a62",
+      goal: s.goal, deckSize: DECK.length, streak: s.streak,
+      count: Math.min(s.done + 1, s.size) + " / " + s.size, pct: pct + "%",
+      undoOp: s.history.length ? 1 : .3,
+      word: d.fr, wordSize: fitSize(d.fr), ipa: d.ipa || "", say: d.say || "",
+      tag: d.g ? G[d.g].label : d.type, tagDot: d.g ? G[d.g].dot : "#b3aa9c",
+      pos: posLabel(d), meaning: d.en, example: d.ex, exampleEn: d.exEn,
+      chips, hasChips: chips.length > 0, note: d.note || "", hasNote: !!d.note,
+      hasTrap: !!d.trap, trapLabel: d.trap ? (d.trap.k === "es" ? "Spanish trap" : "Faux ami") : "", trapText: d.trap ? d.trap.t : "",
+      revealOp: s.revealed ? 1 : 0, revealY: s.revealed ? "0" : "10px", revealPE: s.revealed ? "auto" : "none",
+      hintOp: s.revealed ? 0 : 1,
+      showReveal: !s.revealed, showRate: s.revealed,
+      enter: s.flip ? "wn-inA" : "wn-inB",
+      move: "translateX(" + x + "px) rotate(" + (x * .02) + "deg)",
+      moveT: s.dragging ? "none" : (s.fly ? "transform .26s cubic-bezier(.4,0,1,1), opacity .26s" : "transform .35s cubic-bezier(.2,.8,.3,1)"),
+      moveOp: s.fly ? 0 : 1,
+      againOp: s.dx < -12 ? Math.min(1, -s.dx / 80) : 0, gotOp: s.dx > 12 ? Math.min(1, s.dx / 80) : 0,
+      doneTitle: s.mode === "shuffle" ? "Whole deck, done." : "Petit à petit.",
+      doneLine: s.mode === "shuffle" ? s.done + " cards shuffled through. Your streak is unchanged." : s.done + " cards today. Streak kept alive.",
+      week, weekLine: week.filter((_,i) => i < 5).length + " of 7 days this week",
+      mastered: s.mastered, learning: s.learning, masteredPct: Math.round(100 * s.mastered / (s.mastered + s.learning)) + "%",
+      stats: s.stats, sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#1d1b1840" : "#1d1b1800", sheetPE: s.stats ? "auto" : "none",
+      speak: this.speak, reveal: this.reveal, again: this.again, gotIt: this.gotIt, undo: this.undo,
+      pickToday: this.pickToday, pickShuffle: this.pickShuffle, shuffleAgain: this.shuffleAgain,
+      openStats: this.openStats, closeStats: this.closeStats,
+      onDown: this.onDown, onMove: this.onMove, onUp: this.onUp, onTap: this.onTap
     };
   }
 }

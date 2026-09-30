@@ -21,228 +21,157 @@ const DECK = [
   {fr:"Bonne journée", en:"Have a good day", type:"farewell", g:"f", un:"une journée", note:"bonne agrees with journée (f).", ipa:"/bɔn ʒuʁ.ne/", say:"bun zhoor-NAY", ex:"Merci, bonne journée !", exEn:"Thank you, have a good day!", p:["#54053a","#8d0028","#0b0414","#270317","#f04431"]}
 ];
 
-const G = { m:{ label:"masculin", dot:"#cbd4a6" }, f:{ label:"féminin", dot:"#f2c98a" } };
+const G = { m:{ label:"masculin", abbr:"n. m.", dot:"#6f8a4e" }, f:{ label:"féminin", abbr:"n. f.", dot:"#c7812f" } };
 
 function gramChips(d){
   const out = [];
-  if(d.g){ out.push({ t: d.un, dot: G[d.g].dot }); if(d.pl) out.push({ t: "pl. " + d.pl + (d.rule ? "  ·  " + d.rule : ""), dot: "" }); }
-  if(d.adj){ out.push({ t: "m. " + d.adj[0], dot: G.m.dot }, { t: "f. " + d.adj[1], dot: G.f.dot }, { t: "pl. " + d.adj[2] + " / " + d.adj[3], dot: "" }); }
+  if(d.g && d.un){ out.push({ t: d.un, dot: G[d.g].dot }); if(d.pl) out.push({ t: d.pl + (d.rule ? "  ·  " + d.rule : ""), dot: "" }); }
+  if(d.adj){ out.push({ t: "m. " + d.adj[0], dot: G.m.dot }, { t: "f. " + d.adj[1], dot: G.f.dot }, { t: d.adj[2] + " / " + d.adj[3], dot: "" }); }
   if(d.aux){ out.push({ t: "aux. " + d.aux, dot: "" }, { t: "p.p. " + d.pp, dot: "" }, { t: "futur " + d.fut, dot: "" }); }
   return out.map(c => ({ ...c, show: c.dot ? "block" : "none" }));
 }
-
-function artFor(p){
-  return "radial-gradient(70% 55% at 22% 14%, " + p[4] + "cc 0%, " + p[4] + "00 62%)," +
-         "radial-gradient(62% 48% at 78% 86%, " + p[2] + "e6 0%, " + p[2] + "00 70%)," +
-         "radial-gradient(52% 44% at 46% 52%, " + p[3] + " 0%, " + p[3] + "00 78%)," +
-         "radial-gradient(38% 32% at 44% 50%, " + p[0] + "cc 0%, " + p[0] + "00 80%)," +
-         p[1];
+function posLabel(d){
+  if(d.g && d.type === "noun") return G[d.g].abbr;
+  if(d.type === "adjective") return "adj.";
+  if(d.type === "verb" || /^verb/.test(d.type)) return "v.";
+  return "expr.";
 }
-
-function lum(hex){
-  const n = parseInt(hex.slice(1,7),16), ch = [n>>16&255, n>>8&255, n&255].map(v => { v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); });
-  return .2126*ch[0] + .7152*ch[1] + .0722*ch[2];
-}
-// brightness behind the word: the centre blobs of the card art sit on top of the base colour
-function brightness(p){ return .45*lum(p[0]) + .35*lum(p[3]) + .2*lum(p[1]); }
-function isLight(p){ return brightness(p) > .5; }
 function shuffled(n){
   const a = Array.from({length:n}, (_,i) => i);
   for(let i=n-1;i>0;i--){ const k = Math.floor(Math.random()*(i+1)); [a[i],a[k]] = [a[k],a[i]]; }
   return a;
 }
-function wordOfDay(){ const d = new Date(), start = new Date(d.getFullYear(),0,0); return DECK[Math.floor((d - start) / 864e5) % DECK.length]; }
-function fitSize(text){ const longest = Math.max(...text.split(/\s+/).map(w => w.length)); return Math.max(34, Math.min(58, Math.floor(300 / (longest * .6)))) + "px"; }
+function fitSize(text){ const longest = Math.max(...text.split(/\s+/).map(w => w.length)); return Math.max(36, Math.min(60, Math.floor(310 / (longest * .6)))) + "px"; }
 const IDENTITY = DECK.map((_,i) => i);
 
 class Component extends DCLogic {
   constructor(props){
     super(props);
-    this.cardRef = React.createRef();
-    const size = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
+    const goal = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
     this.state = {
-      screen: (this.props.startScreen ?? "tutorial") === "home" ? "home" : "study",
-      coach: (this.props.startScreen ?? "tutorial") === "home" ? -1 : 0,
-      idx: 0, size, goal: size, mode: "today", order: IDENTITY, revealed: false, dx: 0, dy: 0, dragging: false, fly: 0,
-      learning: 18, mastered: 42, streak: 5, doneToday: 0, history: []
+      screen: "study", mode: "today", order: IDENTITY, idx: 0, size: goal, goal,
+      revealed: false, done: 0, history: [], dx: 0, dragging: false, fly: 0,
+      learning: 18, mastered: 42, streak: 5, stats: false, flip: 0
     };
     this.drag = null;
   }
 
   card(){ const o = this.state.order; return DECK[o[this.state.idx % o.length]]; }
 
-  flip = () => {
-    if(this.state.fly) return;
-    this.setState(s => ({ revealed: !s.revealed }), () => {
-      if(this.state.coach === 0 && this.state.revealed) this.setState({ coach: 1 });
-    });
-  };
+  say(word){
+    const text = word.replace(/…/g,"").trim();
+    if(!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "fr-CA"; u.rate = .82;
+    const v = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith("fr"));
+    if(v) u.voice = v;
+    speechSynthesis.speak(u);
+  }
+  speak = (e) => { if(e) e.stopPropagation(); this.say(this.card().fr); };
+
+  reveal = () => { if(!this.state.revealed && !this.state.fly) this.setState({ revealed: true }); };
 
   rate = (got) => {
-    if(this.state.fly) return;
-    const c = this.state.coach;
-    if(c === 1 && got) return this.snapBack();
-    if(c === 2 && !got) return this.snapBack();
+    if(this.state.fly || !this.state.revealed) return;
     this.setState({ fly: got ? 1 : -1, dragging: false });
-    setTimeout(() => {
-      this.setState(s => {
-        const done = s.doneToday + 1, last = { idx: s.idx, learning: s.learning, mastered: s.mastered, doneToday: s.doneToday };
-        const finished = done >= s.size && s.coach < 0;
-        return {
-          fly: 0, dx: 0, dy: 0, revealed: false,
-          idx: s.idx + 1, doneToday: done,
-          learning: got ? s.learning : s.learning + 1,
-          mastered: got ? s.mastered + 1 : s.mastered,
-          history: [last, ...s.history].slice(0,5),
-          screen: finished ? "done" : "study",
-          streak: finished && s.mode === "today" ? s.streak + 1 : s.streak,
-          coach: c === 1 ? 2 : (c === 2 ? 3 : c)
-        };
-      });
-    }, 300);
+    setTimeout(() => this.setState(s => {
+      const done = s.done + 1, finished = done >= s.size;
+      return {
+        fly: 0, dx: 0, revealed: false, flip: 1 - s.flip,
+        history: [{ idx: s.idx, done: s.done, learning: s.learning, mastered: s.mastered }, ...s.history].slice(0,5),
+        idx: s.idx + 1, done,
+        learning: got ? s.learning : s.learning + 1,
+        mastered: got ? s.mastered + 1 : s.mastered,
+        screen: finished ? "done" : "study",
+        streak: finished && s.mode === "today" ? s.streak + 1 : s.streak
+      };
+    }), 260);
   };
+  again = () => this.rate(false);
+  gotIt = () => this.rate(true);
 
-  snapBack = () => this.setState({ dx: 0, dy: 0, dragging: false });
+  undo = () => this.setState(s => {
+    if(!s.history.length) return null;
+    const [h, ...rest] = s.history;
+    return { ...h, history: rest, revealed: true, screen: "study", flip: 1 - s.flip };
+  });
 
-  undo = () => {
-    if(this.state.coach >= 0) return;
-    this.setState(s => {
-      if(!s.history.length) return null;
-      const [h, ...rest] = s.history;
-      return { ...h, history: rest, revealed: false, screen: "study" };
-    });
-  };
+  start(mode){
+    this.setState(s => ({
+      screen: "study", mode, idx: 0, done: 0, history: [], revealed: false, dx: 0, flip: 1 - s.flip,
+      order: mode === "shuffle" ? shuffled(DECK.length) : IDENTITY,
+      size: mode === "shuffle" ? DECK.length : s.goal
+    }));
+  }
+  pickToday = () => { if(this.state.mode !== "today" || this.state.screen === "done") this.start("today"); };
+  pickShuffle = () => { if(this.state.mode !== "shuffle" || this.state.screen === "done") this.start("shuffle"); };
+  shuffleAgain = () => this.start("shuffle");
+  openStats = () => this.setState({ stats: true });
+  closeStats = () => this.setState({ stats: false });
 
   onDown = (e) => {
-    if(this.state.fly || e.target.closest("button")) return;
-    this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, moved: false };
+    if(this.state.fly || !this.state.revealed || e.target.closest("button")) return;
+    this.drag = { id: e.pointerId, x: e.clientX, moved: false };
   };
   onMove = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
-    const dx = e.clientX - d.x, dy = e.clientY - d.y;
-    if(!d.moved){
-      if(Math.abs(dx) < 8) return;
-      d.moved = true;
-      try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {}
-      this.setState({ dragging: true });
-    }
-    this.setState({ dx, dy: dy * 0.35 });
+    const dx = e.clientX - d.x;
+    if(!d.moved){ if(Math.abs(dx) < 10) return; d.moved = true; try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {} this.setState({ dragging: true }); }
+    this.setState({ dx });
   };
   onUp = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
     this.drag = null;
     if(!d.moved) return;
-    const dx = this.state.dx;
-    if(Math.abs(dx) > 78) this.rate(dx > 0); else this.snapBack();
     this.suppress = Date.now() + 300;
+    if(Math.abs(this.state.dx) > 80) this.rate(this.state.dx > 0); else this.setState({ dx: 0, dragging: false });
   };
-  onCardClick = (e) => {
+  onTap = (e) => {
     if(e.target.closest("button")) return;
     if(this.suppress && Date.now() < this.suppress) return;
-    this.flip();
+    this.reveal();
   };
-
-  say(word){
-    const text = word.replace(/…/g,"").trim();
-    if("speechSynthesis" in window){
-      speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = "fr-CA"; u.rate = .82;
-      const v = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith("fr"));
-      if(v) u.voice = v;
-      speechSynthesis.speak(u);
-    }
-  }
-  speakWotd = () => this.say(wordOfDay().fr);
-  speak = (e) => {
-    e.stopPropagation();
-    this.say(this.card().fr);
-    if(this.state.coach === 3) this.setState({ coach: 4 });
-  };
-
-
-  coachAdvance = () => {
-    const c = this.state.coach;
-    if(c === 4) this.setState({ coach: -1, screen: "home", revealed: false, doneToday: 0, idx: 0 });
-  };
-  skipTutorial = () => this.setState(s => ({ coach: -1, screen: "home", mode: "today", order: IDENTITY, size: s.goal, revealed: false, doneToday: 0, idx: 0 }));
-  replayTutorial = () => this.setState(s => ({ coach: 0, screen: "study", mode: "today", order: IDENTITY, size: s.goal, revealed: false, idx: 0, doneToday: 0, dx: 0, dy: 0 }));
-  startSession = () => this.setState(s => ({ screen: "study", mode: "today", order: IDENTITY, size: s.goal, doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] }));
-  startPractice = () => this.setState({ screen: "study", mode: "practice", order: shuffled(DECK.length), idx: 0, size: DECK.length, doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] });
-  goHome = () => this.setState({ screen: "home", revealed: false, dx: 0, dy: 0 });
 
   renderVals(){
-    const s = this.state, item = this.card(), quiet = this.props.quietMode ?? false;
-    const flyX = s.fly ? s.fly * 520 : 0;
-    const x = s.fly ? flyX : s.dx, y = s.fly ? -90 : s.dy;
-    const rot = Math.max(-22, Math.min(22, x * .035));
-    const amount = Math.min(.95, Math.abs(s.dx) / 90);
-    const steps = [
-      { label:"STEP 1 OF 4", title:"Tap the card", body:"Every card shows the French first. Tap it to see the meaning and an example sentence.", wait:"Waiting for a tap…" },
-      { label:"STEP 2 OF 4", title:"Swipe left to keep learning", body:"Not landed yet? Send it left and Wordnest brings it back tomorrow.", wait:"Swipe the card left…" },
-      { label:"STEP 3 OF 4", title:"Swipe right when you've got it", body:"Right means mastered. The card returns in three days, then a week, then a month.", wait:"Swipe the card right…" },
-      { label:"STEP 4 OF 4", title:"Hear it spoken", body:"Tap the speaker on any card for a slow French reading.", wait:"Tap the speaker…" },
-      { label:"READY", title:"Twelve cards a day", body:"That's all of it. A dozen cards, four minutes, and the streak takes care of itself.", button:"Commençons" }
-    ];
-    const step = s.coach >= 0 ? steps[Math.min(s.coach, 4)] : null;
+    const s = this.state, d = this.card(), chips = gramChips(d);
+    const x = s.fly ? s.fly * 480 : s.dx;
     const days = ["M","T","W","T","F","S","S"];
     const week = days.map((label,i) => {
       const done = i < 5, today = i === 5;
-      return { label, done, fill: done ? "#24261f" : "#1a1a1d", ring: today ? "#cbd4a6" : "#ffffff0d",
-               dot: done ? "#cbd4a6" : (today ? "#cbd4a666" : "#2e2e34") };
+      return { label, fill: done ? "#1d1b18" : "#e4ddd1", ring: today ? "#1d1b18" : "transparent",
+               dot: done ? "#efe9df" : (today ? "#1d1b1880" : "#cfc6b8") };
     });
-    const pips = Array.from({length: s.size}, (_,i) => ({
-      w: i === s.doneToday ? "16px" : "7px",
-      bg: i < s.doneToday ? "#c4c3b1" : (i === s.doneToday ? "#eeeae7" : "#ffffff17")
-    }));
+    const pct = Math.round(100 * Math.min(s.done, s.size) / s.size);
     return {
-      isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
-      word: item.fr, meaning: item.en, type: item.type,
-      tagLabel: item.g ? G[item.g].label : item.type, tagDot: item.g ? G[item.g].dot : "transparent",
-      tagPad: item.g ? "4px 10px 4px 8px" : "0", tagBg: item.g ? "#0000002e" : "transparent",
-      ipa: item.ipa || "", say: item.say || "",
-      chips: gramChips(item), hasChips: gramChips(item).length > 0,
-      note: item.note || "", hasNote: !!item.note,
-      hasTrap: !!item.trap, trapLabel: item.trap ? (item.trap.k === "es" ? "SPANISH TRAP" : "FAUX AMI") : "", trapText: item.trap ? item.trap.t : "", example: item.ex, exampleEn: item.exEn,
-      art: artFor(item.p), glow: item.p[2],
-      todaySub: s.goal + " cards · about 4 min · keeps your streak",
-      practiceSub: "All " + DECK.length + " cards, shuffled · no pressure",
-      ink: isLight(item.p) ? "#1c1712" : "#fffffff2", inkSoft: isLight(item.p) ? "#1c1712b8" : "#ffffffc8",
-      wordSize: fitSize(item.fr),
-      wordShadow: (h => "0 1px 2px rgba(0,0,0," + (h*.9).toFixed(2) + "), 0 6px 28px rgba(0,0,0," + h.toFixed(2) + ")")(Math.min(.75, .28 + brightness(item.p) * .9)),
-      wotdWord: wordOfDay().fr, wotdMeaning: wordOfDay().en, wotdSay: wordOfDay().say || "", wotdArt: artFor(wordOfDay().p),
-      wotdExample: wordOfDay().ex, wotdTag: wordOfDay().g ? G[wordOfDay().g].label : wordOfDay().type, wotdDot: wordOfDay().g ? G[wordOfDay().g].dot : "#6d6d74",
-      speakWotd: this.speakWotd, goal: s.goal, deckSize: DECK.length,
-      masteredPct: Math.round(100 * s.mastered / Math.max(1, s.mastered + s.learning)) + "%",
-      weekLine: week.filter(d => d.done).length + " of 7 days",
-      backScrim: isLight(item.p) ? "#00000066" : "#00000014",
-      counter: String(Math.min(s.doneToday + 1, s.size)).padStart(2,"0") + " / " + String(s.size).padStart(2,"0"),
-      pips,
-      faceTransform: "rotateY(" + (s.revealed ? 180 : 0) + "deg)",
-      cardTransform: "translate3d(" + x + "px," + y + "px,0) rotate(" + rot + "deg)",
-      cardTransition: s.dragging ? "none" : (s.fly ? "transform .3s cubic-bezier(.4,0,1,1)" : "transform .35s cubic-bezier(.2,.8,.3,1)"),
-      noOpacity: s.dx < -10 ? amount : 0, yesOpacity: s.dx > 10 ? amount : 0,
-      undoColor: s.history.length && s.coach < 0 ? "#8d8d95" : "#3a3a41",
-      streak: s.streak, streakNote: quiet ? "" : "best: 21 days",
-      learning: quiet ? "—" : s.learning, mastered: quiet ? "—" : s.mastered,
-      doneLine: s.mode === "practice" ? "Whole deck, done. " + s.doneToday + " cards shuffled through." : s.doneToday + " cards practised. Your next reviews are scheduled.",
-      doneKicker: s.mode === "practice" ? "Practice complete" : "À demain",
-      streakCaption: s.mode === "practice" ? "streak unchanged" : "kept alive",
-      week,
-      startPractice: this.startPractice,
-      coachOn: s.coach >= 0, coachDim: s.coach === 4 ? "#000000b8" : "#00000059",
-      coachStepLabel: step ? step.label : "", coachTitle: step ? step.title : "",
-      coachBody: step ? step.body : "", coachWaitLabel: step ? step.wait : "",
-      coachHasButton: !!(step && step.button), coachButton: step ? step.button : "",
-      coachWaiting: !!(step && !step.button),
-      coachBottom: s.coach === 3 ? "auto" : (s.coach === 4 ? "120px" : "24px"),
-      coachTop: s.coach === 3 ? "calc(env(safe-area-inset-top,0px) + 18px)" : "auto",
-      skipLabel: s.coach === 4 ? "" : "Skip tutorial",
-      cardRef: this.cardRef,
-      flip: this.flip, undo: this.undo, speak: this.speak,
-      onDown: this.onDown, onMove: this.onMove, onUp: this.onUp, onCardClick: this.onCardClick,
-      coachAdvance: this.coachAdvance, skipTutorial: this.skipTutorial, replayTutorial: this.replayTutorial,
-      startSession: this.startSession, goHome: this.goHome
+      isStudy: s.screen === "study", isDone: s.screen === "done",
+      todayBg: s.mode === "today" ? "#1d1b18" : "transparent", todayFg: s.mode === "today" ? "#f4efe7" : "#6f6a62",
+      shuffleBg: s.mode === "shuffle" ? "#1d1b18" : "transparent", shuffleFg: s.mode === "shuffle" ? "#f4efe7" : "#6f6a62",
+      goal: s.goal, deckSize: DECK.length, streak: s.streak,
+      count: Math.min(s.done + 1, s.size) + " / " + s.size, pct: pct + "%",
+      undoOp: s.history.length ? 1 : .3,
+      word: d.fr, wordSize: fitSize(d.fr), ipa: d.ipa || "", say: d.say || "",
+      tag: d.g ? G[d.g].label : d.type, tagDot: d.g ? G[d.g].dot : "#b3aa9c",
+      pos: posLabel(d), meaning: d.en, example: d.ex, exampleEn: d.exEn,
+      chips, hasChips: chips.length > 0, note: d.note || "", hasNote: !!d.note,
+      hasTrap: !!d.trap, trapLabel: d.trap ? (d.trap.k === "es" ? "Spanish trap" : "Faux ami") : "", trapText: d.trap ? d.trap.t : "",
+      revealOp: s.revealed ? 1 : 0, revealY: s.revealed ? "0" : "10px", revealPE: s.revealed ? "auto" : "none",
+      hintOp: s.revealed ? 0 : 1,
+      showReveal: !s.revealed, showRate: s.revealed,
+      enter: s.flip ? "wn-inA" : "wn-inB",
+      move: "translateX(" + x + "px) rotate(" + (x * .02) + "deg)",
+      moveT: s.dragging ? "none" : (s.fly ? "transform .26s cubic-bezier(.4,0,1,1), opacity .26s" : "transform .35s cubic-bezier(.2,.8,.3,1)"),
+      moveOp: s.fly ? 0 : 1,
+      againOp: s.dx < -12 ? Math.min(1, -s.dx / 80) : 0, gotOp: s.dx > 12 ? Math.min(1, s.dx / 80) : 0,
+      doneTitle: s.mode === "shuffle" ? "Whole deck, done." : "Petit à petit.",
+      doneLine: s.mode === "shuffle" ? s.done + " cards shuffled through. Your streak is unchanged." : s.done + " cards today. Streak kept alive.",
+      week, weekLine: week.filter((_,i) => i < 5).length + " of 7 days this week",
+      mastered: s.mastered, learning: s.learning, masteredPct: Math.round(100 * s.mastered / (s.mastered + s.learning)) + "%",
+      stats: s.stats, sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#1d1b1840" : "#1d1b1800", sheetPE: s.stats ? "auto" : "none",
+      speak: this.speak, reveal: this.reveal, again: this.again, gotIt: this.gotIt, undo: this.undo,
+      pickToday: this.pickToday, pickShuffle: this.pickShuffle, shuffleAgain: this.shuffleAgain,
+      openStats: this.openStats, closeStats: this.closeStats,
+      onDown: this.onDown, onMove: this.onMove, onUp: this.onUp, onTap: this.onTap
     };
   }
 }
