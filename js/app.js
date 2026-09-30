@@ -21,7 +21,7 @@ const DECK = [
   {fr:"Bonne journée", en:"Have a good day", type:"farewell", g:"f", un:"une journée", note:"bonne agrees with journée (f).", ipa:"/bɔn ʒuʁ.ne/", say:"bun zhoor-NAY", ex:"Merci, bonne journée !", exEn:"Thank you, have a good day!", p:["#54053a","#8d0028","#0b0414","#270317","#f04431"]}
 ];
 
-const G = { m:{ label:"masculin", dot:"#cbd4a6" }, f:{ label:"féminin", dot:"#f2c98a" } };
+const G = { m:{ label:"masculin", dot:"#cbd4a6", ink:"#4f7a3a" }, f:{ label:"féminin", dot:"#f2c98a", ink:"#c0662a" } };
 
 function artFor(p){
   return "radial-gradient(70% 55% at 22% 14%, " + p[4] + "cc 0%, " + p[4] + "00 62%)," +
@@ -54,6 +54,21 @@ function highlight(d){
   while(e < ex.length && /[\p{L}]/u.test(ex[e])) e++;
   return { pre: ex.slice(0, s), hit: ex.slice(s, e), post: ex.slice(e) };
 }
+function hexToRgb(h){ const n = parseInt(h.slice(1,7),16); return [n>>16&255, n>>8&255, n&255]; }
+function mix(a, b, t){ const x = hexToRgb(a), y = hexToRgb(b); return "#" + x.map((v,i) => Math.round(v + (y[i]-v)*t).toString(16).padStart(2,"0")).join(""); }
+// lift a colour toward white until it's light enough for dark text on top
+function lighten(c, minLum){ let t = 0, out = c; while(lum(out) < minLum && t < .95){ t += .08; out = mix(c, "#ffffff", t); } return out; }
+// pastel card surface from the word's palette: pale top-left, richer bottom-right
+function paperFor(p){
+  const top = lighten(mix(p[4], "#ffffff", .45), .78), bot = lighten(p[0], .42);
+  return "linear-gradient(155deg, " + top + " 0%, " + mix(top, bot, .45) + " 48%, " + bot + " 100%)";
+}
+function kindLabel(d){
+  if(d.g && d.type === "noun") return d.g === "f" ? "Nom féminin" : "Nom masculin";
+  if(d.type === "adjective") return "Adjectif";
+  if(d.aux) return "Verbe";
+  return "Expression";
+}
 const IDENTITY = DECK.map((_,i) => i);
 
 class Component extends DCLogic {
@@ -62,10 +77,18 @@ class Component extends DCLogic {
     const goal = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
     this.state = {
       screen: "study", mode: "today", order: IDENTITY, idx: 0, size: goal, goal,
-      revealed: false, done: 0, history: [], dx: 0, dy: 0, axis: "", fly: 0,
-      learning: 18, mastered: 42, streak: 5, stats: false, menu: false, showEx: true, flip: 0
+      revealed: false, done: 0, history: [], showEx: true,
+      learning: 18, mastered: 42, streak: 5, stats: false, menu: false, flip: 0
     };
-    this.drag = null;
+    this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
+    this.noRef = React.createRef(); this.yesRef = React.createRef();
+    this.drag = null; this.flying = false; this.raf = 0;
+  }
+  componentDidMount(){ this.lastPanel = this.state.showEx + "|" + this.state.screen; this.lastScreen = this.state.screen; this.placePanel(this.state.showEx ? 1 : 0, false); }
+  componentDidUpdate(){
+    // the runtime doesn't pass previous state, so remember what was last applied
+    const key = this.state.showEx + "|" + this.state.screen;
+    if(key !== this.lastPanel){ const same = this.lastScreen === this.state.screen; this.lastPanel = key; this.lastScreen = this.state.screen; this.placePanel(this.state.showEx ? 1 : 0, same); }
   }
 
   card(){ const o = this.state.order; return DECK[o[this.state.idx % o.length]]; }
@@ -82,13 +105,44 @@ class Component extends DCLogic {
   }
   speak = (e) => { if(e) e.stopPropagation(); this.say(this.card().fr); };
 
+  // ---- direct-to-DOM motion: drags and slides only touch transform/opacity, no re-render per frame ----
+  placePanel(p, animate){
+    const panel = this.panelRef.current, btn = this.btnRef.current;
+    if(!panel) return;
+    const h = panel.offsetHeight + 12, y = -(1 - p) * h;
+    const t = animate ? "transform .45s cubic-bezier(.22,1,.36,1), opacity .35s cubic-bezier(.22,1,.36,1)" : "none";
+    panel.style.transition = t; panel.style.transform = "translate3d(0," + y + "px,0)"; panel.style.opacity = p;
+    if(btn){ btn.style.transition = t; btn.style.transform = "translate3d(0," + y + "px,0)"; }
+  }
+  moveCard(dx){
+    const el = this.cardRef.current; if(!el) return;
+    el.style.transition = "none";
+    el.style.transform = "translate3d(" + dx + "px,0,0) rotate(" + Math.max(-16, Math.min(16, dx * .045)) + "deg)";
+    const a = Math.min(1, Math.max(0, (Math.abs(dx) - 12) / 70));
+    if(this.noRef.current) this.noRef.current.style.opacity = dx < 0 ? a : 0;
+    if(this.yesRef.current) this.yesRef.current.style.opacity = dx > 0 ? a : 0;
+  }
+  resetCard(animate){
+    const el = this.cardRef.current; if(!el) return;
+    el.style.transition = animate ? "transform .45s cubic-bezier(.22,1,.36,1)" : "none";
+    el.style.transform = "translate3d(0,0,0)"; el.style.opacity = 1;
+    if(this.noRef.current) this.noRef.current.style.opacity = 0;
+    if(this.yesRef.current) this.yesRef.current.style.opacity = 0;
+  }
+
   rate(got){
-    if(this.state.fly) return;
-    this.setState({ fly: got ? 1 : -1, axis: "" });
+    if(this.flying) return;
+    this.flying = true;
+    const el = this.cardRef.current;
+    if(el){
+      el.style.transition = "transform .3s cubic-bezier(.5,0,.75,0), opacity .3s";
+      el.style.transform = "translate3d(" + (got ? 560 : -560) + "px,-30px,0) rotate(" + (got ? 18 : -18) + "deg)";
+      el.style.opacity = 0;
+    }
     setTimeout(() => this.setState(s => {
       const done = s.done + 1, finished = done >= s.size;
       return {
-        fly: 0, dx: 0, dy: 0, revealed: false, flip: 1 - s.flip,
+        revealed: false, flip: 1 - s.flip,
         history: [{ idx: s.idx, done: s.done, learning: s.learning, mastered: s.mastered }, ...s.history].slice(0,5),
         idx: s.idx + 1, done,
         learning: got ? s.learning : s.learning + 1,
@@ -96,8 +150,10 @@ class Component extends DCLogic {
         screen: finished ? "done" : "study",
         streak: finished && s.mode === "today" ? s.streak + 1 : s.streak
       };
-    }), 280);
+    }, () => { this.resetCard(false); this.flying = false; }), 300);
   }
+  again = () => this.rate(false);
+  gotIt = () => this.rate(true);
 
   undo = () => this.setState(s => {
     if(!s.history.length) return null;
@@ -107,61 +163,61 @@ class Component extends DCLogic {
 
   start(mode){
     this.setState(s => ({
-      screen: "study", mode, idx: 0, done: 0, history: [], revealed: false, dx: 0, dy: 0, flip: 1 - s.flip,
+      screen: "study", mode, idx: 0, done: 0, history: [], revealed: false, flip: 1 - s.flip, menu: false,
       order: mode === "shuffle" ? shuffled(DECK.length) : IDENTITY,
       size: mode === "shuffle" ? DECK.length : s.goal
     }));
   }
-  pickToday = () => { if(this.state.mode !== "today" || this.state.screen === "done") this.start("today"); };
-  pickShuffle = () => { if(this.state.mode !== "shuffle" || this.state.screen === "done") this.start("shuffle"); };
+  pickTodayM = () => this.start("today");
+  pickShuffleM = () => this.start("shuffle");
   shuffleAgain = () => this.start("shuffle");
   toggleMenu = () => this.setState(s => ({ menu: !s.menu }));
   closeMenu = () => this.setState({ menu: false });
-  pickTodayM = () => { this.setState({ menu: false }); this.start("today"); };
-  pickShuffleM = () => { this.setState({ menu: false }); this.start("shuffle"); };
-  toggleEx = () => this.setState(s => ({ showEx: !s.showEx }));
-  reveal = () => this.setState(s => ({ revealed: !s.revealed }));
-  again = () => this.rate(false);
-  gotIt = () => this.rate(true);
   openStats = () => this.setState({ stats: true });
   closeStats = () => this.setState({ stats: false });
 
-  // gestures: tap flips the card, swipe down hides/shows the example (up shows it), left = again, right = got it
+  // gestures: tap flips, drag down shows the example, drag up hides it, left = again, right = got it
   onDown = (e) => {
-    if(this.state.fly || e.target.closest("button")) return;
-    this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, axis: "" };
+    if(this.flying || e.target.closest("button")) return;
+    this.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, axis: "", dx: 0, dy: 0 };
     try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {}
   };
   onMove = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
-    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    d.dx = e.clientX - d.x; d.dy = e.clientY - d.y;
     if(!d.axis){
-      if(Math.max(Math.abs(dx), Math.abs(dy)) < 10) return;
-      d.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
-      this.setState({ axis: d.axis });
+      if(Math.max(Math.abs(d.dx), Math.abs(d.dy)) < 8) return;
+      d.axis = Math.abs(d.dx) > Math.abs(d.dy) ? "x" : "y";
     }
-    if(d.axis === "x") this.setState({ dx }); else this.setState({ dy });
+    if(this.raf) return;
+    this.raf = requestAnimationFrame(() => {
+      this.raf = 0;
+      const g = this.drag; if(!g) return;
+      if(g.axis === "x") this.moveCard(g.dx);
+      else {
+        const h = (this.panelRef.current ? this.panelRef.current.offsetHeight : 100) + 12;
+        const base = this.state.showEx ? 1 : 0;
+        this.placePanel(Math.max(0, Math.min(1, base + g.dy / h)), false);
+      }
+    });
   };
   onUp = (e) => {
     const d = this.drag; if(!d || d.id !== e.pointerId) return;
     this.drag = null;
-    const { dx, dy, revealed } = this.state;
-    if(d.axis === "x" && Math.abs(dx) > 80) return this.rate(dx > 0);
-    if(d.axis === "y" && dy > 50) return this.setState(s => ({ showEx: !s.showEx, dy: 0, axis: "" }));
-    if(d.axis === "y" && dy < -50) return this.setState({ showEx: true, dy: 0, axis: "" });
-    if(!d.axis) return this.setState({ revealed: !revealed });
-    this.setState({ dx: 0, dy: 0, axis: "" });
+    if(this.raf){ cancelAnimationFrame(this.raf); this.raf = 0; }
+    if(d.axis === "x"){ if(Math.abs(d.dx) > 80) this.rate(d.dx > 0); else this.resetCard(true); return; }
+    if(d.axis === "y"){
+      const show = d.dy > 36 ? true : d.dy < -36 ? false : this.state.showEx;
+      this.placePanel(show ? 1 : 0, true);
+      if(show !== this.state.showEx) this.setState({ showEx: show });
+      return;
+    }
+    this.setState(s => ({ revealed: !s.revealed }));
   };
 
   renderVals(){
-    const s = this.state, d = this.card();
-    const vertical = s.axis === "y";
-    let p = s.revealed ? 1 : 0;
-    if(vertical) p = s.revealed ? Math.max(0, Math.min(1, 1 + s.dy / 140)) : Math.max(0, Math.min(1, s.dy / 140));
-    const x = s.fly ? s.fly * 520 : s.dx;
-    const tilt = Math.max(-18, Math.min(18, x * .04));
-    const halo = Math.min(.75, .28 + brightness(d.p) * .9);
-    const ease = "cubic-bezier(.2,.8,.3,1)";
+    const s = this.state, d = this.card(), h = highlight(d);
+    const nxt = (k) => DECK[s.order[(s.idx + k) % s.order.length]];
     const days = ["M","T","W","T","F","S","S"];
     const week = days.map((label,i) => {
       const done = i < 5, today = i === 5;
@@ -169,42 +225,28 @@ class Component extends DCLogic {
                dot: done ? "#cbd4a6" : (today ? "#cbd4a666" : "#2e2e34") };
     });
     return {
-      ...(() => { const h = highlight(d); return { exPre: h.pre, exHit: h.hit, exPost: h.post }; })(),
-      hitColor: d.p[4], gotBg: d.p[4], gotFg: "#141414",
-      back1: artFor(DECK[s.order[(s.idx + 1) % s.order.length]].p), back2: artFor(DECK[s.order[(s.idx + 2) % s.order.length]].p),
-      exMax: s.showEx ? "200px" : "0px", exOp: s.showEx ? 1 : 0, exY: s.showEx ? "0" : "-10px", exHidden: !s.showEx, toggleEx: this.toggleEx,
-      faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enSize: fitSize(d.en),
+      isStudy: s.screen === "study", isDone: s.screen === "done",
+      cardRef: this.cardRef, panelRef: this.panelRef, btnRef: this.btnRef, noRef: this.noRef, yesRef: this.yesRef,
+      paper: paperFor(d.p), back1: paperFor(nxt(1).p), back2: paperFor(nxt(2).p), art: artFor(d.p),
+      kind: kindLabel(d) + ":", kindDot: d.g ? G[d.g].ink : "#1d1b1840",
+      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.ipa || "",
+      footMeta: (d.g ? G[d.g].label : d.type) + "  |  " + (s.showEx ? "tap to flip" : "tap to flip · swipe down for example"),
+      faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enter: s.flip ? "wn-inA" : "wn-inB",
+      exPre: h.pre, exHit: h.hit, exPost: h.post, hitColor: lighten(d.p[4], .55),
+      gotBg: lighten(d.p[4], .6), gotFg: "#141414",
       modeLabel: s.mode === "shuffle" ? "Shuffle" : "Today",
       menuOp: s.menu ? 1 : 0, menuY: s.menu ? "0" : "-6px", menuPE: s.menu ? "auto" : "none",
-      toggleMenu: this.toggleMenu, closeMenu: this.closeMenu, pickTodayM: this.pickTodayM, pickShuffleM: this.pickShuffleM,
-      reveal: this.reveal, again: this.again, gotIt: this.gotIt,
-      isStudy: s.screen === "study", isDone: s.screen === "done",
-      todayBg: s.mode === "today" ? "#eeeae6" : "transparent", todayFg: s.mode === "today" ? "#1b1b1e" : "#8d8d95",
-      shuffleBg: s.mode === "shuffle" ? "#eeeae6" : "transparent", shuffleFg: s.mode === "shuffle" ? "#1b1b1e" : "#8d8d95",
       goal: s.goal, deckSize: DECK.length, streak: s.streak,
-      count: Math.min(s.done + 1, s.size) + " / " + s.size, pct: Math.round(100 * Math.min(s.done, s.size) / s.size) + "%",
-      undoOp: s.history.length ? 1 : .3,
-      art: artFor(d.p), glow: d.p[2],
-      word: d.fr, wordSize: fitSize(d.fr),
-      wordShadow: "0 1px 2px rgba(0,0,0," + (halo*.9).toFixed(2) + "), 0 6px 28px rgba(0,0,0," + halo.toFixed(2) + ")",
-      ipa: d.ipa || "", hasGender: !!d.g, gender: d.g ? G[d.g].label : "", gDot: d.g ? G[d.g].dot : "transparent",
-      meaning: d.en, example: d.ex,
-      cardMove: "translate3d(" + x + "px," + (s.fly ? -60 : 0) + "px,0) rotate(" + tilt + "deg)",
-      cardT: (s.axis === "x") ? "none" : "transform .32s " + (s.fly ? "cubic-bezier(.4,0,1,1)" : ease) + ", opacity .28s",
-      cardOp: s.fly ? 0 : 1,
-      wordY: "translateY(" + (-p * 70) + "px)", panelY: "translateY(" + ((1 - p) * 115) + "%)", panelOp: p, hintOp: 1 - p,
-      liveT: vertical ? "none" : "transform .4s " + ease + ", opacity .35s",
-      againOp: s.dx < -12 ? Math.min(1, -s.dx / 80) : 0, gotOp: s.dx > 12 ? Math.min(1, s.dx / 80) : 0,
-      enter: s.flip ? "wn-inA" : "wn-inB",
+      count: Math.min(s.done + 1, s.size) + " / " + s.size, undoOp: s.history.length ? 1 : .3,
       doneTitle: s.mode === "shuffle" ? "Whole deck, done." : "Petit à petit.",
       doneKicker: s.mode === "shuffle" ? "shuffle complete" : "à demain",
       doneLine: s.mode === "shuffle" ? s.done + " cards shuffled through. Streak unchanged." : s.done + " cards today. Streak kept alive.",
       week, weekLine: "5 of 7 days this week",
       mastered: s.mastered, learning: s.learning, masteredPct: Math.round(100 * s.mastered / (s.mastered + s.learning)) + "%",
       sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#00000080" : "#00000000", sheetPE: s.stats ? "auto" : "none",
-      speak: this.speak, undo: this.undo,
-      pickToday: this.pickToday, pickShuffle: this.pickShuffle, shuffleAgain: this.shuffleAgain,
-      openStats: this.openStats, closeStats: this.closeStats,
+      speak: this.speak, undo: this.undo, again: this.again, gotIt: this.gotIt,
+      toggleMenu: this.toggleMenu, closeMenu: this.closeMenu, pickTodayM: this.pickTodayM, pickShuffleM: this.pickShuffleM,
+      shuffleAgain: this.shuffleAgain, openStats: this.openStats, closeStats: this.closeStats,
       onDown: this.onDown, onMove: this.onMove, onUp: this.onUp
     };
   }
