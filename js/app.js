@@ -42,6 +42,18 @@ function shuffled(n){
   return a;
 }
 function fitSize(text){ const longest = Math.max(...text.split(/\s+/).map(w => w.length)); return Math.max(34, Math.min(58, Math.floor(290 / (longest * .6)))) + "px"; }
+function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+// split the example so the word being learned can be highlighted (matches on a short stem so "attendre" finds "attends")
+function highlight(d){
+  const ex = d.ex, words = d.fr.replace(/…/g,"").split(/[\s/']+/).filter(w => w.length > 1);
+  const key = norm(words[words.length - 1] || "").slice(0, 5), n = norm(ex);
+  const at = key ? n.indexOf(key) : -1;
+  if(at < 0) return { pre: ex, hit: "", post: "" };
+  let s = at, e = at + key.length;
+  while(s > 0 && /[\p{L}]/u.test(ex[s-1])) s--;
+  while(e < ex.length && /[\p{L}]/u.test(ex[e])) e++;
+  return { pre: ex.slice(0, s), hit: ex.slice(s, e), post: ex.slice(e) };
+}
 const IDENTITY = DECK.map((_,i) => i);
 
 class Component extends DCLogic {
@@ -51,7 +63,7 @@ class Component extends DCLogic {
     this.state = {
       screen: "study", mode: "today", order: IDENTITY, idx: 0, size: goal, goal,
       revealed: false, done: 0, history: [], dx: 0, dy: 0, axis: "", fly: 0,
-      learning: 18, mastered: 42, streak: 5, stats: false, flip: 0
+      learning: 18, mastered: 42, streak: 5, stats: false, menu: false, flip: 0
     };
     this.drag = null;
   }
@@ -103,6 +115,13 @@ class Component extends DCLogic {
   pickToday = () => { if(this.state.mode !== "today" || this.state.screen === "done") this.start("today"); };
   pickShuffle = () => { if(this.state.mode !== "shuffle" || this.state.screen === "done") this.start("shuffle"); };
   shuffleAgain = () => this.start("shuffle");
+  toggleMenu = () => this.setState(s => ({ menu: !s.menu }));
+  closeMenu = () => this.setState({ menu: false });
+  pickTodayM = () => { this.setState({ menu: false }); this.start("today"); };
+  pickShuffleM = () => { this.setState({ menu: false }); this.start("shuffle"); };
+  reveal = () => this.setState(s => ({ revealed: !s.revealed }));
+  again = () => this.rate(false);
+  gotIt = () => this.rate(true);
   openStats = () => this.setState({ stats: true });
   closeStats = () => this.setState({ stats: false });
 
@@ -130,6 +149,7 @@ class Component extends DCLogic {
     if(d.axis === "x" && Math.abs(dx) > 80) return this.rate(dx > 0);
     if(d.axis === "y" && !revealed && dy > 50) return this.setState({ revealed: true, dy: 0, axis: "" });
     if(d.axis === "y" && revealed && dy < -50) return this.setState({ revealed: false, dy: 0, axis: "" });
+    if(!d.axis) return this.setState({ revealed: !revealed });
     this.setState({ dx: 0, dy: 0, axis: "" });
   };
 
@@ -149,6 +169,14 @@ class Component extends DCLogic {
                dot: done ? "#cbd4a6" : (today ? "#cbd4a666" : "#2e2e34") };
     });
     return {
+      ...(() => { const h = highlight(d); return { exPre: h.pre, exHit: h.hit, exPost: h.post }; })(),
+      hitColor: d.p[4], gotBg: d.p[4], gotFg: "#141414",
+      back1: artFor(DECK[s.order[(s.idx + 1) % s.order.length]].p), back2: artFor(DECK[s.order[(s.idx + 2) % s.order.length]].p),
+      enBlur: p > .5 ? "blur(0)" : "blur(9px)", enOp: p > .5 ? 1 : .55, tapOp: p > .5 ? 0 : 1,
+      modeLabel: s.mode === "shuffle" ? "Shuffle" : "Today",
+      menuOp: s.menu ? 1 : 0, menuY: s.menu ? "0" : "-6px", menuPE: s.menu ? "auto" : "none",
+      toggleMenu: this.toggleMenu, closeMenu: this.closeMenu, pickTodayM: this.pickTodayM, pickShuffleM: this.pickShuffleM,
+      reveal: this.reveal, again: this.again, gotIt: this.gotIt,
       isStudy: s.screen === "study", isDone: s.screen === "done",
       todayBg: s.mode === "today" ? "#eeeae6" : "transparent", todayFg: s.mode === "today" ? "#1b1b1e" : "#8d8d95",
       shuffleBg: s.mode === "shuffle" ? "#eeeae6" : "transparent", shuffleFg: s.mode === "shuffle" ? "#1b1b1e" : "#8d8d95",
