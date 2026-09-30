@@ -17,7 +17,11 @@
 <div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
 <div style="flex:none;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px 0;display:flex;align-items:center;justify-content:space-between">
-  <span style="font-size:12px;color:#6d6d74;font-variant-numeric:tabular-nums">{{ count }}</span>
+  <div role="progressbar" aria-label="{{ count }}" style="flex:1;max-width:{{ dashMax }};display:flex;gap:5px;margin-right:16px">
+    <sc-for list="{{ dashes }}" as="d" hint-placeholder-count="12">
+      <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
+    </sc-for>
+  </div>
   <div style="display:flex;align-items:center;gap:6px">
     <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:34px;height:34px;border-radius:50%;background:transparent;color:#c2c2c9;opacity:{{ undoOp }};display:grid;place-items:center">
       <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
