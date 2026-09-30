@@ -39,33 +39,28 @@
     </sc-for>
   </div>
 
-  <button sc-camel-on-click="{{ speakNext }}" aria-label="Hear the next word" style="flex:1;min-height:150px;position:relative;margin-top:clamp(10px,2vh,18px);background:transparent;padding:0;display:flex;flex-direction:column;justify-content:center;text-align:left;cursor:pointer">
-    <div style="position:absolute;inset:6% 4%;background:{{ previewArt }};border-radius:50%;filter:blur(52px);opacity:.36;pointer-events:none;animation:wn-breathe 6s ease-in-out infinite"></div>
-    <div style="position:relative;display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1.4px;color:#77777d">
-      <span>UP NEXT</span>
-      <span style="display:flex;align-items:center;gap:6px;letter-spacing:.2px;color:#8d8d95">
-        <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8"></path></svg>tap to hear</span>
-    </div>
-    <canvas ref="{{ heroRef }}" width="1200" height="570" style="position:relative;width:100%;height:auto;max-height:100%;display:block;margin:-7% 0 -9%;animation:wn-float 7s ease-in-out infinite;filter:drop-shadow(0 4px 18px #0006)"></canvas>
-    <div style="position:relative;font-size:12px;color:#8d8d95;text-align:center">{{ previewType }}</div>
-  </button>
+  <div style="flex:1;min-height:28px"></div>
 
-  <div style="margin:clamp(12px,2.4vh,22px) 0 clamp(14px,2.6vh,22px);flex:none">
-    <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
-      <span style="font-size:10px;letter-spacing:1.4px;color:#77777d">TODAY'S NEST</span>
-      <span style="font-size:10.5px;color:#6d6d74">{{ dueLine }}</span>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat({{ nestCols }},1fr);gap:7px">
-      <sc-for list="{{ nest }}" as="n" hint-placeholder-count="12">
-        <span style="aspect-ratio:1;border-radius:50%;background:{{ n.art }};opacity:{{ n.op }};box-shadow:{{ n.ring }};transform:scale({{ n.scale }});transition:transform .4s cubic-bezier(.4,0,.2,1),opacity .4s"></span>
-      </sc-for>
-    </div>
+  <div style="display:flex;flex-direction:column;gap:10px;flex:none">
+    <button sc-camel-on-click="{{ startSession }}" style="display:flex;align-items:center;gap:14px;padding:20px 20px 20px 22px;border-radius:24px;background:#eeeae6;color:#1b1b1e;text-align:left;transition:transform .2s cubic-bezier(.4,0,.2,1)" style-hover="background:#ffffff" style-active="transform:scale(.98)">
+      <span style="flex:1">
+        <span style="display:block;font-size:17px;font-weight:550;letter-spacing:-.4px">Today's cards</span>
+        <span style="display:block;margin-top:4px;font-size:12px;color:#5c5c63">{{ todaySub }}</span>
+      </span>
+      <span style="width:40px;height:40px;border-radius:50%;background:#1b1b1e;color:#eeeae6;display:grid;place-items:center;flex:none">
+        <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h13m-5-6 6 6-6 6"></path></svg>
+      </span>
+    </button>
+    <button sc-camel-on-click="{{ startPractice }}" style="display:flex;align-items:center;gap:14px;padding:18px 20px 18px 22px;border-radius:24px;background:#141416;border:1px solid #ffffff12;color:#e6e3e0;text-align:left;transition:transform .2s cubic-bezier(.4,0,.2,1)" style-hover="background:#1b1b1e" style-active="transform:scale(.98)">
+      <span style="flex:1">
+        <span style="display:block;font-size:16px;font-weight:500;letter-spacing:-.3px">Practice all</span>
+        <span style="display:block;margin-top:4px;font-size:12px;color:#77777d">{{ practiceSub }}</span>
+      </span>
+      <span style="width:40px;height:40px;border-radius:50%;background:#ffffff0d;color:#c9c9d0;display:grid;place-items:center;flex:none">
+        <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>
+      </span>
+    </button>
   </div>
-
-  <button sc-camel-on-click="{{ startSession }}" style="height:56px;flex:none;border-radius:30px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500;letter-spacing:-.2px;display:flex;align-items:center;justify-content:center;gap:10px" style-hover="background:#ffffff">
-    <span>{{ startLabel }}</span>
-    <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h13m-5-6 6 6-6 6"></path></svg>
-  </button>
 
   <div style="margin-top:14px;flex:none;display:flex;align-items:center;justify-content:center;gap:10px;font-size:11px;color:#77777d">
     <span><b style="font-weight:500;color:#d7d7dd">{{ learning }}</b> learning</span>
@@ -100,25 +95,26 @@
         <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 26px 60px #0009;background:{{ art }}">
           <div style="position:absolute;inset:0;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35,inset -1px -1px 1px #ffffff30;border:1px solid #ffffff1f;border-radius:26px;pointer-events:none"></div>
           <div style="position:absolute;top:24px;left:24px;right:24px;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:#fffffff2">Français</span>
-            <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#ffffffd0;padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
+            <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:{{ ink }}">Français</span>
+            <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:{{ inkSoft }};padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
           </div>
           <div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);padding:0 22px">
-            <canvas ref="{{ dotsRef }}" width="1200" height="570" style="width:100%;height:auto;display:block;filter:drop-shadow(0 2px 8px #0003)"></canvas>
+            <canvas ref="{{ dotsRef }}" width="1200" height="570" style="width:100%;height:auto;display:block;filter:{{ dotShadow }}"></canvas>
           </div>
-          <div style="position:absolute;bottom:26px;left:24px;font-size:12px;letter-spacing:.3px;color:#ffffffc8;font-family:ui-monospace,Menlo,monospace">{{ ipa }}</div>
+          <div style="position:absolute;bottom:26px;left:24px;font-size:12px;letter-spacing:.3px;color:{{ inkSoft }};font-family:ui-monospace,Menlo,monospace">{{ ipa }}</div>
           <button sc-camel-on-click="{{ speak }}" aria-label="Listen in French" style="position:absolute;bottom:20px;right:20px;width:38px;height:38px;border-radius:50%;background:#ffffff1f;color:#fffffff0;display:grid;place-items:center" style-hover="background:#ffffff33">
             <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg>
           </button>
         </section>
 
         <section style="position:absolute;inset:0;border-radius:26px;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 26px 60px #0009;background:{{ art }};display:flex;flex-direction:column">
+          <div style="position:absolute;inset:0;background:{{ backScrim }};pointer-events:none"></div>
           <div style="position:absolute;inset:0;box-shadow:inset 0 1px 1px #ffffff85,inset 1px 0 1px #ffffff35;border:1px solid #ffffff1f;border-radius:26px;pointer-events:none"></div>
-          <div style="flex:none;padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center">
+          <div style="position:relative;flex:none;padding:24px 24px 0;display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:18px;font-weight:550;letter-spacing:-.6px;color:#fffffff2">English</span>
             <span style="display:flex;align-items:center;gap:6px;font-size:10.5px;color:#ffffffd0;padding:{{ tagPad }};border-radius:20px;background:{{ tagBg }}"><span style="width:6px;height:6px;border-radius:50%;background:{{ tagDot }}"></span>{{ tagLabel }}</span>
           </div>
-          <div style="flex:1;min-height:0;overflow-y:auto;padding:14px 24px 20px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:14px">
+          <div style="position:relative;flex:1;min-height:0;overflow-y:auto;padding:14px 24px 20px;display:flex;flex-direction:column;justify-content:center;text-align:center;gap:14px">
             <div>
               <p style="font-size:13px;color:#ffffffc0;margin:0 0 6px">{{ word }} <span style="color:#ffffff88">· {{ say }}</span></p>
               <div style="font-size:clamp(24px,7.5vw,30px);font-weight:450;letter-spacing:-.9px;line-height:1.12;color:#fff">{{ meaning }}</div>
@@ -167,17 +163,17 @@
 <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
 <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 30px) clamp(22px,7vw,34px) calc(env(safe-area-inset-bottom,0px) + 34px);gap:0;text-align:center">
   <div style="width:100%;max-width:300px;border-radius:26px;padding:34px 26px;background:{{ art }};box-shadow:0 26px 60px #0009;border:1px solid #ffffff1f;animation:wn-pop .5s cubic-bezier(.2,.9,.3,1.3) both">
-    <div style="font-size:11px;letter-spacing:.4px;color:#ffffffb5">À demain</div>
+    <div style="font-size:11px;letter-spacing:.4px;color:#ffffffb5">{{ doneKicker }}</div>
     <div style="font-size:33px;font-weight:450;letter-spacing:-1px;color:#fff;margin:14px 0 10px">Petit à petit.</div>
     <div style="font-size:13px;color:#ffffffd0;line-height:1.6">{{ doneLine }}</div>
   </div>
   <div style="margin-top:30px;display:flex;align-items:center;gap:11px;animation:wn-rise .5s .25s both">
     <span style="font-size:42px;line-height:1;font-weight:400;letter-spacing:-2px;color:#eeeae7;font-variant-numeric:tabular-nums">{{ streak }}</span>
-    <span style="font-size:12px;color:#8b8b92;text-align:left;line-height:1.4">day streak<br><span style="color:#5f5f67">kept alive</span></span>
+    <span style="font-size:12px;color:#8b8b92;text-align:left;line-height:1.4">day streak<br><span style="color:#5f5f67">{{ streakCaption }}</span></span>
   </div>
   <div style="margin-top:34px;display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;animation:wn-rise .5s .35s both">
     <button sc-camel-on-click="{{ goHome }}" style="height:52px;border-radius:28px;background:#eeeae6;color:#1b1b1e;font-size:14.5px;font-weight:500" style-hover="background:#fff">Done for today</button>
-    <button sc-camel-on-click="{{ startSession }}" style="height:52px;border-radius:28px;background:#1b1b1e;color:#cfcfd6;font-size:14px" style-hover="background:#26262b">Keep practising</button>
+    <button sc-camel-on-click="{{ startPractice }}" style="height:52px;border-radius:28px;background:#1b1b1e;color:#cfcfd6;font-size:14px" style-hover="background:#26262b">Practice all, shuffled</button>
   </div>
 </div>
 </sc-if>
@@ -266,17 +262,30 @@ function artFor(p){
          p[1];
 }
 
+function lum(hex){
+  const n = parseInt(hex.slice(1,7),16), ch = [n>>16&255, n>>8&255, n&255].map(v => { v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); });
+  return .2126*ch[0] + .7152*ch[1] + .0722*ch[2];
+}
+// brightness behind the word: the centre blobs of the card art sit on top of the base colour
+function brightness(p){ return .45*lum(p[0]) + .35*lum(p[3]) + .2*lum(p[1]); }
+function isLight(p){ return brightness(p) > .5; }
+function shuffled(n){
+  const a = Array.from({length:n}, (_,i) => i);
+  for(let i=n-1;i>0;i--){ const k = Math.floor(Math.random()*(i+1)); [a[i],a[k]] = [a[k],a[i]]; }
+  return a;
+}
+const IDENTITY = DECK.map((_,i) => i);
+
 class Component extends DCLogic {
   constructor(props){
     super(props);
     this.cardRef = React.createRef();
     this.dotsRef = React.createRef();
-    this.heroRef = React.createRef();
     const size = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
     this.state = {
       screen: (this.props.startScreen ?? "tutorial") === "home" ? "home" : "study",
       coach: (this.props.startScreen ?? "tutorial") === "home" ? -1 : 0,
-      idx: 0, size, revealed: false, dx: 0, dy: 0, dragging: false, fly: 0,
+      idx: 0, size, goal: size, mode: "today", order: IDENTITY, revealed: false, dx: 0, dy: 0, dragging: false, fly: 0,
       learning: 18, mastered: 42, streak: 5, doneToday: 0, history: []
     };
     this.drag = null;
@@ -284,22 +293,24 @@ class Component extends DCLogic {
   componentDidMount(){ this.paintDots(); }
   componentDidUpdate(){ this.paintDots(); }
 
-  card(){ return DECK[this.state.idx % DECK.length]; }
+  card(){ const o = this.state.order; return DECK[o[this.state.idx % o.length]]; }
 
   paintDots(){
-    this.paintWord(this.dotsRef.current, this.card().fr);
-    this.paintWord(this.heroRef.current, DECK[this.state.idx % DECK.length].fr);
+    const d = this.card();
+    this.paintWord(this.dotsRef.current, d.fr, brightness(d.p));
   }
 
-  paintWord(out, text){
-    if(!out || out.dataset.word === text) return;
-    out.dataset.word = text;
+  paintWord(out, text, bright){
+    // white dots always; the halo behind them gets stronger the brighter the card is
+    const halo = Math.min(.8, .32 + bright * .9), key = text + "|" + halo.toFixed(2);
+    if(!out || out.dataset.word === key) return;
+    out.dataset.word = key;
     const c = out.getContext("2d"), mask = document.createElement("canvas");
     mask.width = 1200; mask.height = 570;
     const m = mask.getContext("2d"), words = text.split(" ");
     let size = 170, lines = [];
     while(size >= 60){
-      m.font = "500 " + size + "px Arial, sans-serif";
+      m.font = "600 " + size + "px Arial, sans-serif";
       lines = [""];
       for(const w of words){
         const last = lines.length - 1, test = lines[last] ? lines[last] + " " + w : w;
@@ -311,9 +322,13 @@ class Component extends DCLogic {
     m.fillStyle = "white"; m.textAlign = "center"; m.textBaseline = "middle";
     lines.forEach((l,i) => m.fillText(l, 600, 285 + (i - (lines.length-1)/2) * size * 1.27));
     const px = m.getImageData(0,0,1200,570).data;
-    c.clearRect(0,0,1200,570); c.fillStyle = "#fffef4";
+    c.clearRect(0,0,1200,570);
+    // soft backplate: a blurred shadow of the word (drawn off-canvas so only the shadow lands) keeps the dots readable on any card
+    c.save(); c.shadowColor = "rgba(0,0,0," + halo.toFixed(2) + ")"; c.shadowBlur = 30; c.shadowOffsetX = 3000;
+    c.drawImage(mask, -3000, 0); c.drawImage(mask, -3000, 0); c.restore();
+    c.fillStyle = "#fffef4";
     for(let y=4;y<570;y+=8) for(let x=4;x<1200;x+=8){
-      if(px[(y*1200+x)*4+3] > 75){ c.beginPath(); c.arc(x,y,2.6,0,Math.PI*2); c.fill(); }
+      if(px[(y*1200+x)*4+3] > 75){ c.beginPath(); c.arc(x,y,3.4,0,Math.PI*2); c.fill(); }
     }
   }
 
@@ -341,7 +356,7 @@ class Component extends DCLogic {
           mastered: got ? s.mastered + 1 : s.mastered,
           history: [last, ...s.history].slice(0,5),
           screen: finished ? "done" : "study",
-          streak: finished ? s.streak + 1 : s.streak,
+          streak: finished && s.mode === "today" ? s.streak + 1 : s.streak,
           coach: c === 1 ? 2 : (c === 2 ? 3 : c)
         };
       });
@@ -404,15 +419,16 @@ class Component extends DCLogic {
     this.say(this.card().fr);
     if(this.state.coach === 3) this.setState({ coach: 4 });
   };
-  speakNext = () => this.say(DECK[this.state.idx % DECK.length].fr);
+
 
   coachAdvance = () => {
     const c = this.state.coach;
     if(c === 4) this.setState({ coach: -1, screen: "home", revealed: false, doneToday: 0, idx: 0 });
   };
-  skipTutorial = () => this.setState({ coach: -1, screen: "home", revealed: false, doneToday: 0, idx: 0 });
-  replayTutorial = () => this.setState({ coach: 0, screen: "study", revealed: false, idx: 0, doneToday: 0, dx: 0, dy: 0 });
-  startSession = () => this.setState({ screen: "study", doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] });
+  skipTutorial = () => this.setState(s => ({ coach: -1, screen: "home", mode: "today", order: IDENTITY, size: s.goal, revealed: false, doneToday: 0, idx: 0 }));
+  replayTutorial = () => this.setState(s => ({ coach: 0, screen: "study", mode: "today", order: IDENTITY, size: s.goal, revealed: false, idx: 0, doneToday: 0, dx: 0, dy: 0 }));
+  startSession = () => this.setState(s => ({ screen: "study", mode: "today", order: IDENTITY, size: s.goal, doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] }));
+  startPractice = () => this.setState({ screen: "study", mode: "practice", order: shuffled(DECK.length), idx: 0, size: DECK.length, doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] });
   goHome = () => this.setState({ screen: "home", revealed: false, dx: 0, dy: 0 });
 
   renderVals(){
@@ -435,7 +451,6 @@ class Component extends DCLogic {
       return { label, fill: done ? "#22231f" : "#151517", ring: today ? "#cbd4a6" : "#ffffff0d",
                dot: done ? "#cbd4a6" : (today ? "#cbd4a666" : "#2e2e34") };
     });
-    const next = DECK[(s.idx + 0) % DECK.length];
     const pips = Array.from({length: s.size}, (_,i) => ({
       w: i === s.doneToday ? "16px" : "7px",
       bg: i < s.doneToday ? "#c4c3b1" : (i === s.doneToday ? "#eeeae7" : "#ffffff17")
@@ -450,9 +465,11 @@ class Component extends DCLogic {
       note: item.note || "", hasNote: !!item.note,
       hasTrap: !!item.trap, trapLabel: item.trap ? (item.trap.k === "es" ? "SPANISH TRAP" : "FAUX AMI") : "", trapText: item.trap ? item.trap.t : "", example: item.ex, exampleEn: item.exEn,
       art: artFor(item.p), glow: item.p[2],
-      previewArt: artFor(next.p), previewWord: next.fr, previewType: next.type,
-      dueLine: (s.size) + " cards due · about 4 minutes",
-      startLabel: "Start today's " + s.size,
+      todaySub: s.goal + " cards · about 4 min · keeps your streak",
+      practiceSub: "All " + DECK.length + " cards, shuffled · no pressure",
+      ink: isLight(item.p) ? "#1c1712" : "#fffffff2", inkSoft: isLight(item.p) ? "#1c1712b8" : "#ffffffc8",
+      dotShadow: "none",
+      backScrim: isLight(item.p) ? "#00000066" : "#00000014",
       counter: String(Math.min(s.doneToday + 1, s.size)).padStart(2,"0") + " / " + String(s.size).padStart(2,"0"),
       pips,
       faceTransform: "rotateY(" + (s.revealed ? 180 : 0) + "deg)",
@@ -462,15 +479,11 @@ class Component extends DCLogic {
       undoColor: s.history.length && s.coach < 0 ? "#8d8d95" : "#3a3a41",
       streak: s.streak, streakNote: quiet ? "" : "best: 21 days",
       learning: quiet ? "—" : s.learning, mastered: quiet ? "—" : s.mastered,
-      doneLine: s.doneToday + " cards practised. Your next reviews are scheduled.",
+      doneLine: s.mode === "practice" ? "Whole deck, done. " + s.doneToday + " cards shuffled through." : s.doneToday + " cards practised. Your next reviews are scheduled.",
+      doneKicker: s.mode === "practice" ? "Practice complete" : "À demain",
+      streakCaption: s.mode === "practice" ? "streak unchanged" : "kept alive",
       week,
-      nest: Array.from({length: s.size}, (_,i) => {
-        const d = DECK[(s.idx + i) % DECK.length], first = i === 0;
-        return { art: artFor(d.p), op: first ? 1 : .55, scale: first ? 1.12 : 1,
-                 ring: first ? "0 0 0 2px #0a0a0b, 0 0 0 3.5px #eeeae7" : "none" };
-      }),
-      nestCols: Math.min(s.size, 12),
-      heroRef: this.heroRef, speakNext: this.speakNext,
+      startPractice: this.startPractice,
       coachOn: s.coach >= 0, coachDim: s.coach === 4 ? "#000000b8" : "#00000059",
       coachStepLabel: step ? step.label : "", coachTitle: step ? step.title : "",
       coachBody: step ? step.body : "", coachWaitLabel: step ? step.wait : "",

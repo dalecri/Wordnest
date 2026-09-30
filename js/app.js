@@ -39,17 +39,30 @@ function artFor(p){
          p[1];
 }
 
+function lum(hex){
+  const n = parseInt(hex.slice(1,7),16), ch = [n>>16&255, n>>8&255, n&255].map(v => { v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); });
+  return .2126*ch[0] + .7152*ch[1] + .0722*ch[2];
+}
+// brightness behind the word: the centre blobs of the card art sit on top of the base colour
+function brightness(p){ return .45*lum(p[0]) + .35*lum(p[3]) + .2*lum(p[1]); }
+function isLight(p){ return brightness(p) > .5; }
+function shuffled(n){
+  const a = Array.from({length:n}, (_,i) => i);
+  for(let i=n-1;i>0;i--){ const k = Math.floor(Math.random()*(i+1)); [a[i],a[k]] = [a[k],a[i]]; }
+  return a;
+}
+const IDENTITY = DECK.map((_,i) => i);
+
 class Component extends DCLogic {
   constructor(props){
     super(props);
     this.cardRef = React.createRef();
     this.dotsRef = React.createRef();
-    this.heroRef = React.createRef();
     const size = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
     this.state = {
       screen: (this.props.startScreen ?? "tutorial") === "home" ? "home" : "study",
       coach: (this.props.startScreen ?? "tutorial") === "home" ? -1 : 0,
-      idx: 0, size, revealed: false, dx: 0, dy: 0, dragging: false, fly: 0,
+      idx: 0, size, goal: size, mode: "today", order: IDENTITY, revealed: false, dx: 0, dy: 0, dragging: false, fly: 0,
       learning: 18, mastered: 42, streak: 5, doneToday: 0, history: []
     };
     this.drag = null;
@@ -57,22 +70,24 @@ class Component extends DCLogic {
   componentDidMount(){ this.paintDots(); }
   componentDidUpdate(){ this.paintDots(); }
 
-  card(){ return DECK[this.state.idx % DECK.length]; }
+  card(){ const o = this.state.order; return DECK[o[this.state.idx % o.length]]; }
 
   paintDots(){
-    this.paintWord(this.dotsRef.current, this.card().fr);
-    this.paintWord(this.heroRef.current, DECK[this.state.idx % DECK.length].fr);
+    const d = this.card();
+    this.paintWord(this.dotsRef.current, d.fr, brightness(d.p));
   }
 
-  paintWord(out, text){
-    if(!out || out.dataset.word === text) return;
-    out.dataset.word = text;
+  paintWord(out, text, bright){
+    // white dots always; the halo behind them gets stronger the brighter the card is
+    const halo = Math.min(.8, .32 + bright * .9), key = text + "|" + halo.toFixed(2);
+    if(!out || out.dataset.word === key) return;
+    out.dataset.word = key;
     const c = out.getContext("2d"), mask = document.createElement("canvas");
     mask.width = 1200; mask.height = 570;
     const m = mask.getContext("2d"), words = text.split(" ");
     let size = 170, lines = [];
     while(size >= 60){
-      m.font = "500 " + size + "px Arial, sans-serif";
+      m.font = "600 " + size + "px Arial, sans-serif";
       lines = [""];
       for(const w of words){
         const last = lines.length - 1, test = lines[last] ? lines[last] + " " + w : w;
@@ -84,9 +99,13 @@ class Component extends DCLogic {
     m.fillStyle = "white"; m.textAlign = "center"; m.textBaseline = "middle";
     lines.forEach((l,i) => m.fillText(l, 600, 285 + (i - (lines.length-1)/2) * size * 1.27));
     const px = m.getImageData(0,0,1200,570).data;
-    c.clearRect(0,0,1200,570); c.fillStyle = "#fffef4";
+    c.clearRect(0,0,1200,570);
+    // soft backplate: a blurred shadow of the word (drawn off-canvas so only the shadow lands) keeps the dots readable on any card
+    c.save(); c.shadowColor = "rgba(0,0,0," + halo.toFixed(2) + ")"; c.shadowBlur = 30; c.shadowOffsetX = 3000;
+    c.drawImage(mask, -3000, 0); c.drawImage(mask, -3000, 0); c.restore();
+    c.fillStyle = "#fffef4";
     for(let y=4;y<570;y+=8) for(let x=4;x<1200;x+=8){
-      if(px[(y*1200+x)*4+3] > 75){ c.beginPath(); c.arc(x,y,2.6,0,Math.PI*2); c.fill(); }
+      if(px[(y*1200+x)*4+3] > 75){ c.beginPath(); c.arc(x,y,3.4,0,Math.PI*2); c.fill(); }
     }
   }
 
@@ -114,7 +133,7 @@ class Component extends DCLogic {
           mastered: got ? s.mastered + 1 : s.mastered,
           history: [last, ...s.history].slice(0,5),
           screen: finished ? "done" : "study",
-          streak: finished ? s.streak + 1 : s.streak,
+          streak: finished && s.mode === "today" ? s.streak + 1 : s.streak,
           coach: c === 1 ? 2 : (c === 2 ? 3 : c)
         };
       });
@@ -177,15 +196,16 @@ class Component extends DCLogic {
     this.say(this.card().fr);
     if(this.state.coach === 3) this.setState({ coach: 4 });
   };
-  speakNext = () => this.say(DECK[this.state.idx % DECK.length].fr);
+
 
   coachAdvance = () => {
     const c = this.state.coach;
     if(c === 4) this.setState({ coach: -1, screen: "home", revealed: false, doneToday: 0, idx: 0 });
   };
-  skipTutorial = () => this.setState({ coach: -1, screen: "home", revealed: false, doneToday: 0, idx: 0 });
-  replayTutorial = () => this.setState({ coach: 0, screen: "study", revealed: false, idx: 0, doneToday: 0, dx: 0, dy: 0 });
-  startSession = () => this.setState({ screen: "study", doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] });
+  skipTutorial = () => this.setState(s => ({ coach: -1, screen: "home", mode: "today", order: IDENTITY, size: s.goal, revealed: false, doneToday: 0, idx: 0 }));
+  replayTutorial = () => this.setState(s => ({ coach: 0, screen: "study", mode: "today", order: IDENTITY, size: s.goal, revealed: false, idx: 0, doneToday: 0, dx: 0, dy: 0 }));
+  startSession = () => this.setState(s => ({ screen: "study", mode: "today", order: IDENTITY, size: s.goal, doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] }));
+  startPractice = () => this.setState({ screen: "study", mode: "practice", order: shuffled(DECK.length), idx: 0, size: DECK.length, doneToday: 0, revealed: false, dx: 0, dy: 0, history: [] });
   goHome = () => this.setState({ screen: "home", revealed: false, dx: 0, dy: 0 });
 
   renderVals(){
@@ -208,7 +228,6 @@ class Component extends DCLogic {
       return { label, fill: done ? "#22231f" : "#151517", ring: today ? "#cbd4a6" : "#ffffff0d",
                dot: done ? "#cbd4a6" : (today ? "#cbd4a666" : "#2e2e34") };
     });
-    const next = DECK[(s.idx + 0) % DECK.length];
     const pips = Array.from({length: s.size}, (_,i) => ({
       w: i === s.doneToday ? "16px" : "7px",
       bg: i < s.doneToday ? "#c4c3b1" : (i === s.doneToday ? "#eeeae7" : "#ffffff17")
@@ -223,9 +242,11 @@ class Component extends DCLogic {
       note: item.note || "", hasNote: !!item.note,
       hasTrap: !!item.trap, trapLabel: item.trap ? (item.trap.k === "es" ? "SPANISH TRAP" : "FAUX AMI") : "", trapText: item.trap ? item.trap.t : "", example: item.ex, exampleEn: item.exEn,
       art: artFor(item.p), glow: item.p[2],
-      previewArt: artFor(next.p), previewWord: next.fr, previewType: next.type,
-      dueLine: (s.size) + " cards due · about 4 minutes",
-      startLabel: "Start today's " + s.size,
+      todaySub: s.goal + " cards · about 4 min · keeps your streak",
+      practiceSub: "All " + DECK.length + " cards, shuffled · no pressure",
+      ink: isLight(item.p) ? "#1c1712" : "#fffffff2", inkSoft: isLight(item.p) ? "#1c1712b8" : "#ffffffc8",
+      dotShadow: "none",
+      backScrim: isLight(item.p) ? "#00000066" : "#00000014",
       counter: String(Math.min(s.doneToday + 1, s.size)).padStart(2,"0") + " / " + String(s.size).padStart(2,"0"),
       pips,
       faceTransform: "rotateY(" + (s.revealed ? 180 : 0) + "deg)",
@@ -235,15 +256,11 @@ class Component extends DCLogic {
       undoColor: s.history.length && s.coach < 0 ? "#8d8d95" : "#3a3a41",
       streak: s.streak, streakNote: quiet ? "" : "best: 21 days",
       learning: quiet ? "—" : s.learning, mastered: quiet ? "—" : s.mastered,
-      doneLine: s.doneToday + " cards practised. Your next reviews are scheduled.",
+      doneLine: s.mode === "practice" ? "Whole deck, done. " + s.doneToday + " cards shuffled through." : s.doneToday + " cards practised. Your next reviews are scheduled.",
+      doneKicker: s.mode === "practice" ? "Practice complete" : "À demain",
+      streakCaption: s.mode === "practice" ? "streak unchanged" : "kept alive",
       week,
-      nest: Array.from({length: s.size}, (_,i) => {
-        const d = DECK[(s.idx + i) % DECK.length], first = i === 0;
-        return { art: artFor(d.p), op: first ? 1 : .55, scale: first ? 1.12 : 1,
-                 ring: first ? "0 0 0 2px #0a0a0b, 0 0 0 3.5px #eeeae7" : "none" };
-      }),
-      nestCols: Math.min(s.size, 12),
-      heroRef: this.heroRef, speakNext: this.speakNext,
+      startPractice: this.startPractice,
       coachOn: s.coach >= 0, coachDim: s.coach === 4 ? "#000000b8" : "#00000059",
       coachStepLabel: step ? step.label : "", coachTitle: step ? step.title : "",
       coachBody: step ? step.body : "", coachWaitLabel: step ? step.wait : "",
