@@ -77,39 +77,39 @@
   <sc-if value="{{ isCards }}" hint-placeholder-val="{{ true }}">
   <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:28px">
     <div style="position:relative;z-index:2;flex:1;min-height:230px;max-height:380px">
-      <div style="position:absolute;inset:0;transform:translate3d(18px,-26px,0) rotate(6deg) scale(.9);border-radius:24px;background:{{ back2 }};opacity:.55;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
-      <div style="position:absolute;inset:0;transform:translate3d(-14px,-12px,0) rotate(-4.5deg) scale(.95);border-radius:24px;background:{{ back1 }};opacity:.8;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
+      <div style="position:absolute;inset:0;transform:translate3d(18px,-26px,0) rotate(6deg) scale(.9);border-radius:24px;background:{{ back2 }};opacity:.55;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff08;border-bottom:1px solid #ffffff0f"></div></div>
+      <div style="position:absolute;inset:0;transform:translate3d(-14px,-12px,0) rotate(-4.5deg) scale(.95);border-radius:24px;background:{{ back1 }};opacity:.8;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff08;border-bottom:1px solid #ffffff0f"></div></div>
 
       <div ref="{{ cardRef }}" sc-camel-on-pointer-down="{{ onDown }}" sc-camel-on-pointer-move="{{ onMove }}" sc-camel-on-pointer-up="{{ onUp }}" sc-camel-on-pointer-cancel="{{ onUp }}" style="position:absolute;inset:0;touch-action:none;cursor:grab;will-change:transform">
         <div style="position:absolute;inset:0;perspective:1200px;animation:{{ enter }} .5s cubic-bezier(.22,1,.36,1) both">
         <div style="position:absolute;inset:0;transform-style:preserve-3d;transform:{{ faceT }};transition:transform .6s cubic-bezier(.22,1,.36,1)">
-          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#1d1b18;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 28px 50px -22px #000,inset 0 1px 0 #ffffffb0;display:flex;flex-direction:column">
-            <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff66;border-bottom:1px solid #1d1b1814">
-              <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:{{ badgeBg }};color:#fff;font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">FR</span>
-              <span style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#1d1b18c0"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
+          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 28px 50px -22px #000,inset 0 1px 0 #ffffff2e,inset 0 0 0 1px #ffffff14;display:flex;flex-direction:column">
+            <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff0a;border-bottom:1px solid #ffffff12">
+              <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">FR</span>
+              <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
             </div>
             <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:20px 20px 16px">
-              <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ wordSize }};line-height:1.03;letter-spacing:-.035em;text-wrap:balance;overflow-wrap:anywhere">{{ word }}</div>
+              <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ wordSize }};line-height:1.03;letter-spacing:-.035em;text-shadow:0 2px 24px #0006;text-wrap:balance;overflow-wrap:anywhere">{{ word }}</div>
               <div style="flex:1;min-height:12px"></div>
-              <div style="height:1px;background:#1d1b181c;margin-bottom:12px"></div>
+              <div style="height:1px;background:#ffffff1f;margin-bottom:12px"></div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div style="min-width:0"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ ipa }}</div><div style="margin-top:4px;font-size:12.5px;color:#1d1b1880">{{ footMeta }}</div></div>
-                <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="flex:none;width:40px;height:40px;border-radius:50%;background:{{ badgeBg }};color:#fff;display:grid;place-items:center;box-shadow:0 6px 14px -6px {{ badgeBg }}" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
+                <div style="min-width:0"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ ipa }}</div><div style="margin-top:4px;font-size:12.5px;color:#ffffff8c">{{ footMeta }}</div></div>
+                <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="flex:none;width:40px;height:40px;border-radius:50%;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
               </div>
             </div>
           </section>
-          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#1d1b18;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 28px 50px -22px #000,inset 0 1px 0 #ffffffb0;display:flex;flex-direction:column">
-            <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff66;border-bottom:1px solid #1d1b1814">
-              <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:{{ badgeBg }};color:#fff;font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">EN</span>
-              <span style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#1d1b18c0"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
+          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 28px 50px -22px #000,inset 0 1px 0 #ffffff2e,inset 0 0 0 1px #ffffff14;display:flex;flex-direction:column">
+            <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff0a;border-bottom:1px solid #ffffff12">
+              <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">EN</span>
+              <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
             </div>
             <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:20px 20px 16px">
-              <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ enSize }};line-height:1.03;letter-spacing:-.035em;text-wrap:balance;overflow-wrap:anywhere">{{ meaning }}</div>
+              <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ enSize }};line-height:1.03;letter-spacing:-.035em;text-shadow:0 2px 24px #0006;text-wrap:balance;overflow-wrap:anywhere">{{ meaning }}</div>
               <div style="flex:1;min-height:12px"></div>
-              <div style="height:1px;background:#1d1b181c;margin-bottom:12px"></div>
+              <div style="height:1px;background:#ffffff1f;margin-bottom:12px"></div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div style="min-width:0"><div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ word }}</div><div style="margin-top:3px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#1d1b1899">{{ ipa }}</div></div>
-                <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="flex:none;width:40px;height:40px;border-radius:50%;background:{{ badgeBg }};color:#fff;display:grid;place-items:center;box-shadow:0 6px 14px -6px {{ badgeBg }}" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
+                <div style="min-width:0"><div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ word }}</div><div style="margin-top:3px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#ffffffa6">{{ ipa }}</div></div>
+                <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="flex:none;width:40px;height:40px;border-radius:50%;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
               </div>
             </div>
           </section>
@@ -150,19 +150,19 @@
   </sc-if>
   <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
   <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:22px">
-    <section style="flex:none;border-radius:24px;overflow:hidden;background:{{ qPaper }};color:#1d1b18;box-shadow:{{ qGlow }};transition:box-shadow .3s;display:flex;flex-direction:column;animation:{{ enter }} .45s cubic-bezier(.22,1,.36,1) both">
-      <div style="flex:none;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff66;border-bottom:1px solid #1d1b1814">
-        <span style="height:24px;padding:0 9px;border-radius:7px;background:{{ qBadge }};color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;display:grid;place-items:center">{{ qLabel }}</span>
-        <span style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#1d1b18c0"><span style="width:7px;height:7px;border-radius:50%;background:{{ qKindDot }}"></span>{{ qKind }}</span>
+    <section style="flex:none;border-radius:24px;overflow:hidden;background:{{ qPaper }};color:#f4f1ec;box-shadow:{{ qGlow }};transition:box-shadow .3s;display:flex;flex-direction:column;animation:{{ enter }} .45s cubic-bezier(.22,1,.36,1) both">
+      <div style="flex:none;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff0a;border-bottom:1px solid #ffffff12">
+        <span style="height:24px;padding:0 9px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;display:grid;place-items:center">{{ qLabel }}</span>
+        <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ qKindDot }}"></span>{{ qKind }}</span>
       </div>
       <div style="padding:18px 20px 18px;display:flex;flex-direction:column;gap:8px;min-height:150px">
-        <div style="font-size:12.5px;color:#1d1b1880">{{ qAsk }}</div>
+        <div style="font-size:12.5px;color:#ffffff8c">{{ qAsk }}</div>
         <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:{{ qPromptWeight }};font-size:{{ qPromptSize }};line-height:1.12;letter-spacing:-.025em;text-wrap:balance;overflow-wrap:anywhere">{{ qPrompt }}</div>
         <div style="flex:1"></div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-          <div style="font-size:13px;color:#1d1b1899;line-height:1.4">{{ qSub }}</div>
+          <div style="font-size:13px;color:#ffffffa6;line-height:1.4">{{ qSub }}</div>
           <sc-if value="{{ qSpeak }}" hint-placeholder-val="{{ false }}">
-            <button sc-camel-on-click="{{ speakQ }}" aria-label="Hear it in French" style="flex:none;width:38px;height:38px;border-radius:50%;background:{{ qBadge }};color:#fff;display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
+            <button sc-camel-on-click="{{ speakQ }}" aria-label="Hear it in French" style="flex:none;width:38px;height:38px;border-radius:50%;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
           </sc-if>
         </div>
       </div>

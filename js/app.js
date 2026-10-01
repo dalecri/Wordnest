@@ -48,7 +48,7 @@ const COLLECTIONS = [
 const SWATCHES = ["#cdb4f5","#dff07a","#4b5fd6","#f2683a","#8fe0c0","#f5a3c7","#8cc8f5","#f6d873","#ff8a7a","#b9d39b","#a993f0","#7fd1d8"];
 const SESSION = 12;
 
-const G = { m:{ label:"masculin", ink:"#4f7a3a" }, f:{ label:"féminin", ink:"#c0662a" } };
+const G = { m:{ label:"masculin", ink:"#b9d98a" }, f:{ label:"féminin", ink:"#f4b77a" } };
 
 // ---------- colour helpers ----------
 function hexToRgb(h){ const n = parseInt(h.slice(1,7),16); return [n>>16&255, n>>8&255, n&255]; }
@@ -77,6 +77,14 @@ function paletteFor(hex, i){
   return [hsl(h,s,.68), hsl(h,s,.52), hsl(h,s*.8,.16), hsl(h,s*.75,.30), hsl((h+20)%360,s,.86)];
 }
 // pastel card surface: pale top-left, richer bottom-right
+// dark glow card: the word's colour pools at the top and sinks into near-black, with a second soft orb low on the right
+function glowFor(p, dim){
+  const k = dim ? .55 : 1, a = h => h + Math.round(255 * k).toString(16).padStart(2, "0");
+  return "radial-gradient(120% 75% at 30% -10%, " + a(lighten(p[0], .32)) + " 0%, " + p[0] + "00 62%)," +
+         "radial-gradient(70% 55% at 95% 105%, " + a(p[1]) + " 0%, " + p[1] + "00 70%)," +
+         "radial-gradient(60% 45% at 15% 75%, " + p[3] + "aa 0%, " + p[3] + "00 75%)," +
+         "linear-gradient(180deg, " + mix(p[2], "#000000", .2) + " 0%, #0b0b0e 85%)";
+}
 function paperFor(p){
   const top = lighten(mix(p[4], "#ffffff", .45), .78), bot = lighten(p[0], .42);
   return "linear-gradient(155deg, " + top + " 0%, " + mix(top, bot, .45) + " 48%, " + bot + " 100%)";
@@ -108,7 +116,7 @@ function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")
 // split the example so the word being learned can be highlighted (matches on a short stem so "attendre" finds "attends")
 function highlight(d){
   const ex = d.ex || "", words = d.fr.replace(/…/g,"").split(/[\s/']+/).filter(w => w.length > 1);
-  const key = norm(words[words.length - 1] || "").slice(0, 5), n = norm(ex);
+  const last = norm(words[words.length - 1] || ""), key = last.slice(0, Math.max(3, Math.min(5, last.length - 1))), n = norm(ex);
   const at = key ? n.indexOf(key) : -1;
   if(at < 0) return { pre: ex, hit: "", post: "" };
   let s = at, e = at + key.length;
@@ -477,8 +485,8 @@ class Component extends DCLogic {
     return {
       isCards: !isQuiz, isQuiz, cardsBg: isQuiz ? "transparent" : "#eeeae6", cardsFg: isQuiz ? "#8d8d95" : "#1b1b1e",
       quizBg: isQuiz ? "#eeeae6" : "transparent", quizFg: isQuiz ? "#1b1b1e" : "#8d8d95", setCards: this.setCards, setQuiz: this.setQuiz,
-      qLabel: q ? q.label : "", qKind: kindLabel(qc), qKindDot: qc.g ? G[qc.g].ink : "#1d1b1840",
-      qPaper: paperFor(qc.p), qBadge: (() => { let c = qc.p[3]; if(lum(c) > .12) c = mix(qc.p[3], qc.p[2], .55); return c; })(),
+      qLabel: q ? q.label : "", qKind: kindLabel(qc), qKindDot: qc.g ? G[qc.g].ink : "#ffffff55",
+      qPaper: glowFor(qc.p), qBadge: (() => { let c = qc.p[3]; if(lum(c) > .12) c = mix(qc.p[3], qc.p[2], .55); return c; })(),
       qPrompt: q ? q.prompt : "", qPromptSize: q && q.big ? fitSize(q.prompt) : "23px", qPromptWeight: q && q.big ? 700 : 600,
       qSub: q ? q.sub : "", qAsk: q ? q.ask : "", qSpeak: !!(q && (q.speak || q.kind === "gender")), speakQ: this.speakQ,
       isChoice: !!(q && q.options), isBuild: !!(q && q.bank), qOptions, qOptCols: q && q.options && q.options.length === 2 ? "1fr 1fr" : "1fr",
@@ -494,8 +502,8 @@ class Component extends DCLogic {
       colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
       cardRef: this.cardRef, panelRef: this.panelRef, btnRef: this.btnRef, noRef: this.noRef, yesRef: this.yesRef,
-      paper: paperFor(d.p), back1: paperFor(nxt(1).p), back2: paperFor(nxt(2).p), art: artFor(d.p),
-      kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#1d1b1840",
+      paper: glowFor(d.p), back1: glowFor(nxt(1).p, true), back2: glowFor(nxt(2).p, true), accent: lighten(d.p[0], .4), art: artFor(d.p),
+      kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
       badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
       word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.ipa || "",
       footMeta: s.showEx ? "tap to flip" : "tap to flip · swipe down for example",
