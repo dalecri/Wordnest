@@ -1,0 +1,13 @@
+{
+  "appId": "com.twostorytails.wordnest",
+  "appName": "WordNest",
+  "webDir": "www",
+  "backgroundColor": "#0a0a0b",
+  "android": {
+    "backgroundColor": "#0a0a0b"
+  },
+  "ios": {
+    "backgroundColor": "#0a0a0b",
+    "contentInset": "never"
+  }
+}

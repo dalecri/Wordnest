@@ -1,0 +1,24 @@
+{
+  "name": "wordnest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WordNest: offline French flashcards",
+  "scripts": {
+    "build": "python3 build.py && node scripts/copy-web.mjs",
+    "copy": "node scripts/copy-web.mjs",
+    "sync": "npm run copy && npx cap sync",
+    "android": "npm run sync && npx cap open android",
+    "ios": "npm run sync && npx cap open ios",
+    "run:android": "npm run sync && npx cap run android",
+    "run:ios": "npm run sync && npx cap run ios"
+  },
+  "dependencies": {
+    "@capacitor-community/text-to-speech": "^8.0.2",
+    "@capacitor/core": "^8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/ios": "^8.5.2"
+  }
+}

@@ -304,10 +304,17 @@ class Component extends DCLogic {
 
   say(word){
     const text = word.replace(/…/g,"").trim();
+    const fr = (this.state.prefs && this.state.prefs.accent === "fr") ? "fr-FR" : "fr-CA";
+    // In the Capacitor app, speak through the native TTS plugin (Android's WebView has no speechSynthesis)
+    const cap = window.Capacitor;
+    if(cap && cap.isNativePlatform && cap.isNativePlatform() && cap.registerPlugin){
+      if(!this.tts) this.tts = cap.registerPlugin("TextToSpeech");
+      this.tts.speak({ text, lang: fr, rate: .82 }).catch(() => {});
+      return;
+    }
     if(!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    const fr = (this.state.prefs && this.state.prefs.accent === "fr") ? "fr-FR" : "fr-CA";
     u.lang = fr; u.rate = .82;
     const voices = speechSynthesis.getVoices(), v = voices.find(v => v.lang === fr) || voices.find(v => v.lang.toLowerCase().startsWith("fr"));
     if(v) u.voice = v;

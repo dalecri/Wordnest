@@ -65,6 +65,10 @@ vocabulary.json       803 French cards in 19 categories, with IPA and examples
 tools/add_ipa.py      fills in missing IPA with espeak-ng
 wordnest.png          app icon / preview image
 build.py              regenerates index.html and js/deck.js
+capacitor.config.json Capacitor settings (app ID, webDir www/)
+scripts/copy-web.mjs  copies the app into www/ for Capacitor
+assets/               source images for app icons and splash screens
+android/, ios/        native Capacitor projects
 ```
 
 ## Running it
@@ -81,6 +85,31 @@ or serve it locally:
 python3 -m http.server
 # then open http://localhost:8000
 ```
+
+## Mobile app (Capacitor)
+
+WordNest is wrapped with [Capacitor](https://capacitorjs.com) 8 for Android
+and iOS. The native projects live in `android/` and `ios/`; `www/` is a build
+output (git-ignored) that Capacitor copies into them.
+
+```bash
+npm install
+npm run build          # build.py + copy the app into www/
+npm run android        # sync, then open in Android Studio
+npm run ios            # sync, then open in Xcode (macOS)
+npm run run:android    # sync and launch on a connected device/emulator
+```
+
+- `scripts/copy-web.mjs` copies the app into `www/` and adds the Capacitor
+  runtime (`js/capacitor.js`) there only, so the browser `index.html` is
+  unchanged.
+- Pronunciation uses the native text-to-speech plugin
+  (`@capacitor-community/text-to-speech`) in the app, because Android's
+  WebView has no `speechSynthesis`. In a browser it still uses
+  `speechSynthesis`.
+- App icons and splash screens are generated from `assets/logo.png` with
+  `npx @capacitor/assets generate` (dark background `#0a0a0b`).
+- App ID: `com.twostorytails.wordnest` (in `capacitor.config.json`).
 
 ## Editing
 
