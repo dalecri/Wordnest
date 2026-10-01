@@ -85,6 +85,15 @@ function glowFor(p, dim){
          "radial-gradient(60% 45% at 15% 75%, " + p[3] + "aa 0%, " + p[3] + "00 75%)," +
          "linear-gradient(180deg, " + mix(p[2], "#000000", .2) + " 0%, #0b0b0e 85%)";
 }
+// ring glow, like the reference tiles: a deep inner colour in the middle, a brighter second hue around the
+// edges, and a soft blend between them (plus an inset glow set in the markup)
+function ringFor(p, opts){
+  const o = opts || {}, [h, s] = toHsl(p[1]), sat = Math.max(.55, s);
+  const inner = hsl((h + 38) % 360, sat * .9, .14), mid = hsl((h + 18) % 360, sat, .3), edge = hsl(h, sat, o.dim ? .42 : .58);
+  const shape = o.wide ? "ellipse 70% 95% at 50% 55%" : "ellipse 78% 72% at 50% 48%";
+  return "radial-gradient(" + shape + ", " + inner + " 0%, " + inner + " 38%, " + mid + " 66%, " + edge + " 100%)";
+}
+function edgeOf(p){ const [h, s] = toHsl(p[1]); return hsl(h, Math.max(.55, s), .62); }
 function paperFor(p){
   const top = lighten(mix(p[4], "#ffffff", .45), .78), bot = lighten(p[0], .42);
   return "linear-gradient(155deg, " + top + " 0%, " + mix(top, bot, .45) + " 48%, " + bot + " 100%)";
@@ -450,9 +459,7 @@ class Component extends DCLogic {
         title: c.name, en: list[0] ? list[0].fr : "", count: list.length + " words",
         pct: Math.round(100 * masteredIn(list) / Math.max(1, list.length)) + "%",
         // same dark glow as the study cards, tuned for a short wide tile: colour pours in from the top-left
-        bg: "radial-gradient(85% 140% at 0% 0%, " + lighten(pal[0], .3) + " 0%, " + pal[0] + "00 65%)," +
-            "radial-gradient(60% 120% at 100% 100%, " + pal[1] + "cc 0%, " + pal[1] + "00 70%)," +
-            "linear-gradient(160deg, " + mix(pal[2], "#000000", .1) + " 0%, #0b0b0e 90%)",
+        bg: ringFor(pal, { wide: true }), edge: edgeOf(pal),
         fg: "#f4f1ec", line: "#ffffff2e", accent: lighten(pal[0], .45),
         arrowBg: "#ffffff1f", arrowFg: "#ffffff",
         z: i + 1, top: i ? "-30px" : "0", delay: (i * 28) + "ms",
@@ -490,7 +497,7 @@ class Component extends DCLogic {
       isCards: !isQuiz, isQuiz, cardsBg: isQuiz ? "transparent" : "#eeeae6", cardsFg: isQuiz ? "#8d8d95" : "#1b1b1e",
       quizBg: isQuiz ? "#eeeae6" : "transparent", quizFg: isQuiz ? "#1b1b1e" : "#8d8d95", setCards: this.setCards, setQuiz: this.setQuiz,
       qLabel: q ? q.label : "", qKind: kindLabel(qc), qKindDot: qc.g ? G[qc.g].ink : "#ffffff55",
-      qPaper: glowFor(qc.p), qBadge: (() => { let c = qc.p[3]; if(lum(c) > .12) c = mix(qc.p[3], qc.p[2], .55); return c; })(),
+      qPaper: ringFor(qc.p), qEdge: edgeOf(qc.p), qBadge: (() => { let c = qc.p[3]; if(lum(c) > .12) c = mix(qc.p[3], qc.p[2], .55); return c; })(),
       qPrompt: q ? q.prompt : "", qPromptSize: q && q.big ? fitSize(q.prompt) : "23px", qPromptWeight: q && q.big ? 700 : 600,
       qSub: q ? q.sub : "", qAsk: q ? q.ask : "", qSpeak: !!(q && (q.speak || q.kind === "gender")), speakQ: this.speakQ,
       isChoice: !!(q && q.options), isBuild: !!(q && q.bank), qOptions, qOptCols: q && q.options && q.options.length === 2 ? "1fr 1fr" : "1fr",
@@ -498,7 +505,7 @@ class Component extends DCLogic {
       qAnswered: !!s.status, qRight: s.status === "right", qWrong: s.status === "wrong",
       qFeedBg: s.status === "right" ? "#16271d" : "#2a1416", qFeedBd: s.status === "right" ? GOOD + "66" : BAD + "66", qFeedFg: s.status === "right" ? GOOD : BAD,
       qFeedTitle: s.status === "right" ? "Correct!" : "Not quite", qReveal: q ? q.reveal : "",
-      qGlow: s.status === "right" ? "0 0 0 2px " + GOOD + ", 0 28px 50px -22px #000" : s.status === "wrong" ? "0 0 0 2px " + BAD + ", 0 28px 50px -22px #000" : "0 28px 50px -22px #000,inset 0 1px 0 #ffffffb0",
+      qGlow: s.status === "right" ? "0 0 0 2px " + GOOD + ", 0 28px 50px -22px #000" : s.status === "wrong" ? "0 0 0 2px " + BAD + ", 0 28px 50px -22px #000" : "0 28px 50px -22px #000, inset 0 0 0 1px #ffffff1f, inset 0 0 34px -6px " + edgeOf(qc.p),
       next: this.next,
       qDashes: Array.from({length: qn}, (_,i) => ({ bg: i < s.results.length ? (s.results[i] ? GOOD : BAD) : (i === s.qi ? "#eeeae7" : "#ffffff1c"), grow: i === s.qi && !s.status ? 2 : 1 })),
       qCount: "Question " + Math.min(s.qi + 1, qn) + " of " + qn,
@@ -506,7 +513,7 @@ class Component extends DCLogic {
       colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
       cardRef: this.cardRef, panelRef: this.panelRef, btnRef: this.btnRef, noRef: this.noRef, yesRef: this.yesRef,
-      paper: glowFor(d.p), back1: glowFor(nxt(1).p, true), back2: glowFor(nxt(2).p, true), accent: lighten(d.p[0], .4), art: artFor(d.p),
+      paper: ringFor(d.p), edge: edgeOf(d.p), back1: ringFor(nxt(1).p, { dim: true }), back2: ringFor(nxt(2).p, { dim: true }), accent: lighten(d.p[0], .4), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
       badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
       word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.ipa || "",

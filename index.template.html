@@ -31,7 +31,7 @@
 
   <div style="display:flex;flex-direction:column">
     <sc-for list="{{ colls }}" as="c" hint-placeholder-count="6">
-      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 1px 0 #ffffff2e,inset 0 0 0 1px #ffffff12;animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
+      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 0 0 1px #ffffff1c,inset 0 0 30px -8px {{ c.edge }};animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
         <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
           <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.03em">{{ c.title }}</span>
           <span style="flex:none;padding-top:5px;font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span>
@@ -83,8 +83,8 @@
       <div ref="{{ cardRef }}" sc-camel-on-pointer-down="{{ onDown }}" sc-camel-on-pointer-move="{{ onMove }}" sc-camel-on-pointer-up="{{ onUp }}" sc-camel-on-pointer-cancel="{{ onUp }}" style="position:absolute;inset:0;touch-action:none;cursor:grab;will-change:transform">
         <div style="position:absolute;inset:0;perspective:1200px;animation:{{ enter }} .5s cubic-bezier(.22,1,.36,1) both">
         <div style="position:absolute;inset:0;transform-style:preserve-3d;transform:{{ faceT }};transition:transform .6s cubic-bezier(.22,1,.36,1)">
-          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 28px 50px -22px #000,inset 0 1px 0 #ffffff2e,inset 0 0 0 1px #ffffff14;display:flex;flex-direction:column">
-            <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff0a;border-bottom:1px solid #ffffff12">
+          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ edge }};display:flex;flex-direction:column">
+            <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:transparent;border-bottom:1px solid #ffffff14">
               <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">FR</span>
               <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
             </div>
@@ -98,8 +98,8 @@
               </div>
             </div>
           </section>
-          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 28px 50px -22px #000,inset 0 1px 0 #ffffff2e,inset 0 0 0 1px #ffffff14;display:flex;flex-direction:column">
-            <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff0a;border-bottom:1px solid #ffffff12">
+          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ edge }};display:flex;flex-direction:column">
+            <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:transparent;border-bottom:1px solid #ffffff14">
               <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">EN</span>
               <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
             </div>
@@ -151,7 +151,7 @@
   <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
   <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:22px">
     <section style="flex:none;border-radius:24px;overflow:hidden;background:{{ qPaper }};color:#f4f1ec;box-shadow:{{ qGlow }};transition:box-shadow .3s;display:flex;flex-direction:column;animation:{{ enter }} .45s cubic-bezier(.22,1,.36,1) both">
-      <div style="flex:none;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff0a;border-bottom:1px solid #ffffff12">
+      <div style="flex:none;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:transparent;border-bottom:1px solid #ffffff14">
         <span style="height:24px;padding:0 9px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;display:grid;place-items:center">{{ qLabel }}</span>
         <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ qKindDot }}"></span>{{ qKind }}</span>
       </div>
