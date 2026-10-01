@@ -445,12 +445,16 @@ class Component extends DCLogic {
 
     // home: overlapping collection cards
     const colls = COLLECTIONS.map((c, i) => {
-      const list = CARDS[c.id], dark = lum(c.color) < .25;
+      const list = CARDS[c.id], pal = paletteFor(c.color, 0);
       return {
         title: c.name, en: list[0] ? list[0].fr : "", count: list.length + " words",
         pct: Math.round(100 * masteredIn(list) / Math.max(1, list.length)) + "%",
-        bg: c.color, fg: dark ? "#ffffff" : "#141414", line: dark ? "#ffffff80" : "#14141459",
-        arrowBg: dark ? "#ffffff" : "#141414", arrowFg: dark ? "#141414" : c.color,
+        // same dark glow as the study cards, tuned for a short wide tile: colour pours in from the top-left
+        bg: "radial-gradient(85% 140% at 0% 0%, " + lighten(pal[0], .3) + " 0%, " + pal[0] + "00 65%)," +
+            "radial-gradient(60% 120% at 100% 100%, " + pal[1] + "cc 0%, " + pal[1] + "00 70%)," +
+            "linear-gradient(160deg, " + mix(pal[2], "#000000", .1) + " 0%, #0b0b0e 90%)",
+        fg: "#f4f1ec", line: "#ffffff2e", accent: lighten(pal[0], .45),
+        arrowBg: "#ffffff1f", arrowFg: "#ffffff",
         z: i + 1, top: i ? "-30px" : "0", delay: (i * 28) + "ms",
         open: () => this.open(c.id)
       };

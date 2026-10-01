@@ -31,17 +31,17 @@
 
   <div style="display:flex;flex-direction:column">
     <sc-for list="{{ colls }}" as="c" hint-placeholder-count="6">
-      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -18px #000c;animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
+      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 1px 0 #ffffff2e,inset 0 0 0 1px #ffffff12;animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
         <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
           <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.03em">{{ c.title }}</span>
           <span style="flex:none;padding-top:5px;font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span>
         </span>
         <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
           <span style="display:flex;flex-wrap:wrap;gap:6px;min-width:0">
-            <span style="padding:5px 11px;border-radius:999px;border:1px solid {{ c.line }};font-size:12px;white-space:nowrap">{{ c.en }}</span>
-            <span style="padding:5px 11px;border-radius:999px;border:1px solid {{ c.line }};font-size:12px;white-space:nowrap">{{ c.count }}</span>
+            <span style="padding:5px 11px;border-radius:999px;border:1px solid {{ c.line }};background:#ffffff0d;color:{{ c.accent }};font-size:12px;white-space:nowrap">{{ c.en }}</span>
+            <span style="padding:5px 11px;border-radius:999px;border:1px solid {{ c.line }};background:#ffffff0d;font-size:12px;white-space:nowrap">{{ c.count }}</span>
           </span>
-          <span style="flex:none;width:36px;height:36px;border-radius:50%;background:{{ c.arrowBg }};color:{{ c.arrowFg }};display:grid;place-items:center"><svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg></span>
+          <span style="flex:none;width:36px;height:36px;border-radius:50%;background:{{ c.arrowBg }};color:{{ c.arrowFg }};border:1px solid #ffffff2b;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:grid;place-items:center"><svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg></span>
         </span>
       </button>
     </sc-for>
