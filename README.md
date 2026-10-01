@@ -1,12 +1,12 @@
-# Wordnest
+# WordNest
 
 *Un peu de français*: a minimal, offline flashcard app for learning beginner French.
 
-![Wordnest](wordnest.png)
+![WordNest](wordnest.png)
 
 ## What it is
 
-Wordnest is a single-page flashcard app. You pick a collection of words
+WordNest is a single-page flashcard app. You pick a collection of words
 (food, verbs, numbers…), then work through a short session of cards: tap to
 flip between French and English, swipe right when you know it, left to keep
 practising. Progress and your day streak are saved on the device.
@@ -16,10 +16,10 @@ and no network access: every dependency, font and word ships in the repo.
 
 ## Features
 
-- **Collections home**: 20 colour-coded collections (a hand-picked "Mots du
-  jour" mix plus the 19 vocabulary categories), each showing its word count
-  and how much of it you've mastered. "Tout mélanger" serves 20 random cards
-  from everything.
+- **Collections home**: 20 colour-coded collections (a hand-picked "Daily picks"
+  mix plus the 19 vocabulary categories), each showing its word count and how
+  much of it you've mastered. "Shuffle all" serves 20 random cards from
+  everything.
 - **Cards**: the French word with its gender or word type, IPA pronunciation
   and a speaker button (browser `speechSynthesis`, French voice when
   available). Tap to flip to the English.

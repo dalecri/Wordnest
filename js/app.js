@@ -22,28 +22,28 @@ const CURATED = [
 ];
 
 // ---------- collections ----------
-// French title, plus the English label from vocabulary.json shown as a chip
+// collection names; each card on the home page also shows a sample French word as a chip
 const COLLECTIONS = [
-  { id: "mdj",          fr: "Mots du jour" },
-  { id: "basics",       fr: "Premiers mots" },
-  { id: "daily",        fr: "Au quotidien" },
-  { id: "out",          fr: "En ville" },
-  { id: "work",         fr: "Au travail" },
-  { id: "people",       fr: "Gens & famille" },
-  { id: "home",         fr: "La maison" },
-  { id: "food",         fr: "Manger & boire" },
-  { id: "body",         fr: "Corps & santé" },
-  { id: "clothes",      fr: "Vêtements" },
-  { id: "places",       fr: "Lieux & voyages" },
-  { id: "nature",       fr: "Nature & météo" },
-  { id: "time",         fr: "Temps & calendrier" },
-  { id: "adjectives",   fr: "Adjectifs" },
-  { id: "adverbs",      fr: "Adverbes" },
-  { id: "verbs",        fr: "Verbes" },
-  { id: "grammar",      fr: "Petits mots" },
-  { id: "workwords",    fr: "Travail & études" },
-  { id: "numbers",      fr: "Les nombres" },
-  { id: "conjugations", fr: "Être & avoir" }
+  { id: "mdj",          name: "Daily picks" },
+  { id: "basics",       name: "First words" },
+  { id: "daily",        name: "Everyday life" },
+  { id: "out",          name: "Out & about" },
+  { id: "work",         name: "At work" },
+  { id: "people",       name: "People & family" },
+  { id: "home",         name: "Home" },
+  { id: "food",         name: "Food & drink" },
+  { id: "body",         name: "Body & health" },
+  { id: "clothes",      name: "Clothes" },
+  { id: "places",       name: "Places & travel" },
+  { id: "nature",       name: "Nature & weather" },
+  { id: "time",         name: "Time & calendar" },
+  { id: "adjectives",   name: "Adjectives & colours" },
+  { id: "adverbs",      name: "Adverbs" },
+  { id: "verbs",        name: "Everyday verbs" },
+  { id: "grammar",      name: "Small words" },
+  { id: "workwords",    name: "Work & study" },
+  { id: "numbers",      name: "Numbers" },
+  { id: "conjugations", name: "Être & avoir" }
 ];
 const SWATCHES = ["#cdb4f5","#dff07a","#4b5fd6","#f2683a","#8fe0c0","#f5a3c7","#8cc8f5","#f6d873","#ff8a7a","#b9d39b","#a993f0","#7fd1d8"];
 const SESSION = 12;
@@ -91,15 +91,15 @@ function artFor(p){
 function genderOf(type){ return /^masculine noun/.test(type) ? "m" : /^feminine noun/.test(type) ? "f" : ""; }
 function kindLabel(d){
   const t = d.type || "";
-  if(d.g) return d.g === "f" ? "Nom féminin" : "Nom masculin";
-  if(/^pronoun/.test(t)) return "Petit mot";
-  if(/^plural noun/.test(t)) return "Nom pluriel";
-  if(/noun/.test(t)) return "Nom";
-  if(/^adjective/.test(t)) return "Adjectif";
-  if(/^adverb/.test(t)) return "Adverbe";
-  if(/^(être|avoir)/.test(t)) return "Conjugaison";
-  if(/^verb/.test(t) || d.aux) return "Verbe";
-  if(/^number/.test(t)) return "Nombre";
+  if(d.g) return d.g === "f" ? "Feminine noun" : "Masculine noun";
+  if(/^pronoun/.test(t)) return "Small word";
+  if(/^plural noun/.test(t)) return "Plural noun";
+  if(/noun/.test(t)) return "Noun";
+  if(/^adjective/.test(t)) return "Adjective";
+  if(/^adverb/.test(t)) return "Adverb";
+  if(/^(être|avoir)/.test(t)) return "Conjugation";
+  if(/^verb/.test(t) || d.aux) return "Verb";
+  if(/^number/.test(t)) return "Number";
   return "Expression";
 }
 function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const k = Math.floor(Math.random()*(i+1)); [a[i],a[k]] = [a[k],a[i]]; } return a; }
@@ -119,8 +119,6 @@ function highlight(d){
 
 // ---------- data ----------
 const VOCAB = window.WN_VOCAB || { categories: [], cards: [] };
-const EN_LABEL = Object.fromEntries(VOCAB.categories.map(c => [c.id, c.label]));
-EN_LABEL.mdj = "Hand-picked mix";
 const CARDS = {};   // collection id -> cards
 COLLECTIONS.forEach((c, ci) => { c.color = SWATCHES[ci % SWATCHES.length]; CARDS[c.id] = []; });
 CURATED.forEach((d, i) => CARDS.mdj.push({ ...d, id: "mdj" + i, deck: "mdj" }));
@@ -309,7 +307,7 @@ class Component extends DCLogic {
     const colls = COLLECTIONS.map((c, i) => {
       const list = CARDS[c.id], dark = lum(c.color) < .25;
       return {
-        title: c.fr, en: EN_LABEL[c.id] || "", count: list.length + " mots",
+        title: c.name, en: list[0] ? list[0].fr : "", count: list.length + " words",
         pct: Math.round(100 * masteredIn(list) / Math.max(1, list.length)) + "%",
         bg: c.color, fg: dark ? "#ffffff" : "#141414", line: dark ? "#ffffff80" : "#14141459",
         arrowBg: dark ? "#ffffff" : "#141414", arrowFg: dark ? "#141414" : c.color,
@@ -324,7 +322,7 @@ class Component extends DCLogic {
     const nxt = k => sess.length ? sess[(s.idx + k) % sess.length] : d;
     const coll = COLLECTIONS.find(c => c.id === s.coll);
     const days = s.prog.days, today = new Date(), mon = addDays(today, -((today.getDay() + 6) % 7));
-    const week = ["L","M","M","J","V","S","D"].map((label, i) => {
+    const week = ["M","T","W","T","F","S","S"].map((label, i) => {
       const k = dayKey(addDays(mon, i)), done = days.includes(k), isToday = k === dayKey(today);
       return { label, done, fill: done ? "#24261f" : "#1a1a1d", ring: isToday ? "#cbd4a6" : "#ffffff0d",
                dot: done ? "#cbd4a6" : (isToday ? "#cbd4a666" : "#2e2e34") };
@@ -333,8 +331,8 @@ class Component extends DCLogic {
 
     return {
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
-      colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " mots maîtrisés",
-      collTitle: s.coll === "all" ? "All cards" : (coll ? coll.fr : ""),
+      colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
+      collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
       cardRef: this.cardRef, panelRef: this.panelRef, btnRef: this.btnRef, noRef: this.noRef, yesRef: this.yesRef,
       paper: paperFor(d.p), back1: paperFor(nxt(1).p), back2: paperFor(nxt(2).p), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#1d1b1840",
@@ -348,12 +346,12 @@ class Component extends DCLogic {
       dashes: Array.from({length: n}, (_,i) => ({ bg: i < s.done ? "#eeeae7" : (i === s.done ? lighten(d.p[4], .55) : "#ffffff1c"), grow: i === s.done ? 2 : 1 })),
       dashMax: Math.min(300, n * 17) + "px",
       undoOp: s.history.length ? 1 : .3,
-      doneTitle: s.coll === "all" ? "All done." : "Petit à petit.",
-      doneKicker: s.coll === "all" ? "All cards" : (coll ? coll.fr : ""),
-      doneLine: s.done + " cartes pratiquées. Série : " + streak + (streak === 1 ? " jour." : " jours."),
-      againLabel: s.coll === "all" ? "Encore 20 au hasard" : "Encore " + Math.min(SESSION, (CARDS[s.coll] || []).length),
-      week, weekLine: week.filter(w => w.done).length + " / 7 jours cette semaine",
-      streak, bestLine: "record : " + best + (best === 1 ? " jour" : " jours"),
+      doneTitle: s.coll === "all" ? "All done." : "Nice work.",
+      doneKicker: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
+      doneLine: s.done + " cards practised. Streak: " + streak + (streak === 1 ? " day." : " days."),
+      againLabel: s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(SESSION, (CARDS[s.coll] || []).length),
+      week, weekLine: week.filter(w => w.done).length + " / 7 days this week",
+      streak, bestLine: "best: " + best + (best === 1 ? " day" : " days"),
       mastered: totalM, learning: ALL.length - totalM, masteredPct: Math.round(100 * totalM / ALL.length) + "%",
       sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#00000080" : "#00000000", sheetPE: s.stats ? "auto" : "none",
       speak: this.speak, undo: this.undo, again: this.again, gotIt: this.gotIt,
