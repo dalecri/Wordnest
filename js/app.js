@@ -262,18 +262,21 @@ class Component extends DCLogic {
   open(id){
     const m = this.state.prog.m;
     let pool;
-    if(id === "all") pool = shuffle(ALL).slice(0, 20);
+    // Daily picks and Shuffle all skip mastered words entirely; other collections top up with them for review
+    if(id === "all") pool = shuffle(ALL.filter(c => !m[c.id])).slice(0, 20);
+    else if(id === "mdj") pool = shuffle(CARDS.mdj.filter(c => !m[c.id])).slice(0, SESSION);
     else {
       const cards = CARDS[id];
       pool = shuffle(cards.filter(c => !m[c.id])).concat(shuffle(cards.filter(c => m[c.id]))).slice(0, SESSION);
     }
+    if(!pool.length) return this.setState({ screen: "done", coll: id, empty: true, stats: false });
     if(this.state.mode === "quiz"){
       const src = id === "all" ? ALL : CARDS[id];
       const quiz = makeQuiz(pool.slice(0, QUIZ), src);
       clearTimeout(this.nextTimer);
-      return this.setState(s => ({ screen: "study", coll: id, quiz, qi: 0, picked: [], status: "", results: [], flip: 1 - s.flip, stats: false }));
+      return this.setState(s => ({ screen: "study", empty: false, coll: id, quiz, qi: 0, picked: [], status: "", results: [], flip: 1 - s.flip, stats: false }));
     }
-    this.setState(s => ({ screen: "study", coll: id, session: pool, idx: 0, done: 0, history: [], revealed: false, flip: 1 - s.flip, stats: false }));
+    this.setState(s => ({ screen: "study", empty: false, coll: id, session: pool, idx: 0, done: 0, history: [], revealed: false, flip: 1 - s.flip, stats: false }));
   }
   setCards = () => { if(this.state.mode !== "cards"){ this.state.mode = "cards"; this.setState({ mode: "cards" }); this.open(this.state.coll); } };
   setQuiz = () => { if(this.state.mode !== "quiz"){ this.state.mode = "quiz"; this.setState({ mode: "quiz" }); this.open(this.state.coll); } };
@@ -503,9 +506,10 @@ class Component extends DCLogic {
       dashes: Array.from({length: n}, (_,i) => ({ bg: i < s.done ? "#eeeae7" : (i === s.done ? lighten(d.p[4], .55) : "#ffffff1c"), grow: i === s.done ? 2 : 1 })),
       dashMax: Math.min(300, n * 17) + "px",
       undoOp: s.history.length ? 1 : .3,
-      doneTitle: isQuiz ? s.results.filter(Boolean).length + " / " + s.results.length + " correct" : (s.coll === "all" ? "All done." : "Nice work."),
+      isEmpty: !!s.empty, notEmpty: !s.empty,
+      doneTitle: s.empty ? "All mastered!" : isQuiz ? s.results.filter(Boolean).length + " / " + s.results.length + " correct" : (s.coll === "all" ? "All done." : "Nice work."),
       doneKicker: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
-      doneLine: (isQuiz ? (s.results.length && s.results.every(Boolean) ? "Perfect round." : "Missed words go back to learning.") : s.done + " cards practised.") + " Streak: " + streak + (streak === 1 ? " day." : " days."),
+      doneLine: s.empty ? "You know every word here. Reset mastered words from the streak sheet, or pick another collection." : (isQuiz ? (s.results.length && s.results.every(Boolean) ? "Perfect round." : "Missed words go back to learning.") : s.done + " cards practised.") + " Streak: " + streak + (streak === 1 ? " day." : " days."),
       againLabel: isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(SESSION, (CARDS[s.coll] || []).length),
       week, weekLine: week.filter(w => w.done).length + " / 7 days this week",
       streak, bestLine: "best: " + best + (best === 1 ? " day" : " days"),

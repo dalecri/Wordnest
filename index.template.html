@@ -225,7 +225,9 @@
     <div style="font-size:13px;color:#ffffffd8;line-height:1.5">{{ doneLine }}</div>
   </div>
   <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:30px">
-    <button sc-camel-on-click="{{ again12 }}" style="height:54px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500">{{ againLabel }}</button>
+    <sc-if value="{{ notEmpty }}" hint-placeholder-val="{{ true }}">
+      <button sc-camel-on-click="{{ again12 }}" style="height:54px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500">{{ againLabel }}</button>
+    </sc-if>
     <button sc-camel-on-click="{{ goHome }}" style="height:54px;border-radius:999px;background:#17171a;border:1px solid #ffffff12;color:#e6e3e0;font-size:15px">My collections</button>
   </div>
 </div>
