@@ -28,6 +28,12 @@ and no network access: every dependency, font and word ships in the repo.
 - **Swipe to grade**: right = got it (mastered), left = again. Buttons do the
   same. Undo steps back through the last few grades.
 - **Sessions**: 12 cards per collection session, unmastered cards first.
+- **Quiz mode**: a Cards / Quiz switch in every collection. A quiz is 10
+  questions mixing four formats: gender (le or la), fill the blank in the
+  example sentence, build the sentence from word tiles, and meaning (multiple
+  choice, French to English or back). Wrong answers in multiple choice skip
+  words with the same meaning. Right answers mark the word mastered, misses
+  send it back to learning.
   Progress shows as a row of dashes under the buttons.
 - **Streak**: finishing a session counts the day. The streak chip opens a
   sheet with the current and best streak, this week's days and overall

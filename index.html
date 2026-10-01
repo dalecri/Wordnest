@@ -56,17 +56,26 @@
       <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="m14 6-6 6 6 6"></path></svg>
     </button>
     <div style="display:flex;align-items:center;gap:6px">
+      <sc-if value="{{ isCards }}" hint-placeholder-val="{{ true }}">
       <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:34px;height:34px;border-radius:50%;background:transparent;color:#c2c2c9;opacity:{{ undoOp }};display:grid;place-items:center">
         <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
       </button>
+      </sc-if>
       <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
       <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
     </button>
     </div>
   </div>
   <div style="flex:none;margin-top:14px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(32px,9.5vw,42px);line-height:1;letter-spacing:-.035em;text-wrap:balance">{{ collTitle }}</div>
+  <div style="flex:none;margin-top:14px;display:flex">
+    <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d">
+      <button sc-camel-on-click="{{ setCards }}" style="padding:8px 16px;border-radius:999px;background:{{ cardsBg }};color:{{ cardsFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Cards</button>
+      <button sc-camel-on-click="{{ setQuiz }}" style="padding:8px 16px;border-radius:999px;background:{{ quizBg }};color:{{ quizFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Quiz</button>
+    </div>
+  </div>
 
-  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:34px">
+  <sc-if value="{{ isCards }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:28px">
     <div style="position:relative;z-index:2;flex:1;min-height:230px;max-height:380px">
       <div style="position:absolute;inset:0;transform:translate3d(18px,-26px,0) rotate(6deg) scale(.9);border-radius:24px;background:{{ back2 }};opacity:.55;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
       <div style="position:absolute;inset:0;transform:translate3d(-14px,-12px,0) rotate(-4.5deg) scale(.95);border-radius:24px;background:{{ back1 }};opacity:.8;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
@@ -138,6 +147,73 @@
       </div>
     </div>
   </div>
+  </sc-if>
+  <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:22px">
+    <section style="flex:none;border-radius:24px;overflow:hidden;background:{{ qPaper }};color:#1d1b18;box-shadow:{{ qGlow }};transition:box-shadow .3s;display:flex;flex-direction:column;animation:{{ enter }} .45s cubic-bezier(.22,1,.36,1) both">
+      <div style="flex:none;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff66;border-bottom:1px solid #1d1b1814">
+        <span style="height:24px;padding:0 9px;border-radius:7px;background:{{ qBadge }};color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;display:grid;place-items:center">{{ qLabel }}</span>
+        <span style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#1d1b18c0"><span style="width:7px;height:7px;border-radius:50%;background:{{ qKindDot }}"></span>{{ qKind }}</span>
+      </div>
+      <div style="padding:18px 20px 18px;display:flex;flex-direction:column;gap:8px;min-height:150px">
+        <div style="font-size:12.5px;color:#1d1b1880">{{ qAsk }}</div>
+        <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:{{ qPromptWeight }};font-size:{{ qPromptSize }};line-height:1.12;letter-spacing:-.025em;text-wrap:balance;overflow-wrap:anywhere">{{ qPrompt }}</div>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="font-size:13px;color:#1d1b1899;line-height:1.4">{{ qSub }}</div>
+          <sc-if value="{{ qSpeak }}" hint-placeholder-val="{{ false }}">
+            <button sc-camel-on-click="{{ speakQ }}" aria-label="Hear it in French" style="flex:none;width:38px;height:38px;border-radius:50%;background:{{ qBadge }};color:#fff;display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+
+    <sc-if value="{{ isChoice }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:16px;display:grid;grid-template-columns:{{ qOptCols }};gap:9px">
+        <sc-for list="{{ qOptions }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="min-height:52px;padding:12px 18px;border-radius:18px;background:{{ o.bg }};border:1.5px solid {{ o.bd }};color:{{ o.fg }};font-size:15.5px;font-weight:500;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .25s,border-color .25s,color .25s" style-active="transform:scale(.98)">
+            <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600">{{ o.t }}</span>
+            <sc-if value="{{ o.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;color:#77777d">{{ o.note }}</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isBuild }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:16px;min-height:58px;padding:10px;border-radius:18px;border:1.5px dashed #ffffff22;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start">
+        <sc-for list="{{ qSel }}" as="w" hint-placeholder-count="0">
+          <button sc-camel-on-click="{{ w.drop }}" style="padding:9px 13px;border-radius:12px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500;animation:wn-tile .2s cubic-bezier(.22,1,.36,1) both">{{ w.t }}</button>
+        </sc-for>
+      </div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:7px;justify-content:center">
+        <sc-for list="{{ qBank }}" as="w" hint-placeholder-count="6">
+          <button sc-camel-on-click="{{ w.pick }}" style="visibility:{{ w.vis }};padding:9px 13px;border-radius:12px;background:#17171a;border:1px solid #ffffff1a;color:#eeeae7;font-size:15px;font-weight:500" style-active="transform:scale(.95)">{{ w.t }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="flex:1;min-height:14px"></div>
+
+    <sc-if value="{{ qAnswered }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:12px;padding:12px 16px;border-radius:16px;background:{{ qFeedBg }};border:1px solid {{ qFeedBd }};animation:wn-inA .3s cubic-bezier(.22,1,.36,1) both">
+        <div style="font-size:13px;font-weight:600;color:{{ qFeedFg }}">{{ qFeedTitle }}</div>
+        <div style="margin-top:3px;font-size:14.5px;line-height:1.45;color:#dcdce2">{{ qReveal }}</div>
+      </div>
+      <button sc-camel-on-click="{{ next }}" style="margin-top:12px;width:100%;height:52px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:600" style-active="transform:scale(.98)">Continue</button>
+    </sc-if>
+    <sc-if value="{{ isBuild }}" hint-placeholder-val="{{ false }}">
+    </sc-if>
+    <sc-if value="{{ qCanCheck }}" hint-placeholder-val="{{ false }}">
+      <button sc-camel-on-click="{{ check }}" style="margin-top:12px;width:100%;height:52px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:600;opacity:{{ qCheckOp }};transition:opacity .2s" style-active="transform:scale(.98)">Check</button>
+    </sc-if>
+
+    <div role="progressbar" aria-label="{{ qCount }}" style="margin:16px auto 0;width:100%;max-width:220px;display:flex;gap:5px;flex:none">
+      <sc-for list="{{ qDashes }}" as="d" hint-placeholder-count="10">
+        <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
 </div>
 </sc-if>
 
@@ -320,6 +396,80 @@ VOCAB.cards.forEach(d => {
 });
 const ALL = [].concat(...COLLECTIONS.map(c => CARDS[c.id]));
 
+// ---------- quiz ----------
+const QUIZ = 10;
+const ARTICLE = /^(le |la |les |l'|l’|un |une )/i;
+function bare(fr){ return fr.replace(ARTICLE, "").replace(/…/g, "").trim(); }
+function meanings(en){ return en.toLowerCase().split(/[\/;(),]/).map(s => s.replace(/^to /, "").trim()).filter(Boolean); }
+function sameMeaning(a, b){ const x = meanings(a.en); return meanings(b.en).some(m => x.includes(m)); }
+function capLike(word, model){ return /^\p{Lu}/u.test(model) ? word.charAt(0).toUpperCase() + word.slice(1) : word; }
+// sentence -> word tiles: trailing punctuation dropped, elisions (l'orange, J'ai) stay one tile
+function tilesOf(ex){ return ex.trim().replace(/\s*[.!?…]+$/, "").split(/\s+/).filter(Boolean); }
+function pickOthers(pool, card, n, test){
+  const out = [], seen = new Set();
+  for(const c of shuffle(pool)){
+    if(out.length >= n) break;
+    if(c.id === card.id || sameMeaning(c, card) || !test(c)) continue;
+    out.push(c);
+  }
+  return out;
+}
+const FORMATS = {
+  gender: {
+    label: "Gender",
+    ok: c => !!c.g && ARTICLE.test(c.fr) && !/^les /i.test(c.fr),
+    make: c => ({ prompt: bare(c.fr), sub: c.en, ask: "Is it le or la?", big: true,
+      options: [{ t: "le", note: "masculine", ok: c.g === "m" }, { t: "la", note: "feminine", ok: c.g === "f" }],
+      reveal: c.fr })
+  },
+  fill: {
+    label: "Fill the blank",
+    ok: c => !!c.ex && !!highlight(c).hit,
+    make: (c, pool) => {
+      const h = highlight(c), kind = kindLabel(c);
+      let others = pickOthers(pool, c, 3, o => kindLabel(o) === kind && norm(bare(o.fr)) !== norm(h.hit));
+      if(others.length < 3) others = others.concat(pickOthers(pool, c, 3 - others.length, o => !others.includes(o) && norm(bare(o.fr)) !== norm(h.hit)));
+      const opts = shuffle([{ t: h.hit, ok: true }].concat(others.map(o => ({ t: capLike(bare(o.fr).toLowerCase(), h.hit), ok: false }))));
+      return { prompt: h.pre + "____" + h.post, sub: c.exEn || "", ask: "Pick the missing word", big: false, options: opts, reveal: c.ex };
+    }
+  },
+  build: {
+    label: "Build the sentence",
+    ok: c => !!c.ex && !!c.exEn && tilesOf(c.ex).length >= 3 && tilesOf(c.ex).length <= 8,
+    make: (c, pool) => {
+      const target = tilesOf(c.ex), have = new Set(target.map(norm));
+      const decoys = [];
+      for(const o of shuffle(pool)){
+        if(decoys.length >= 2) break;
+        if(o.id === c.id || !o.ex) continue;
+        const w = shuffle(tilesOf(o.ex)).find(t => t.length > 1 && !/[,;:]/.test(t) && !have.has(norm(t)) && !decoys.includes(t.toLowerCase()));
+        if(w) decoys.push(w.toLowerCase());
+      }
+      return { prompt: c.exEn, sub: "", ask: "Build it in French", big: false, target,
+        bank: shuffle(target.concat(decoys)).map((t, i) => ({ t, i })), reveal: c.ex };
+    }
+  },
+  mc: {
+    label: "Meaning",
+    ok: c => true,
+    make: (c, pool) => {
+      const toEn = Math.random() < .6, others = pickOthers(pool, c, 3, () => true);
+      const opts = shuffle([{ t: toEn ? c.en : c.fr, ok: true }].concat(others.map(o => ({ t: toEn ? o.en : o.fr, ok: false }))));
+      return toEn
+        ? { prompt: c.fr, sub: c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
+        : { prompt: c.en, sub: "", ask: "How do you say it in French?", big: true, options: opts, reveal: c.en + " = " + c.fr };
+    }
+  }
+};
+const ROTATION = ["gender", "fill", "build", "mc", "fill", "build", "gender", "mc", "build", "fill"];
+function makeQuiz(cards, pool){
+  return cards.map((c, i) => {
+    let kind = ROTATION[i % ROTATION.length];
+    if(!FORMATS[kind].ok(c)) kind = shuffle(Object.keys(FORMATS).filter(k => FORMATS[k].ok(c)))[0];
+    return { card: c, kind, label: FORMATS[kind].label, ...FORMATS[kind].make(c, pool) };
+  });
+}
+
 // ---------- saved progress (this device only) ----------
 const STORE = "wordnest.progress.v2";
 function loadProgress(){ try { const p = JSON.parse(localStorage.getItem(STORE)); if(p && p.m && p.days) return p; } catch(e) {} return { m: {}, days: [] }; }
@@ -343,7 +493,8 @@ class Component extends DCLogic {
     super(props);
     this.state = {
       screen: "home", coll: "mdj", session: [], idx: 0, done: 0, history: [],
-      revealed: false, showEx: true, stats: false, confirmReset: false, flip: 0, prog: loadProgress()
+      revealed: false, showEx: true, stats: false, confirmReset: false,
+      mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
     this.noRef = React.createRef(); this.yesRef = React.createRef();
@@ -353,10 +504,10 @@ class Component extends DCLogic {
   componentDidUpdate(){ this.syncPanel(); }
   // the runtime doesn't pass previous state, so remember what was last applied to the panel
   syncPanel(){
-    const key = this.state.showEx + "|" + this.state.screen;
+    const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode;
     if(key === this.lastPanel) return;
-    const same = this.lastScreen === this.state.screen;
-    this.lastPanel = key; this.lastScreen = this.state.screen;
+    const same = this.lastScreen === this.state.screen + this.state.mode;
+    this.lastPanel = key; this.lastScreen = this.state.screen + this.state.mode;
     this.placePanel(this.state.showEx ? 1 : 0, same);
   }
 
@@ -383,8 +534,52 @@ class Component extends DCLogic {
       const cards = CARDS[id];
       pool = shuffle(cards.filter(c => !m[c.id])).concat(shuffle(cards.filter(c => m[c.id]))).slice(0, SESSION);
     }
+    if(this.state.mode === "quiz"){
+      const src = id === "all" ? ALL : CARDS[id];
+      const quiz = makeQuiz(pool.slice(0, QUIZ), src);
+      clearTimeout(this.nextTimer);
+      return this.setState(s => ({ screen: "study", coll: id, quiz, qi: 0, picked: [], status: "", results: [], flip: 1 - s.flip, stats: false }));
+    }
     this.setState(s => ({ screen: "study", coll: id, session: pool, idx: 0, done: 0, history: [], revealed: false, flip: 1 - s.flip, stats: false }));
   }
+  setCards = () => { if(this.state.mode !== "cards"){ this.state.mode = "cards"; this.setState({ mode: "cards" }); this.open(this.state.coll); } };
+  setQuiz = () => { if(this.state.mode !== "quiz"){ this.state.mode = "quiz"; this.setState({ mode: "quiz" }); this.open(this.state.coll); } };
+
+  // ---- quiz ----
+  q(){ return this.state.quiz[this.state.qi]; }
+  choose(i){
+    const q = this.q(); if(!q || this.state.status) return;
+    this.finish(!!q.options[i].ok, [i]);
+  }
+  pickTile(i){ if(this.state.status) return; this.setState(s => s.picked.includes(i) ? null : { picked: s.picked.concat(i) }); }
+  dropTile(i){ if(this.state.status) return; this.setState(s => ({ picked: s.picked.filter(p => p !== i) })); }
+  check = () => {
+    const q = this.q(); if(!q || this.state.status || !this.state.picked.length) return;
+    const said = this.state.picked.map(i => norm(q.bank.find(b => b.i === i).t)).join(" ");
+    this.finish(said === q.target.map(norm).join(" "), this.state.picked);
+  };
+  finish(ok, picked){
+    const q = this.q();
+    this.setState(s => {
+      const m = { ...s.prog.m };
+      if(ok) m[q.card.id] = 1; else delete m[q.card.id];
+      const prog = { ...s.prog, m }; saveProgress(prog);
+      return { status: ok ? "right" : "wrong", picked, prog, results: s.results.concat(ok) };
+    });
+    if(ok) this.nextTimer = setTimeout(this.next, 900);
+  }
+  next = () => {
+    clearTimeout(this.nextTimer);
+    const s = this.state;
+    if(!s.status) return;
+    if(s.qi + 1 >= s.quiz.length){
+      const k = dayKey(new Date()), days = s.prog.days.includes(k) ? s.prog.days : s.prog.days.concat(k).slice(-400);
+      const prog = { ...s.prog, days }; saveProgress(prog);
+      return this.setState({ screen: "done", prog });
+    }
+    this.setState(t => ({ qi: t.qi + 1, picked: [], status: "", flip: 1 - t.flip }));
+  };
+  speakQ = (e) => { if(e) e.stopPropagation(); const q = this.q(); if(q) this.say(q.card.fr); };
   shuffleAll = () => this.open("all");
   again12 = () => this.open(this.state.coll);
   goHome = () => this.setState({ screen: "home", revealed: false });
@@ -530,7 +725,35 @@ class Component extends DCLogic {
     });
     const streak = streakOf(days), best = Math.max(streak, bestOf(days));
 
+    // quiz view
+    const isQuiz = s.mode === "quiz", q = s.quiz[s.qi], qc = q ? q.card : d;
+    const GOOD = "#77ce9c", BAD = "#f16b73";
+    const qOptions = q && q.options ? q.options.map((o, i) => {
+      const chosen = s.picked.includes(i), show = !!s.status;
+      const bg = show && o.ok ? "#16271d" : show && chosen ? "#2a1416" : "#17171a";
+      const bd = show && o.ok ? GOOD : show && chosen ? BAD : "#ffffff17";
+      return { t: o.t, note: o.note || "", hasNote: !!o.note, bg, bd, fg: show && !o.ok && !chosen ? "#6d6d74" : "#eeeae7", pick: () => this.choose(i) };
+    }) : [];
+    const qSel = q && q.bank ? s.picked.map(i => ({ t: q.bank.find(b => b.i === i).t, drop: () => this.dropTile(i) })) : [];
+    const qBank = q && q.bank ? q.bank.map(b => ({ t: b.t, vis: s.picked.includes(b.i) ? "hidden" : "visible", pick: () => this.pickTile(b.i) })) : [];
+    const qn = s.quiz.length || 1;
+
     return {
+      isCards: !isQuiz, isQuiz, cardsBg: isQuiz ? "transparent" : "#eeeae6", cardsFg: isQuiz ? "#8d8d95" : "#1b1b1e",
+      quizBg: isQuiz ? "#eeeae6" : "transparent", quizFg: isQuiz ? "#1b1b1e" : "#8d8d95", setCards: this.setCards, setQuiz: this.setQuiz,
+      qLabel: q ? q.label : "", qKind: kindLabel(qc), qKindDot: qc.g ? G[qc.g].ink : "#1d1b1840",
+      qPaper: paperFor(qc.p), qBadge: (() => { let c = qc.p[3]; if(lum(c) > .12) c = mix(qc.p[3], qc.p[2], .55); return c; })(),
+      qPrompt: q ? q.prompt : "", qPromptSize: q && q.big ? fitSize(q.prompt) : "23px", qPromptWeight: q && q.big ? 700 : 600,
+      qSub: q ? q.sub : "", qAsk: q ? q.ask : "", qSpeak: !!(q && (q.speak || q.kind === "gender")), speakQ: this.speakQ,
+      isChoice: !!(q && q.options), isBuild: !!(q && q.bank), qOptions, qOptCols: q && q.options && q.options.length === 2 ? "1fr 1fr" : "1fr",
+      qSel, qBank, qHasSel: qSel.length > 0, qCanCheck: !!(q && q.bank) && !s.status, qCheckOp: s.picked.length && !s.status ? 1 : .35, check: this.check,
+      qAnswered: !!s.status, qRight: s.status === "right", qWrong: s.status === "wrong",
+      qFeedBg: s.status === "right" ? "#16271d" : "#2a1416", qFeedBd: s.status === "right" ? GOOD + "66" : BAD + "66", qFeedFg: s.status === "right" ? GOOD : BAD,
+      qFeedTitle: s.status === "right" ? "Correct!" : "Not quite", qReveal: q ? q.reveal : "",
+      qGlow: s.status === "right" ? "0 0 0 2px " + GOOD + ", 0 28px 50px -22px #000" : s.status === "wrong" ? "0 0 0 2px " + BAD + ", 0 28px 50px -22px #000" : "0 28px 50px -22px #000,inset 0 1px 0 #ffffffb0",
+      next: this.next,
+      qDashes: Array.from({length: qn}, (_,i) => ({ bg: i < s.results.length ? (s.results[i] ? GOOD : BAD) : (i === s.qi ? "#eeeae7" : "#ffffff1c"), grow: i === s.qi && !s.status ? 2 : 1 })),
+      qCount: "Question " + Math.min(s.qi + 1, qn) + " of " + qn,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
       colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
@@ -547,10 +770,10 @@ class Component extends DCLogic {
       dashes: Array.from({length: n}, (_,i) => ({ bg: i < s.done ? "#eeeae7" : (i === s.done ? lighten(d.p[4], .55) : "#ffffff1c"), grow: i === s.done ? 2 : 1 })),
       dashMax: Math.min(300, n * 17) + "px",
       undoOp: s.history.length ? 1 : .3,
-      doneTitle: s.coll === "all" ? "All done." : "Nice work.",
+      doneTitle: isQuiz ? s.results.filter(Boolean).length + " / " + s.results.length + " correct" : (s.coll === "all" ? "All done." : "Nice work."),
       doneKicker: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
-      doneLine: s.done + " cards practised. Streak: " + streak + (streak === 1 ? " day." : " days."),
-      againLabel: s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(SESSION, (CARDS[s.coll] || []).length),
+      doneLine: (isQuiz ? (s.results.length && s.results.every(Boolean) ? "Perfect round." : "Missed words go back to learning.") : s.done + " cards practised.") + " Streak: " + streak + (streak === 1 ? " day." : " days."),
+      againLabel: isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(SESSION, (CARDS[s.coll] || []).length),
       week, weekLine: week.filter(w => w.done).length + " / 7 days this week",
       streak, bestLine: "best: " + best + (best === 1 ? " day" : " days"),
       mastered: totalM, learning: ALL.length - totalM, masteredPct: Math.round(100 * totalM / ALL.length) + "%",

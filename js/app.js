@@ -129,6 +129,80 @@ VOCAB.cards.forEach(d => {
 });
 const ALL = [].concat(...COLLECTIONS.map(c => CARDS[c.id]));
 
+// ---------- quiz ----------
+const QUIZ = 10;
+const ARTICLE = /^(le |la |les |l'|l’|un |une )/i;
+function bare(fr){ return fr.replace(ARTICLE, "").replace(/…/g, "").trim(); }
+function meanings(en){ return en.toLowerCase().split(/[\/;(),]/).map(s => s.replace(/^to /, "").trim()).filter(Boolean); }
+function sameMeaning(a, b){ const x = meanings(a.en); return meanings(b.en).some(m => x.includes(m)); }
+function capLike(word, model){ return /^\p{Lu}/u.test(model) ? word.charAt(0).toUpperCase() + word.slice(1) : word; }
+// sentence -> word tiles: trailing punctuation dropped, elisions (l'orange, J'ai) stay one tile
+function tilesOf(ex){ return ex.trim().replace(/\s*[.!?…]+$/, "").split(/\s+/).filter(Boolean); }
+function pickOthers(pool, card, n, test){
+  const out = [], seen = new Set();
+  for(const c of shuffle(pool)){
+    if(out.length >= n) break;
+    if(c.id === card.id || sameMeaning(c, card) || !test(c)) continue;
+    out.push(c);
+  }
+  return out;
+}
+const FORMATS = {
+  gender: {
+    label: "Gender",
+    ok: c => !!c.g && ARTICLE.test(c.fr) && !/^les /i.test(c.fr),
+    make: c => ({ prompt: bare(c.fr), sub: c.en, ask: "Is it le or la?", big: true,
+      options: [{ t: "le", note: "masculine", ok: c.g === "m" }, { t: "la", note: "feminine", ok: c.g === "f" }],
+      reveal: c.fr })
+  },
+  fill: {
+    label: "Fill the blank",
+    ok: c => !!c.ex && !!highlight(c).hit,
+    make: (c, pool) => {
+      const h = highlight(c), kind = kindLabel(c);
+      let others = pickOthers(pool, c, 3, o => kindLabel(o) === kind && norm(bare(o.fr)) !== norm(h.hit));
+      if(others.length < 3) others = others.concat(pickOthers(pool, c, 3 - others.length, o => !others.includes(o) && norm(bare(o.fr)) !== norm(h.hit)));
+      const opts = shuffle([{ t: h.hit, ok: true }].concat(others.map(o => ({ t: capLike(bare(o.fr).toLowerCase(), h.hit), ok: false }))));
+      return { prompt: h.pre + "____" + h.post, sub: c.exEn || "", ask: "Pick the missing word", big: false, options: opts, reveal: c.ex };
+    }
+  },
+  build: {
+    label: "Build the sentence",
+    ok: c => !!c.ex && !!c.exEn && tilesOf(c.ex).length >= 3 && tilesOf(c.ex).length <= 8,
+    make: (c, pool) => {
+      const target = tilesOf(c.ex), have = new Set(target.map(norm));
+      const decoys = [];
+      for(const o of shuffle(pool)){
+        if(decoys.length >= 2) break;
+        if(o.id === c.id || !o.ex) continue;
+        const w = shuffle(tilesOf(o.ex)).find(t => t.length > 1 && !/[,;:]/.test(t) && !have.has(norm(t)) && !decoys.includes(t.toLowerCase()));
+        if(w) decoys.push(w.toLowerCase());
+      }
+      return { prompt: c.exEn, sub: "", ask: "Build it in French", big: false, target,
+        bank: shuffle(target.concat(decoys)).map((t, i) => ({ t, i })), reveal: c.ex };
+    }
+  },
+  mc: {
+    label: "Meaning",
+    ok: c => true,
+    make: (c, pool) => {
+      const toEn = Math.random() < .6, others = pickOthers(pool, c, 3, () => true);
+      const opts = shuffle([{ t: toEn ? c.en : c.fr, ok: true }].concat(others.map(o => ({ t: toEn ? o.en : o.fr, ok: false }))));
+      return toEn
+        ? { prompt: c.fr, sub: c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
+        : { prompt: c.en, sub: "", ask: "How do you say it in French?", big: true, options: opts, reveal: c.en + " = " + c.fr };
+    }
+  }
+};
+const ROTATION = ["gender", "fill", "build", "mc", "fill", "build", "gender", "mc", "build", "fill"];
+function makeQuiz(cards, pool){
+  return cards.map((c, i) => {
+    let kind = ROTATION[i % ROTATION.length];
+    if(!FORMATS[kind].ok(c)) kind = shuffle(Object.keys(FORMATS).filter(k => FORMATS[k].ok(c)))[0];
+    return { card: c, kind, label: FORMATS[kind].label, ...FORMATS[kind].make(c, pool) };
+  });
+}
+
 // ---------- saved progress (this device only) ----------
 const STORE = "wordnest.progress.v2";
 function loadProgress(){ try { const p = JSON.parse(localStorage.getItem(STORE)); if(p && p.m && p.days) return p; } catch(e) {} return { m: {}, days: [] }; }
@@ -152,7 +226,8 @@ class Component extends DCLogic {
     super(props);
     this.state = {
       screen: "home", coll: "mdj", session: [], idx: 0, done: 0, history: [],
-      revealed: false, showEx: true, stats: false, confirmReset: false, flip: 0, prog: loadProgress()
+      revealed: false, showEx: true, stats: false, confirmReset: false,
+      mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
     this.noRef = React.createRef(); this.yesRef = React.createRef();
@@ -162,10 +237,10 @@ class Component extends DCLogic {
   componentDidUpdate(){ this.syncPanel(); }
   // the runtime doesn't pass previous state, so remember what was last applied to the panel
   syncPanel(){
-    const key = this.state.showEx + "|" + this.state.screen;
+    const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode;
     if(key === this.lastPanel) return;
-    const same = this.lastScreen === this.state.screen;
-    this.lastPanel = key; this.lastScreen = this.state.screen;
+    const same = this.lastScreen === this.state.screen + this.state.mode;
+    this.lastPanel = key; this.lastScreen = this.state.screen + this.state.mode;
     this.placePanel(this.state.showEx ? 1 : 0, same);
   }
 
@@ -192,8 +267,52 @@ class Component extends DCLogic {
       const cards = CARDS[id];
       pool = shuffle(cards.filter(c => !m[c.id])).concat(shuffle(cards.filter(c => m[c.id]))).slice(0, SESSION);
     }
+    if(this.state.mode === "quiz"){
+      const src = id === "all" ? ALL : CARDS[id];
+      const quiz = makeQuiz(pool.slice(0, QUIZ), src);
+      clearTimeout(this.nextTimer);
+      return this.setState(s => ({ screen: "study", coll: id, quiz, qi: 0, picked: [], status: "", results: [], flip: 1 - s.flip, stats: false }));
+    }
     this.setState(s => ({ screen: "study", coll: id, session: pool, idx: 0, done: 0, history: [], revealed: false, flip: 1 - s.flip, stats: false }));
   }
+  setCards = () => { if(this.state.mode !== "cards"){ this.state.mode = "cards"; this.setState({ mode: "cards" }); this.open(this.state.coll); } };
+  setQuiz = () => { if(this.state.mode !== "quiz"){ this.state.mode = "quiz"; this.setState({ mode: "quiz" }); this.open(this.state.coll); } };
+
+  // ---- quiz ----
+  q(){ return this.state.quiz[this.state.qi]; }
+  choose(i){
+    const q = this.q(); if(!q || this.state.status) return;
+    this.finish(!!q.options[i].ok, [i]);
+  }
+  pickTile(i){ if(this.state.status) return; this.setState(s => s.picked.includes(i) ? null : { picked: s.picked.concat(i) }); }
+  dropTile(i){ if(this.state.status) return; this.setState(s => ({ picked: s.picked.filter(p => p !== i) })); }
+  check = () => {
+    const q = this.q(); if(!q || this.state.status || !this.state.picked.length) return;
+    const said = this.state.picked.map(i => norm(q.bank.find(b => b.i === i).t)).join(" ");
+    this.finish(said === q.target.map(norm).join(" "), this.state.picked);
+  };
+  finish(ok, picked){
+    const q = this.q();
+    this.setState(s => {
+      const m = { ...s.prog.m };
+      if(ok) m[q.card.id] = 1; else delete m[q.card.id];
+      const prog = { ...s.prog, m }; saveProgress(prog);
+      return { status: ok ? "right" : "wrong", picked, prog, results: s.results.concat(ok) };
+    });
+    if(ok) this.nextTimer = setTimeout(this.next, 900);
+  }
+  next = () => {
+    clearTimeout(this.nextTimer);
+    const s = this.state;
+    if(!s.status) return;
+    if(s.qi + 1 >= s.quiz.length){
+      const k = dayKey(new Date()), days = s.prog.days.includes(k) ? s.prog.days : s.prog.days.concat(k).slice(-400);
+      const prog = { ...s.prog, days }; saveProgress(prog);
+      return this.setState({ screen: "done", prog });
+    }
+    this.setState(t => ({ qi: t.qi + 1, picked: [], status: "", flip: 1 - t.flip }));
+  };
+  speakQ = (e) => { if(e) e.stopPropagation(); const q = this.q(); if(q) this.say(q.card.fr); };
   shuffleAll = () => this.open("all");
   again12 = () => this.open(this.state.coll);
   goHome = () => this.setState({ screen: "home", revealed: false });
@@ -339,7 +458,35 @@ class Component extends DCLogic {
     });
     const streak = streakOf(days), best = Math.max(streak, bestOf(days));
 
+    // quiz view
+    const isQuiz = s.mode === "quiz", q = s.quiz[s.qi], qc = q ? q.card : d;
+    const GOOD = "#77ce9c", BAD = "#f16b73";
+    const qOptions = q && q.options ? q.options.map((o, i) => {
+      const chosen = s.picked.includes(i), show = !!s.status;
+      const bg = show && o.ok ? "#16271d" : show && chosen ? "#2a1416" : "#17171a";
+      const bd = show && o.ok ? GOOD : show && chosen ? BAD : "#ffffff17";
+      return { t: o.t, note: o.note || "", hasNote: !!o.note, bg, bd, fg: show && !o.ok && !chosen ? "#6d6d74" : "#eeeae7", pick: () => this.choose(i) };
+    }) : [];
+    const qSel = q && q.bank ? s.picked.map(i => ({ t: q.bank.find(b => b.i === i).t, drop: () => this.dropTile(i) })) : [];
+    const qBank = q && q.bank ? q.bank.map(b => ({ t: b.t, vis: s.picked.includes(b.i) ? "hidden" : "visible", pick: () => this.pickTile(b.i) })) : [];
+    const qn = s.quiz.length || 1;
+
     return {
+      isCards: !isQuiz, isQuiz, cardsBg: isQuiz ? "transparent" : "#eeeae6", cardsFg: isQuiz ? "#8d8d95" : "#1b1b1e",
+      quizBg: isQuiz ? "#eeeae6" : "transparent", quizFg: isQuiz ? "#1b1b1e" : "#8d8d95", setCards: this.setCards, setQuiz: this.setQuiz,
+      qLabel: q ? q.label : "", qKind: kindLabel(qc), qKindDot: qc.g ? G[qc.g].ink : "#1d1b1840",
+      qPaper: paperFor(qc.p), qBadge: (() => { let c = qc.p[3]; if(lum(c) > .12) c = mix(qc.p[3], qc.p[2], .55); return c; })(),
+      qPrompt: q ? q.prompt : "", qPromptSize: q && q.big ? fitSize(q.prompt) : "23px", qPromptWeight: q && q.big ? 700 : 600,
+      qSub: q ? q.sub : "", qAsk: q ? q.ask : "", qSpeak: !!(q && (q.speak || q.kind === "gender")), speakQ: this.speakQ,
+      isChoice: !!(q && q.options), isBuild: !!(q && q.bank), qOptions, qOptCols: q && q.options && q.options.length === 2 ? "1fr 1fr" : "1fr",
+      qSel, qBank, qHasSel: qSel.length > 0, qCanCheck: !!(q && q.bank) && !s.status, qCheckOp: s.picked.length && !s.status ? 1 : .35, check: this.check,
+      qAnswered: !!s.status, qRight: s.status === "right", qWrong: s.status === "wrong",
+      qFeedBg: s.status === "right" ? "#16271d" : "#2a1416", qFeedBd: s.status === "right" ? GOOD + "66" : BAD + "66", qFeedFg: s.status === "right" ? GOOD : BAD,
+      qFeedTitle: s.status === "right" ? "Correct!" : "Not quite", qReveal: q ? q.reveal : "",
+      qGlow: s.status === "right" ? "0 0 0 2px " + GOOD + ", 0 28px 50px -22px #000" : s.status === "wrong" ? "0 0 0 2px " + BAD + ", 0 28px 50px -22px #000" : "0 28px 50px -22px #000,inset 0 1px 0 #ffffffb0",
+      next: this.next,
+      qDashes: Array.from({length: qn}, (_,i) => ({ bg: i < s.results.length ? (s.results[i] ? GOOD : BAD) : (i === s.qi ? "#eeeae7" : "#ffffff1c"), grow: i === s.qi && !s.status ? 2 : 1 })),
+      qCount: "Question " + Math.min(s.qi + 1, qn) + " of " + qn,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
       colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
@@ -356,10 +503,10 @@ class Component extends DCLogic {
       dashes: Array.from({length: n}, (_,i) => ({ bg: i < s.done ? "#eeeae7" : (i === s.done ? lighten(d.p[4], .55) : "#ffffff1c"), grow: i === s.done ? 2 : 1 })),
       dashMax: Math.min(300, n * 17) + "px",
       undoOp: s.history.length ? 1 : .3,
-      doneTitle: s.coll === "all" ? "All done." : "Nice work.",
+      doneTitle: isQuiz ? s.results.filter(Boolean).length + " / " + s.results.length + " correct" : (s.coll === "all" ? "All done." : "Nice work."),
       doneKicker: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
-      doneLine: s.done + " cards practised. Streak: " + streak + (streak === 1 ? " day." : " days."),
-      againLabel: s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(SESSION, (CARDS[s.coll] || []).length),
+      doneLine: (isQuiz ? (s.results.length && s.results.every(Boolean) ? "Perfect round." : "Missed words go back to learning.") : s.done + " cards practised.") + " Streak: " + streak + (streak === 1 ? " day." : " days."),
+      againLabel: isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(SESSION, (CARDS[s.coll] || []).length),
       week, weekLine: week.filter(w => w.done).length + " / 7 days this week",
       streak, bestLine: "best: " + best + (best === 1 ? " day" : " days"),
       mastered: totalM, learning: ALL.length - totalM, masteredPct: Math.round(100 * totalM / ALL.length) + "%",

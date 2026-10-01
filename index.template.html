@@ -56,17 +56,26 @@
       <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="m14 6-6 6 6 6"></path></svg>
     </button>
     <div style="display:flex;align-items:center;gap:6px">
+      <sc-if value="{{ isCards }}" hint-placeholder-val="{{ true }}">
       <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:34px;height:34px;border-radius:50%;background:transparent;color:#c2c2c9;opacity:{{ undoOp }};display:grid;place-items:center">
         <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
       </button>
+      </sc-if>
       <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
       <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
     </button>
     </div>
   </div>
   <div style="flex:none;margin-top:14px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(32px,9.5vw,42px);line-height:1;letter-spacing:-.035em;text-wrap:balance">{{ collTitle }}</div>
+  <div style="flex:none;margin-top:14px;display:flex">
+    <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d">
+      <button sc-camel-on-click="{{ setCards }}" style="padding:8px 16px;border-radius:999px;background:{{ cardsBg }};color:{{ cardsFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Cards</button>
+      <button sc-camel-on-click="{{ setQuiz }}" style="padding:8px 16px;border-radius:999px;background:{{ quizBg }};color:{{ quizFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Quiz</button>
+    </div>
+  </div>
 
-  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:34px">
+  <sc-if value="{{ isCards }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:28px">
     <div style="position:relative;z-index:2;flex:1;min-height:230px;max-height:380px">
       <div style="position:absolute;inset:0;transform:translate3d(18px,-26px,0) rotate(6deg) scale(.9);border-radius:24px;background:{{ back2 }};opacity:.55;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
       <div style="position:absolute;inset:0;transform:translate3d(-14px,-12px,0) rotate(-4.5deg) scale(.95);border-radius:24px;background:{{ back1 }};opacity:.8;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
@@ -138,6 +147,73 @@
       </div>
     </div>
   </div>
+  </sc-if>
+  <sc-if value="{{ isQuiz }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:22px">
+    <section style="flex:none;border-radius:24px;overflow:hidden;background:{{ qPaper }};color:#1d1b18;box-shadow:{{ qGlow }};transition:box-shadow .3s;display:flex;flex-direction:column;animation:{{ enter }} .45s cubic-bezier(.22,1,.36,1) both">
+      <div style="flex:none;height:50px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:#ffffff66;border-bottom:1px solid #1d1b1814">
+        <span style="height:24px;padding:0 9px;border-radius:7px;background:{{ qBadge }};color:#fff;font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;display:grid;place-items:center">{{ qLabel }}</span>
+        <span style="display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:#1d1b18c0"><span style="width:7px;height:7px;border-radius:50%;background:{{ qKindDot }}"></span>{{ qKind }}</span>
+      </div>
+      <div style="padding:18px 20px 18px;display:flex;flex-direction:column;gap:8px;min-height:150px">
+        <div style="font-size:12.5px;color:#1d1b1880">{{ qAsk }}</div>
+        <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:{{ qPromptWeight }};font-size:{{ qPromptSize }};line-height:1.12;letter-spacing:-.025em;text-wrap:balance;overflow-wrap:anywhere">{{ qPrompt }}</div>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="font-size:13px;color:#1d1b1899;line-height:1.4">{{ qSub }}</div>
+          <sc-if value="{{ qSpeak }}" hint-placeholder-val="{{ false }}">
+            <button sc-camel-on-click="{{ speakQ }}" aria-label="Hear it in French" style="flex:none;width:38px;height:38px;border-radius:50%;background:{{ qBadge }};color:#fff;display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+
+    <sc-if value="{{ isChoice }}" hint-placeholder-val="{{ true }}">
+      <div style="margin-top:16px;display:grid;grid-template-columns:{{ qOptCols }};gap:9px">
+        <sc-for list="{{ qOptions }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="min-height:52px;padding:12px 18px;border-radius:18px;background:{{ o.bg }};border:1.5px solid {{ o.bd }};color:{{ o.fg }};font-size:15.5px;font-weight:500;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .25s,border-color .25s,color .25s" style-active="transform:scale(.98)">
+            <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600">{{ o.t }}</span>
+            <sc-if value="{{ o.hasNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:11.5px;color:#77777d">{{ o.note }}</span></sc-if>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isBuild }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:16px;min-height:58px;padding:10px;border-radius:18px;border:1.5px dashed #ffffff22;display:flex;flex-wrap:wrap;gap:7px;align-content:flex-start">
+        <sc-for list="{{ qSel }}" as="w" hint-placeholder-count="0">
+          <button sc-camel-on-click="{{ w.drop }}" style="padding:9px 13px;border-radius:12px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500;animation:wn-tile .2s cubic-bezier(.22,1,.36,1) both">{{ w.t }}</button>
+        </sc-for>
+      </div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:7px;justify-content:center">
+        <sc-for list="{{ qBank }}" as="w" hint-placeholder-count="6">
+          <button sc-camel-on-click="{{ w.pick }}" style="visibility:{{ w.vis }};padding:9px 13px;border-radius:12px;background:#17171a;border:1px solid #ffffff1a;color:#eeeae7;font-size:15px;font-weight:500" style-active="transform:scale(.95)">{{ w.t }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <div style="flex:1;min-height:14px"></div>
+
+    <sc-if value="{{ qAnswered }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:12px;padding:12px 16px;border-radius:16px;background:{{ qFeedBg }};border:1px solid {{ qFeedBd }};animation:wn-inA .3s cubic-bezier(.22,1,.36,1) both">
+        <div style="font-size:13px;font-weight:600;color:{{ qFeedFg }}">{{ qFeedTitle }}</div>
+        <div style="margin-top:3px;font-size:14.5px;line-height:1.45;color:#dcdce2">{{ qReveal }}</div>
+      </div>
+      <button sc-camel-on-click="{{ next }}" style="margin-top:12px;width:100%;height:52px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:600" style-active="transform:scale(.98)">Continue</button>
+    </sc-if>
+    <sc-if value="{{ isBuild }}" hint-placeholder-val="{{ false }}">
+    </sc-if>
+    <sc-if value="{{ qCanCheck }}" hint-placeholder-val="{{ false }}">
+      <button sc-camel-on-click="{{ check }}" style="margin-top:12px;width:100%;height:52px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:600;opacity:{{ qCheckOp }};transition:opacity .2s" style-active="transform:scale(.98)">Check</button>
+    </sc-if>
+
+    <div role="progressbar" aria-label="{{ qCount }}" style="margin:16px auto 0;width:100%;max-width:220px;display:flex;gap:5px;flex:none">
+      <sc-for list="{{ qDashes }}" as="d" hint-placeholder-count="10">
+        <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
 </div>
 </sc-if>
 
