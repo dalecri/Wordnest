@@ -4,10 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wordnest</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="css/app.css">
+<script src="js/deck.js"></script>
 <script src="js/react.production.min.js"></script>
 <script src="js/react-dom.production.min.js"></script>
 <script src="js/dc-runtime.js"></script>
@@ -16,41 +14,59 @@
 <x-dc>
 <div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
-<div style="flex:none;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px 0;display:flex;align-items:center;justify-content:space-between">
-  <div role="progressbar" aria-label="{{ count }}" style="flex:1;max-width:{{ dashMax }};display:flex;gap:5px;margin-right:16px">
-    <sc-for list="{{ dashes }}" as="d" hint-placeholder-count="12">
-      <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
-    </sc-for>
-  </div>
-  <div style="display:flex;align-items:center;gap:6px">
-    <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:34px;height:34px;border-radius:50%;background:transparent;color:#c2c2c9;opacity:{{ undoOp }};display:grid;place-items:center">
-      <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
-    </button>
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 28px)">
+  <div style="display:flex;justify-content:flex-end;padding:0 4px">
     <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
       <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
     </button>
   </div>
-</div>
-
-<sc-if value="{{ isStudy }}" hint-placeholder-val="{{ true }}">
-<div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:0 22px calc(env(safe-area-inset-bottom,0px) + 22px)">
-
-  <div style="flex:none;margin-top:10px;position:relative;z-index:5">
-    <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(38px,11vw,46px);line-height:1;letter-spacing:-.035em">Mots<br>du jour</div>
-    <div style="position:absolute;right:0;top:4px">
-      <button sc-camel-on-click="{{ toggleMenu }}" style="display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:13px;font-weight:500">{{ modeLabel }}
-        <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m6 9 6 6 6-6"></path></svg>
-      </button>
-      <div style="position:absolute;right:0;top:46px;width:200px;padding:6px;border-radius:18px;background:#1a1a1d;border:1px solid #ffffff14;box-shadow:0 18px 40px #000a;opacity:{{ menuOp }};transform:translateY({{ menuY }});transition:opacity .2s,transform .2s cubic-bezier(.2,.8,.3,1);pointer-events:{{ menuPE }}">
-        <button sc-camel-on-click="{{ pickTodayM }}" style="width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:transparent;color:#eeeae7" style-hover="background:#ffffff0d"><div style="font-size:14px;font-weight:500">Today</div><div style="font-size:11px;color:#77777d;margin-top:2px">{{ goal }} cards · keeps your streak</div></button>
-        <button sc-camel-on-click="{{ pickShuffleM }}" style="width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:transparent;color:#eeeae7" style-hover="background:#ffffff0d"><div style="font-size:14px;font-weight:500">Shuffle all</div><div style="font-size:11px;color:#77777d;margin-top:2px">all {{ deckSize }}, any order · no pressure</div></button>
-      </div>
-    </div>
+  <div style="padding:14px 4px 0;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(38px,11vw,46px);line-height:1;letter-spacing:-.035em">Mes<br>collections</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 4px 22px">
+    <button sc-camel-on-click="{{ shuffleAll }}" style="display:flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:13.5px;font-weight:500" style-hover="background:#1f1f23" style-active="transform:scale(.96)">
+      <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>Tout mélanger
+    </button>
+    <span style="font-size:11.5px;color:#6d6d74;text-align:right">{{ totalLine }}</span>
   </div>
 
-  <div sc-camel-on-click="{{ closeMenu }}" style="position:absolute;inset:0;z-index:4;pointer-events:{{ menuPE }}"></div>
+  <div style="display:flex;flex-direction:column">
+    <sc-for list="{{ colls }}" as="c" hint-placeholder-count="6">
+      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -18px #000c;animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
+        <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.03em">{{ c.title }}</span>
+          <span style="flex:none;padding-top:5px;font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span>
+        </span>
+        <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
+          <span style="display:flex;flex-wrap:wrap;gap:6px;min-width:0">
+            <span style="padding:5px 11px;border-radius:999px;border:1px solid {{ c.line }};font-size:12px;white-space:nowrap">{{ c.en }}</span>
+            <span style="padding:5px 11px;border-radius:999px;border:1px solid {{ c.line }};font-size:12px;white-space:nowrap">{{ c.count }}</span>
+          </span>
+          <span style="flex:none;width:36px;height:36px;border-radius:50%;background:{{ c.arrowBg }};color:{{ c.arrowFg }};display:grid;place-items:center"><svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg></span>
+        </span>
+      </button>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
 
-  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:40px">
+<sc-if value="{{ isStudy }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 20px)">
+  <div style="flex:none;display:flex;align-items:center;justify-content:space-between">
+    <button sc-camel-on-click="{{ goHome }}" aria-label="Back to collections" style="width:38px;height:38px;border-radius:50%;background:#17171a;border:1px solid #ffffff0d;color:#c2c2c9;display:grid;place-items:center" style-hover="color:#fff">
+      <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="m14 6-6 6 6 6"></path></svg>
+    </button>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:34px;height:34px;border-radius:50%;background:transparent;color:#c2c2c9;opacity:{{ undoOp }};display:grid;place-items:center">
+        <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
+      </button>
+      <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
+      <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
+    </button>
+    </div>
+  </div>
+  <div style="flex:none;margin-top:14px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(32px,9.5vw,42px);line-height:1;letter-spacing:-.035em;text-wrap:balance">{{ collTitle }}</div>
+
+  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:34px">
     <div style="position:relative;z-index:2;flex:1;min-height:230px;max-height:380px">
       <div style="position:absolute;inset:0;transform:translate3d(18px,-26px,0) rotate(6deg) scale(.9);border-radius:24px;background:{{ back2 }};opacity:.55;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
       <div style="position:absolute;inset:0;transform:translate3d(-14px,-12px,0) rotate(-4.5deg) scale(.95);border-radius:24px;background:{{ back1 }};opacity:.8;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
@@ -105,17 +121,23 @@
         <div style="padding:12px 16px 15px;font-size:15px;line-height:1.5;color:#dcdce2">{{ exPre }}<span style="color:{{ hitColor }};font-weight:600">{{ exHit }}</span>{{ exPost }}</div>
       </div>
 
-      <div ref="{{ btnRef }}" style="display:flex;justify-content:center;gap:10px;margin-top:18px;will-change:transform">
+      <div ref="{{ btnRef }}" style="will-change:transform">
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:18px">
         <button sc-camel-on-click="{{ again }}" style="display:flex;align-items:center;gap:9px;height:50px;padding:0 22px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:15px;font-weight:500" style-hover="background:#1f1f23" style-active="transform:scale(.96)">Again
           <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M17 2l4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
         </button>
         <button sc-camel-on-click="{{ gotIt }}" style="display:flex;align-items:center;gap:9px;height:50px;padding:0 24px;border-radius:999px;background:{{ gotBg }};color:{{ gotFg }};font-size:15px;font-weight:600;transition:background .4s" style-active="transform:scale(.96)">Got it
           <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M7 10v11"></path><path d="M15 5.9 14 10h5.8a2 2 0 0 1 2 2.3l-1.4 7A2 2 0 0 1 18.4 21H7V10l4-8a3 3 0 0 1 4 3.9Z"></path></svg>
         </button>
+        </div>
+        <div role="progressbar" aria-label="{{ count }}" style="margin:18px auto 0;width:100%;max-width:{{ dashMax }};display:flex;gap:5px">
+          <sc-for list="{{ dashes }}" as="d" hint-placeholder-count="12">
+            <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
+          </sc-for>
+        </div>
       </div>
     </div>
   </div>
-
 </div>
 </sc-if>
 
@@ -123,12 +145,12 @@
 <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px 28px calc(env(safe-area-inset-bottom,0px) + 24px)">
   <div style="width:100%;max-width:320px;border-radius:28px;padding:34px 24px;background:{{ art }};box-shadow:0 26px 60px #0009;animation:wn-pop .5s cubic-bezier(.2,.9,.3,1.3) both">
     <div style="font-size:11px;letter-spacing:.4px;color:#ffffffc0">{{ doneKicker }}</div>
-    <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:36px;letter-spacing:-.03em;color:#fff;margin:12px 0 10px;text-shadow:0 2px 18px #0006">{{ doneTitle }}</div>
+    <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:34px;letter-spacing:-.03em;color:#fff;margin:12px 0 10px;text-shadow:0 2px 18px #0006">{{ doneTitle }}</div>
     <div style="font-size:13px;color:#ffffffd8;line-height:1.5">{{ doneLine }}</div>
   </div>
   <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:30px">
-    <button sc-camel-on-click="{{ shuffleAgain }}" style="height:54px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500">Shuffle all {{ deckSize }}</button>
-    <button sc-camel-on-click="{{ openStats }}" style="height:54px;border-radius:999px;background:#17171a;border:1px solid #ffffff12;color:#e6e3e0;font-size:15px">See progress</button>
+    <button sc-camel-on-click="{{ again12 }}" style="height:54px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500">{{ againLabel }}</button>
+    <button sc-camel-on-click="{{ goHome }}" style="height:54px;border-radius:999px;background:#17171a;border:1px solid #ffffff12;color:#e6e3e0;font-size:15px">Mes collections</button>
   </div>
 </div>
 </sc-if>
@@ -139,7 +161,7 @@
   <div style="display:flex;align-items:flex-end;justify-content:space-between">
     <div style="display:flex;align-items:flex-end;gap:10px">
       <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:56px;line-height:.82;letter-spacing:-.04em">{{ streak }}</div>
-      <div><div style="font-size:14px;color:#c2c2c9">day streak</div><div style="font-size:11.5px;color:#6d6d74;margin-top:1px">best: 21 days</div></div>
+      <div><div style="font-size:14px;color:#c2c2c9">jours de suite</div><div style="font-size:11.5px;color:#6d6d74;margin-top:1px">{{ bestLine }}</div></div>
     </div>
     <button sc-camel-on-click="{{ closeStats }}" aria-label="Close" style="width:34px;height:34px;border-radius:50%;background:#ffffff10;color:#9a9aa2;display:grid;place-items:center;font-size:16px">×</button>
   </div>
@@ -153,13 +175,14 @@
   </div>
   <div style="margin-top:8px;font-size:11.5px;color:#6d6d74">{{ weekLine }}</div>
   <div style="margin-top:22px">
-    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px;color:#77777d"><span><b style="font-weight:600;color:#eeeae7">{{ mastered }}</b> mastered</span><span><b style="font-weight:600;color:#eeeae7">{{ learning }}</b> still learning</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px;color:#77777d"><span><b style="font-weight:600;color:#eeeae7">{{ mastered }}</b> maîtrisés</span><span><b style="font-weight:600;color:#eeeae7">{{ learning }}</b> à apprendre</span></div>
     <div style="height:6px;border-radius:3px;background:#ffffff12;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#cbd4a6;border-radius:3px"></div></div>
   </div>
 </div>
 
+
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:920},&quot;dailyGoal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:4,&quot;max&quot;:20,&quot;section&quot;:&quot;Session&quot;},}"><!--APP_JS--></script>
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:920},&quot;dailyGoal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:4,&quot;max&quot;:20,&quot;section&quot;:&quot;Session&quot;}}"><!--APP_JS--></script>
 </body>
 </html>

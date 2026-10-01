@@ -1,56 +1,55 @@
 # Wordnest
 
-*Un peu de français* — a minimal, offline flashcard app for learning beginner French.
+*Un peu de français*: a minimal, offline flashcard app for learning beginner French.
 
 ![Wordnest](wordnest.png)
 
 ## What it is
 
-Wordnest is a single-page spaced-repetition flashcard app. Each session serves a
-small daily batch of French words and phrases; you flip each card to see the
-English meaning and an example sentence, then swipe (or click) to mark it as
-still-learning or mastered. It tracks a day streak and session progress, and
-can read cards aloud in French.
+Wordnest is a single-page flashcard app. You pick a collection of words
+(food, verbs, numbers…), then work through a short session of cards: tap to
+flip between French and English, swipe right when you know it, left to keep
+practising. Progress and your day streak are saved on the device.
 
-It runs entirely in the browser with no server, no build tooling, and no
-network access required — every dependency ships in the repo.
+It runs entirely in the browser with no server, no build tooling at runtime,
+and no network access: every dependency, font and word ships in the repo.
 
 ## Features
 
-- **Flip cards** — tap/click a card to reveal the English meaning and an example
-  sentence in both languages.
-- **Swipe to grade** — swipe (or drag) left to keep a word in the learning pile,
-  right to mark it mastered. Mastered cards are meant to resurface on a longer
-  interval (3 days, then a week, then a month).
-- **Undo** — step back through the last few grades in a session.
-- **Text-to-speech** — hear any card's French word read aloud (via the
-  browser's built-in `speechSynthesis`, using a French voice when available).
-- **Daily streak & weekly view** — a day-streak counter and a 7-day strip
-  showing which days you've kept it up.
-- **Guided first run** — a 4-step tutorial coach walks new users through
-  tapping, swiping, and listening before the first real session.
-- **Session progress** — a pip/dot tracker shows how far through today's batch
-  you are.
-- **Configurable session** — three simple options control behavior:
-  - `dailyGoal` — how many cards make up a session (4–20, default 12)
-  - `startScreen` — start on the tutorial or straight on the home screen
-  - `quietMode` — hides the learning/mastered counters and streak note
+- **Collections home**: 20 colour-coded collections (a hand-picked "Mots du
+  jour" mix plus the 19 vocabulary categories), each showing its word count
+  and how much of it you've mastered. "Tout mélanger" serves 20 random cards
+  from everything.
+- **Cards**: the French word with its gender or word type, IPA pronunciation
+  and a speaker button (browser `speechSynthesis`, French voice when
+  available). Tap to flip to the English.
+- **Word in use**: an example sentence under the card with the word
+  highlighted. Swipe down on the card to show it, up to hide it.
+- **Swipe to grade**: right = got it (mastered), left = again. Buttons do the
+  same. Undo steps back through the last few grades.
+- **Sessions**: 12 cards per collection session, unmastered cards first.
+  Progress shows as a row of dashes under the buttons.
+- **Streak**: finishing a session counts the day. The streak chip opens a
+  sheet with the current and best streak, this week's days and overall
+  mastery.
+- **Saved progress**: mastered cards and practice days are kept in
+  `localStorage` on this device.
 
 ## Project structure
 
 ```
-index.html            the app (generated — see "Editing" below)
+index.html            the app (generated, see "Editing")
 index.template.html   HTML shell + markup (source of truth)
-css/app.css           global styles and animations
-js/app.js             card deck + app logic (source of truth)
+css/app.css           global styles, animations and @font-face rules
+js/app.js             collections, curated deck and app logic (source of truth)
+js/deck.js            vocabulary.json as a script (generated)
 js/dc-runtime.js      the templating/rendering engine that powers the UI
-js/react.production.min.js, js/react-dom.production.min.js
-                       React, used by the rendering engine
-vocabulary.json        a larger 803-card French vocabulary dataset
-                       (19 categories — see below), not yet wired into
-                       the app's card deck
-wordnest.png           app icon / preview image
-build.py               regenerates index.html from the template + app.js
+js/react*.min.js      React, used by the rendering engine
+fonts/                Space Grotesk (SIL OFL, see SpaceGrotesk-OFL.txt)
+vocabulary.json       803 French cards in 19 categories, with IPA and examples
+tools/add_ipa.py      fills in missing IPA with espeak-ng
+wordnest.png          app icon / preview image
+build.py              regenerates index.html and js/deck.js
 ```
 
 ## Running it
@@ -70,30 +69,33 @@ python3 -m http.server
 
 ## Editing
 
-The app's logic lives in `js/app.js` (the card deck and the `Component`
-class) and its styles in `css/app.css` — edit those directly. `index.html`
-is a generated file: the rendering engine requires the app's script to be
-inlined in the page, so after changing `js/app.js` run:
+Edit `js/app.js`, `index.template.html`, `css/app.css` and `vocabulary.json`
+directly. The rendering engine needs the app's script inlined in the page,
+and the vocabulary is shipped as a plain script so it works from `file://`,
+so after changing the JS, template or vocabulary run:
 
 ```bash
 python3 build.py
 ```
 
-to regenerate `index.html`. Changes to `css/app.css` take effect immediately
-since it's linked normally and don't need a rebuild.
+Changes to `css/app.css` take effect immediately and don't need a rebuild.
 
 ## Vocabulary data
 
-`vocabulary.json` is a separate, larger French vocabulary set (fr-CA,
-beginner level, 803 cards across 19 categories — greetings, food, numbers,
-être/avoir conjugations, and more). The app currently ships with a small
-12-card sample deck hardcoded in `js/app.js`; `vocabulary.json` is available
-as a dataset to expand the deck from, but isn't loaded by the app yet.
+`vocabulary.json` holds 803 beginner cards (fr-CA) across 19 categories:
+greetings, food, body, places, verbs, numbers, être/avoir forms and more.
+Every card has an English meaning, an example sentence (`ex` / `exEn`) and an
+IPA pronunciation. The IPA was generated with espeak-ng
+(`python3 tools/add_ipa.py`) and is a good approximation of standard French;
+hand-edit any card to refine it and the script will leave it alone. Card IDs
+are stable, so saved progress survives edits.
 
 ## Tech notes
 
 - No CDN links, no external fonts, no analytics, no network calls at
-  runtime — everything the app needs is a local file.
+  runtime: everything the app needs is a local file.
 - The UI is built with a small custom templating engine (`js/dc-runtime.js`)
   on top of React, using inline `{{ }}` bindings, `sc-if`/`sc-for`
   directives, and a small component class in `js/app.js` rather than JSX.
+- Drags and slide animations write `transform`/`opacity` straight to the DOM
+  inside `requestAnimationFrame`, so gestures stay smooth on phones.

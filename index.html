@@ -4,10 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wordnest</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap">
 <link rel="stylesheet" href="css/app.css">
+<script src="js/deck.js"></script>
 <script src="js/react.production.min.js"></script>
 <script src="js/react-dom.production.min.js"></script>
 <script src="js/dc-runtime.js"></script>
@@ -16,41 +14,59 @@
 <x-dc>
 <div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
-<div style="flex:none;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px 0;display:flex;align-items:center;justify-content:space-between">
-  <div role="progressbar" aria-label="{{ count }}" style="flex:1;max-width:{{ dashMax }};display:flex;gap:5px;margin-right:16px">
-    <sc-for list="{{ dashes }}" as="d" hint-placeholder-count="12">
-      <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
-    </sc-for>
-  </div>
-  <div style="display:flex;align-items:center;gap:6px">
-    <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:34px;height:34px;border-radius:50%;background:transparent;color:#c2c2c9;opacity:{{ undoOp }};display:grid;place-items:center">
-      <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
-    </button>
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 28px)">
+  <div style="display:flex;justify-content:flex-end;padding:0 4px">
     <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
       <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
     </button>
   </div>
-</div>
-
-<sc-if value="{{ isStudy }}" hint-placeholder-val="{{ true }}">
-<div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:0 22px calc(env(safe-area-inset-bottom,0px) + 22px)">
-
-  <div style="flex:none;margin-top:10px;position:relative;z-index:5">
-    <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(38px,11vw,46px);line-height:1;letter-spacing:-.035em">Mots<br>du jour</div>
-    <div style="position:absolute;right:0;top:4px">
-      <button sc-camel-on-click="{{ toggleMenu }}" style="display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:13px;font-weight:500">{{ modeLabel }}
-        <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="m6 9 6 6 6-6"></path></svg>
-      </button>
-      <div style="position:absolute;right:0;top:46px;width:200px;padding:6px;border-radius:18px;background:#1a1a1d;border:1px solid #ffffff14;box-shadow:0 18px 40px #000a;opacity:{{ menuOp }};transform:translateY({{ menuY }});transition:opacity .2s,transform .2s cubic-bezier(.2,.8,.3,1);pointer-events:{{ menuPE }}">
-        <button sc-camel-on-click="{{ pickTodayM }}" style="width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:transparent;color:#eeeae7" style-hover="background:#ffffff0d"><div style="font-size:14px;font-weight:500">Today</div><div style="font-size:11px;color:#77777d;margin-top:2px">{{ goal }} cards · keeps your streak</div></button>
-        <button sc-camel-on-click="{{ pickShuffleM }}" style="width:100%;text-align:left;padding:10px 12px;border-radius:12px;background:transparent;color:#eeeae7" style-hover="background:#ffffff0d"><div style="font-size:14px;font-weight:500">Shuffle all</div><div style="font-size:11px;color:#77777d;margin-top:2px">all {{ deckSize }}, any order · no pressure</div></button>
-      </div>
-    </div>
+  <div style="padding:14px 4px 0;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(38px,11vw,46px);line-height:1;letter-spacing:-.035em">Mes<br>collections</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 4px 22px">
+    <button sc-camel-on-click="{{ shuffleAll }}" style="display:flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:13.5px;font-weight:500" style-hover="background:#1f1f23" style-active="transform:scale(.96)">
+      <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>Tout mélanger
+    </button>
+    <span style="font-size:11.5px;color:#6d6d74;text-align:right">{{ totalLine }}</span>
   </div>
 
-  <div sc-camel-on-click="{{ closeMenu }}" style="position:absolute;inset:0;z-index:4;pointer-events:{{ menuPE }}"></div>
+  <div style="display:flex;flex-direction:column">
+    <sc-for list="{{ colls }}" as="c" hint-placeholder-count="6">
+      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -18px #000c;animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
+        <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+          <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.03em">{{ c.title }}</span>
+          <span style="flex:none;padding-top:5px;font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span>
+        </span>
+        <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
+          <span style="display:flex;flex-wrap:wrap;gap:6px;min-width:0">
+            <span style="padding:5px 11px;border-radius:999px;border:1px solid {{ c.line }};font-size:12px;white-space:nowrap">{{ c.en }}</span>
+            <span style="padding:5px 11px;border-radius:999px;border:1px solid {{ c.line }};font-size:12px;white-space:nowrap">{{ c.count }}</span>
+          </span>
+          <span style="flex:none;width:36px;height:36px;border-radius:50%;background:{{ c.arrowBg }};color:{{ c.arrowFg }};display:grid;place-items:center"><svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg></span>
+        </span>
+      </button>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
 
-  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:40px">
+<sc-if value="{{ isStudy }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 20px)">
+  <div style="flex:none;display:flex;align-items:center;justify-content:space-between">
+    <button sc-camel-on-click="{{ goHome }}" aria-label="Back to collections" style="width:38px;height:38px;border-radius:50%;background:#17171a;border:1px solid #ffffff0d;color:#c2c2c9;display:grid;place-items:center" style-hover="color:#fff">
+      <svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="m14 6-6 6 6 6"></path></svg>
+    </button>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button sc-camel-on-click="{{ undo }}" aria-label="Undo" style="width:34px;height:34px;border-radius:50%;background:transparent;color:#c2c2c9;opacity:{{ undoOp }};display:grid;place-items:center">
+        <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="m9 5-5 5 5 5M4 10h9a5 5 0 0 1 0 10"></path></svg>
+      </button>
+      <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
+      <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
+    </button>
+    </div>
+  </div>
+  <div style="flex:none;margin-top:14px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(32px,9.5vw,42px);line-height:1;letter-spacing:-.035em;text-wrap:balance">{{ collTitle }}</div>
+
+  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:34px">
     <div style="position:relative;z-index:2;flex:1;min-height:230px;max-height:380px">
       <div style="position:absolute;inset:0;transform:translate3d(18px,-26px,0) rotate(6deg) scale(.9);border-radius:24px;background:{{ back2 }};opacity:.55;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
       <div style="position:absolute;inset:0;transform:translate3d(-14px,-12px,0) rotate(-4.5deg) scale(.95);border-radius:24px;background:{{ back1 }};opacity:.8;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff55;border-bottom:1px solid #1d1b1812"></div></div>
@@ -105,17 +121,23 @@
         <div style="padding:12px 16px 15px;font-size:15px;line-height:1.5;color:#dcdce2">{{ exPre }}<span style="color:{{ hitColor }};font-weight:600">{{ exHit }}</span>{{ exPost }}</div>
       </div>
 
-      <div ref="{{ btnRef }}" style="display:flex;justify-content:center;gap:10px;margin-top:18px;will-change:transform">
+      <div ref="{{ btnRef }}" style="will-change:transform">
+        <div style="display:flex;justify-content:center;gap:10px;margin-top:18px">
         <button sc-camel-on-click="{{ again }}" style="display:flex;align-items:center;gap:9px;height:50px;padding:0 22px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:15px;font-weight:500" style-hover="background:#1f1f23" style-active="transform:scale(.96)">Again
           <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M17 2l4 4-4 4"></path><path d="M3 11v-1a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v1a4 4 0 0 1-4 4H3"></path></svg>
         </button>
         <button sc-camel-on-click="{{ gotIt }}" style="display:flex;align-items:center;gap:9px;height:50px;padding:0 24px;border-radius:999px;background:{{ gotBg }};color:{{ gotFg }};font-size:15px;font-weight:600;transition:background .4s" style-active="transform:scale(.96)">Got it
           <svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M7 10v11"></path><path d="M15 5.9 14 10h5.8a2 2 0 0 1 2 2.3l-1.4 7A2 2 0 0 1 18.4 21H7V10l4-8a3 3 0 0 1 4 3.9Z"></path></svg>
         </button>
+        </div>
+        <div role="progressbar" aria-label="{{ count }}" style="margin:18px auto 0;width:100%;max-width:{{ dashMax }};display:flex;gap:5px">
+          <sc-for list="{{ dashes }}" as="d" hint-placeholder-count="12">
+            <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
+          </sc-for>
+        </div>
       </div>
     </div>
   </div>
-
 </div>
 </sc-if>
 
@@ -123,12 +145,12 @@
 <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:24px 28px calc(env(safe-area-inset-bottom,0px) + 24px)">
   <div style="width:100%;max-width:320px;border-radius:28px;padding:34px 24px;background:{{ art }};box-shadow:0 26px 60px #0009;animation:wn-pop .5s cubic-bezier(.2,.9,.3,1.3) both">
     <div style="font-size:11px;letter-spacing:.4px;color:#ffffffc0">{{ doneKicker }}</div>
-    <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:36px;letter-spacing:-.03em;color:#fff;margin:12px 0 10px;text-shadow:0 2px 18px #0006">{{ doneTitle }}</div>
+    <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:34px;letter-spacing:-.03em;color:#fff;margin:12px 0 10px;text-shadow:0 2px 18px #0006">{{ doneTitle }}</div>
     <div style="font-size:13px;color:#ffffffd8;line-height:1.5">{{ doneLine }}</div>
   </div>
   <div style="display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin-top:30px">
-    <button sc-camel-on-click="{{ shuffleAgain }}" style="height:54px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500">Shuffle all {{ deckSize }}</button>
-    <button sc-camel-on-click="{{ openStats }}" style="height:54px;border-radius:999px;background:#17171a;border:1px solid #ffffff12;color:#e6e3e0;font-size:15px">See progress</button>
+    <button sc-camel-on-click="{{ again12 }}" style="height:54px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:500">{{ againLabel }}</button>
+    <button sc-camel-on-click="{{ goHome }}" style="height:54px;border-radius:999px;background:#17171a;border:1px solid #ffffff12;color:#e6e3e0;font-size:15px">Mes collections</button>
   </div>
 </div>
 </sc-if>
@@ -139,7 +161,7 @@
   <div style="display:flex;align-items:flex-end;justify-content:space-between">
     <div style="display:flex;align-items:flex-end;gap:10px">
       <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:56px;line-height:.82;letter-spacing:-.04em">{{ streak }}</div>
-      <div><div style="font-size:14px;color:#c2c2c9">day streak</div><div style="font-size:11.5px;color:#6d6d74;margin-top:1px">best: 21 days</div></div>
+      <div><div style="font-size:14px;color:#c2c2c9">jours de suite</div><div style="font-size:11.5px;color:#6d6d74;margin-top:1px">{{ bestLine }}</div></div>
     </div>
     <button sc-camel-on-click="{{ closeStats }}" aria-label="Close" style="width:34px;height:34px;border-radius:50%;background:#ffffff10;color:#9a9aa2;display:grid;place-items:center;font-size:16px">×</button>
   </div>
@@ -153,15 +175,16 @@
   </div>
   <div style="margin-top:8px;font-size:11.5px;color:#6d6d74">{{ weekLine }}</div>
   <div style="margin-top:22px">
-    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px;color:#77777d"><span><b style="font-weight:600;color:#eeeae7">{{ mastered }}</b> mastered</span><span><b style="font-weight:600;color:#eeeae7">{{ learning }}</b> still learning</span></div>
+    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px;color:#77777d"><span><b style="font-weight:600;color:#eeeae7">{{ mastered }}</b> maîtrisés</span><span><b style="font-weight:600;color:#eeeae7">{{ learning }}</b> à apprendre</span></div>
     <div style="height:6px;border-radius:3px;background:#ffffff12;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#cbd4a6;border-radius:3px"></div></div>
   </div>
 </div>
 
+
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:920},&quot;dailyGoal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:4,&quot;max&quot;:20,&quot;section&quot;:&quot;Session&quot;},}">
-const DECK = [
+<script type="text/x-dc" data-dc-script="" data-props="{&quot;$preview&quot;:{&quot;width&quot;:460,&quot;height&quot;:920},&quot;dailyGoal&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:4,&quot;max&quot;:20,&quot;section&quot;:&quot;Session&quot;}}">
+const CURATED = [
   {fr:"Bonjour", en:"Hello", type:"greeting", ipa:"/bɔ̃.ʒuʁ/", say:"bohn-ZHOOR", ex:"Bonjour, comment allez-vous ?", exEn:"Hello, how are you?", p:["#f5aa84","#ff7256","#0b310c","#3c7918","#ffe0bd"]},
   {fr:"La mer", en:"The sea", type:"noun", g:"f", un:"une mer", pl:"les mers", rule:"+s", ipa:"/la mɛʁ/", say:"lah MEHR", trap:{k:"es", t:"Spanish flips it: el mar is masculine."}, ex:"On va à la mer cet été.", exEn:"We're going to the sea this summer.", p:["#7fd3e8","#1c7fa6","#062334","#0e4f6b","#c8f3ff"]},
   {fr:"Merci", en:"Thank you", type:"courtesy", ipa:"/mɛʁ.si/", say:"mehr-SEE", ex:"Merci pour votre aide.", exEn:"Thank you for your help.", p:["#83f8b4","#11b6ab","#00336c","#0062a2","#c9ffc8"]},
@@ -184,31 +207,93 @@ const DECK = [
   {fr:"Bonne journée", en:"Have a good day", type:"farewell", g:"f", un:"une journée", note:"bonne agrees with journée (f).", ipa:"/bɔn ʒuʁ.ne/", say:"bun zhoor-NAY", ex:"Merci, bonne journée !", exEn:"Thank you, have a good day!", p:["#54053a","#8d0028","#0b0414","#270317","#f04431"]}
 ];
 
-const G = { m:{ label:"masculin", dot:"#cbd4a6", ink:"#4f7a3a" }, f:{ label:"féminin", dot:"#f2c98a", ink:"#c0662a" } };
+// ---------- collections ----------
+// French title, plus the English label from vocabulary.json shown as a chip
+const COLLECTIONS = [
+  { id: "mdj",          fr: "Mots du jour" },
+  { id: "basics",       fr: "Premiers mots" },
+  { id: "daily",        fr: "Au quotidien" },
+  { id: "out",          fr: "En ville" },
+  { id: "work",         fr: "Au travail" },
+  { id: "people",       fr: "Gens & famille" },
+  { id: "home",         fr: "La maison" },
+  { id: "food",         fr: "Manger & boire" },
+  { id: "body",         fr: "Corps & santé" },
+  { id: "clothes",      fr: "Vêtements" },
+  { id: "places",       fr: "Lieux & voyages" },
+  { id: "nature",       fr: "Nature & météo" },
+  { id: "time",         fr: "Temps & calendrier" },
+  { id: "adjectives",   fr: "Adjectifs" },
+  { id: "adverbs",      fr: "Adverbes" },
+  { id: "verbs",        fr: "Verbes" },
+  { id: "grammar",      fr: "Petits mots" },
+  { id: "workwords",    fr: "Travail & études" },
+  { id: "numbers",      fr: "Les nombres" },
+  { id: "conjugations", fr: "Être & avoir" }
+];
+const SWATCHES = ["#cdb4f5","#dff07a","#4b5fd6","#f2683a","#8fe0c0","#f5a3c7","#8cc8f5","#f6d873","#ff8a7a","#b9d39b","#a993f0","#7fd1d8"];
+const SESSION = 12;
 
+const G = { m:{ label:"masculin", ink:"#4f7a3a" }, f:{ label:"féminin", ink:"#c0662a" } };
+
+// ---------- colour helpers ----------
+function hexToRgb(h){ const n = parseInt(h.slice(1,7),16); return [n>>16&255, n>>8&255, n&255]; }
+function lum(hex){
+  const ch = hexToRgb(hex).map(v => { v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); });
+  return .2126*ch[0] + .7152*ch[1] + .0722*ch[2];
+}
+function mix(a, b, t){ const x = hexToRgb(a), y = hexToRgb(b); return "#" + x.map((v,i) => Math.round(v + (y[i]-v)*t).toString(16).padStart(2,"0")).join(""); }
+// lift a colour toward white until it's light enough for dark text on top
+function lighten(c, minLum){ let t = 0, out = c; while(lum(out) < minLum && t < .95){ t += .08; out = mix(c, "#ffffff", t); } return out; }
+function toHsl(hex){
+  let [r,g,b] = hexToRgb(hex).map(v => v/255); const mx = Math.max(r,g,b), mn = Math.min(r,g,b), l = (mx+mn)/2;
+  if(mx === mn) return [0,0,l];
+  const d = mx-mn, s = l > .5 ? d/(2-mx-mn) : d/(mx+mn);
+  const h = mx === r ? (g-b)/d + (g<b?6:0) : mx === g ? (b-r)/d + 2 : (r-g)/d + 4;
+  return [h*60, s, l];
+}
+function hsl(h, s, l){
+  const k = n => (n + h/30) % 12, a = s * Math.min(l, 1-l);
+  const f = n => l - a * Math.max(-1, Math.min(k(n)-3, 9-k(n), 1));
+  return "#" + [f(0),f(8),f(4)].map(v => Math.round(v*255).toString(16).padStart(2,"0")).join("");
+}
+// a five-stop palette (same shape as the hand-made CURATED ones) drifting around a collection's colour
+function paletteFor(hex, i){
+  const [h0, s0] = toHsl(hex), h = (h0 + ((i*47) % 36) - 18 + 360) % 360, s = Math.max(.5, s0);
+  return [hsl(h,s,.68), hsl(h,s,.52), hsl(h,s*.8,.16), hsl(h,s*.75,.30), hsl((h+20)%360,s,.86)];
+}
+// pastel card surface: pale top-left, richer bottom-right
+function paperFor(p){
+  const top = lighten(mix(p[4], "#ffffff", .45), .78), bot = lighten(p[0], .42);
+  return "linear-gradient(155deg, " + top + " 0%, " + mix(top, bot, .45) + " 48%, " + bot + " 100%)";
+}
 function artFor(p){
   return "radial-gradient(70% 55% at 22% 14%, " + p[4] + "cc 0%, " + p[4] + "00 62%)," +
          "radial-gradient(62% 48% at 78% 86%, " + p[2] + "e6 0%, " + p[2] + "00 70%)," +
-         "radial-gradient(52% 44% at 46% 52%, " + p[3] + " 0%, " + p[3] + "00 78%)," +
-         "radial-gradient(38% 32% at 44% 50%, " + p[0] + "cc 0%, " + p[0] + "00 80%)," +
-         p[1];
+         "radial-gradient(52% 44% at 46% 52%, " + p[3] + " 0%, " + p[3] + "00 78%)," + p[1];
 }
-function lum(hex){
-  const n = parseInt(hex.slice(1,7),16), ch = [n>>16&255, n>>8&255, n&255].map(v => { v/=255; return v<=.03928 ? v/12.92 : Math.pow((v+.055)/1.055,2.4); });
-  return .2126*ch[0] + .7152*ch[1] + .0722*ch[2];
+
+// ---------- card helpers ----------
+function genderOf(type){ return /^masculine noun/.test(type) ? "m" : /^feminine noun/.test(type) ? "f" : ""; }
+function kindLabel(d){
+  const t = d.type || "";
+  if(d.g) return d.g === "f" ? "Nom féminin" : "Nom masculin";
+  if(/^pronoun/.test(t)) return "Petit mot";
+  if(/^plural noun/.test(t)) return "Nom pluriel";
+  if(/noun/.test(t)) return "Nom";
+  if(/^adjective/.test(t)) return "Adjectif";
+  if(/^adverb/.test(t)) return "Adverbe";
+  if(/^(être|avoir)/.test(t)) return "Conjugaison";
+  if(/^verb/.test(t) || d.aux) return "Verbe";
+  if(/^number/.test(t)) return "Nombre";
+  return "Expression";
 }
-// how bright the art is behind the word; brighter cards get a stronger halo so white text always reads
-function brightness(p){ return .45*lum(p[0]) + .35*lum(p[3]) + .2*lum(p[1]); }
-function shuffled(n){
-  const a = Array.from({length:n}, (_,i) => i);
-  for(let i=n-1;i>0;i--){ const k = Math.floor(Math.random()*(i+1)); [a[i],a[k]] = [a[k],a[i]]; }
-  return a;
-}
-function fitSize(text){ const longest = Math.max(...text.split(/\s+/).map(w => w.length)); return Math.max(34, Math.min(58, Math.floor(290 / (longest * .6)))) + "px"; }
-function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const k = Math.floor(Math.random()*(i+1)); [a[i],a[k]] = [a[k],a[i]]; } return a; }
+function fitSize(text){ const longest = Math.max(...text.split(/\s+/).map(w => w.length)); return Math.max(30, Math.min(56, Math.floor(290 / (longest * .6)))) + "px"; }
+function norm(s){ return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,""); }
 // split the example so the word being learned can be highlighted (matches on a short stem so "attendre" finds "attends")
 function highlight(d){
-  const ex = d.ex, words = d.fr.replace(/…/g,"").split(/[\s/']+/).filter(w => w.length > 1);
+  const ex = d.ex || "", words = d.fr.replace(/…/g,"").split(/[\s/']+/).filter(w => w.length > 1);
   const key = norm(words[words.length - 1] || "").slice(0, 5), n = norm(ex);
   const at = key ? n.indexOf(key) : -1;
   if(at < 0) return { pre: ex, hit: "", post: "" };
@@ -217,44 +302,62 @@ function highlight(d){
   while(e < ex.length && /[\p{L}]/u.test(ex[e])) e++;
   return { pre: ex.slice(0, s), hit: ex.slice(s, e), post: ex.slice(e) };
 }
-function hexToRgb(h){ const n = parseInt(h.slice(1,7),16); return [n>>16&255, n>>8&255, n&255]; }
-function mix(a, b, t){ const x = hexToRgb(a), y = hexToRgb(b); return "#" + x.map((v,i) => Math.round(v + (y[i]-v)*t).toString(16).padStart(2,"0")).join(""); }
-// lift a colour toward white until it's light enough for dark text on top
-function lighten(c, minLum){ let t = 0, out = c; while(lum(out) < minLum && t < .95){ t += .08; out = mix(c, "#ffffff", t); } return out; }
-// pastel card surface from the word's palette: pale top-left, richer bottom-right
-function paperFor(p){
-  const top = lighten(mix(p[4], "#ffffff", .45), .78), bot = lighten(p[0], .42);
-  return "linear-gradient(155deg, " + top + " 0%, " + mix(top, bot, .45) + " 48%, " + bot + " 100%)";
+
+// ---------- data ----------
+const VOCAB = window.WN_VOCAB || { categories: [], cards: [] };
+const EN_LABEL = Object.fromEntries(VOCAB.categories.map(c => [c.id, c.label]));
+EN_LABEL.mdj = "Hand-picked mix";
+const CARDS = {};   // collection id -> cards
+COLLECTIONS.forEach((c, ci) => { c.color = SWATCHES[ci % SWATCHES.length]; CARDS[c.id] = []; });
+CURATED.forEach((d, i) => CARDS.mdj.push({ ...d, id: "mdj" + i, deck: "mdj" }));
+VOCAB.cards.forEach(d => {
+  const list = CARDS[d.deck]; if(!list) return;
+  const coll = COLLECTIONS.find(c => c.id === d.deck);
+  list.push({ ...d, g: genderOf(d.type), p: paletteFor(coll.color, list.length) });
+});
+const ALL = [].concat(...COLLECTIONS.map(c => CARDS[c.id]));
+
+// ---------- saved progress (this device only) ----------
+const STORE = "wordnest.progress.v2";
+function loadProgress(){ try { const p = JSON.parse(localStorage.getItem(STORE)); if(p && p.m && p.days) return p; } catch(e) {} return { m: {}, days: [] }; }
+function saveProgress(p){ try { localStorage.setItem(STORE, JSON.stringify(p)); } catch(e) {} }
+function dayKey(d){ return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); }
+function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function streakOf(days){
+  const set = new Set(days); let d = new Date(), n = 0;
+  if(!set.has(dayKey(d))) d = addDays(d, -1);
+  while(set.has(dayKey(d))){ n++; d = addDays(d, -1); }
+  return n;
 }
-function kindLabel(d){
-  if(d.g && d.type === "noun") return d.g === "f" ? "Nom féminin" : "Nom masculin";
-  if(d.type === "adjective") return "Adjectif";
-  if(d.aux) return "Verbe";
-  return "Expression";
+function bestOf(days){
+  const sorted = [...new Set(days)].sort(); let best = 0, run = 0, prev = null;
+  sorted.forEach(k => { const d = new Date(k + "T12:00"); run = prev && dayKey(addDays(prev, 1)) === k ? run + 1 : 1; best = Math.max(best, run); prev = d; });
+  return best;
 }
-const IDENTITY = DECK.map((_,i) => i);
 
 class Component extends DCLogic {
   constructor(props){
     super(props);
-    const goal = Math.max(4, Math.min(20, this.props.dailyGoal ?? 12));
     this.state = {
-      screen: "study", mode: "today", order: IDENTITY, idx: 0, size: goal, goal,
-      revealed: false, done: 0, history: [], showEx: true,
-      learning: 18, mastered: 42, streak: 5, stats: false, menu: false, flip: 0
+      screen: "home", coll: "mdj", session: [], idx: 0, done: 0, history: [],
+      revealed: false, showEx: true, stats: false, flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
     this.noRef = React.createRef(); this.yesRef = React.createRef();
     this.drag = null; this.flying = false; this.raf = 0;
   }
-  componentDidMount(){ this.lastPanel = this.state.showEx + "|" + this.state.screen; this.lastScreen = this.state.screen; this.placePanel(this.state.showEx ? 1 : 0, false); }
-  componentDidUpdate(){
-    // the runtime doesn't pass previous state, so remember what was last applied
+  componentDidMount(){ this.syncPanel(); }
+  componentDidUpdate(){ this.syncPanel(); }
+  // the runtime doesn't pass previous state, so remember what was last applied to the panel
+  syncPanel(){
     const key = this.state.showEx + "|" + this.state.screen;
-    if(key !== this.lastPanel){ const same = this.lastScreen === this.state.screen; this.lastPanel = key; this.lastScreen = this.state.screen; this.placePanel(this.state.showEx ? 1 : 0, same); }
+    if(key === this.lastPanel) return;
+    const same = this.lastScreen === this.state.screen;
+    this.lastPanel = key; this.lastScreen = this.state.screen;
+    this.placePanel(this.state.showEx ? 1 : 0, same);
   }
 
-  card(){ const o = this.state.order; return DECK[o[this.state.idx % o.length]]; }
+  card(){ return this.state.session[this.state.idx] || ALL[0]; }
 
   say(word){
     const text = word.replace(/…/g,"").trim();
@@ -267,6 +370,21 @@ class Component extends DCLogic {
     speechSynthesis.speak(u);
   }
   speak = (e) => { if(e) e.stopPropagation(); this.say(this.card().fr); };
+
+  // ---- sessions ----
+  open(id){
+    const m = this.state.prog.m;
+    let pool;
+    if(id === "all") pool = shuffle(ALL).slice(0, 20);
+    else {
+      const cards = CARDS[id];
+      pool = shuffle(cards.filter(c => !m[c.id])).concat(shuffle(cards.filter(c => m[c.id]))).slice(0, SESSION);
+    }
+    this.setState(s => ({ screen: "study", coll: id, session: pool, idx: 0, done: 0, history: [], revealed: false, flip: 1 - s.flip, stats: false }));
+  }
+  shuffleAll = () => this.open("all");
+  again12 = () => this.open(this.state.coll);
+  goHome = () => this.setState({ screen: "home", revealed: false });
 
   // ---- direct-to-DOM motion: drags and slides only touch transform/opacity, no re-render per frame ----
   placePanel(p, animate){
@@ -294,7 +412,7 @@ class Component extends DCLogic {
   }
 
   rate(got){
-    if(this.flying) return;
+    if(this.flying || this.state.screen !== "study") return;
     this.flying = true;
     const el = this.cardRef.current;
     if(el){
@@ -303,15 +421,17 @@ class Component extends DCLogic {
       el.style.opacity = 0;
     }
     setTimeout(() => this.setState(s => {
-      const done = s.done + 1, finished = done >= s.size;
+      const card = s.session[s.idx], m = { ...s.prog.m }, had = !!m[card.id];
+      if(got) m[card.id] = 1; else delete m[card.id];
+      const done = s.done + 1, finished = done >= s.session.length;
+      const days = finished && !s.prog.days.includes(dayKey(new Date())) ? s.prog.days.concat(dayKey(new Date())).slice(-400) : s.prog.days;
+      const prog = { m, days };
+      saveProgress(prog);
       return {
-        revealed: false, flip: 1 - s.flip,
-        history: [{ idx: s.idx, done: s.done, learning: s.learning, mastered: s.mastered }, ...s.history].slice(0,5),
-        idx: s.idx + 1, done,
-        learning: got ? s.learning : s.learning + 1,
-        mastered: got ? s.mastered + 1 : s.mastered,
-        screen: finished ? "done" : "study",
-        streak: finished && s.mode === "today" ? s.streak + 1 : s.streak
+        prog, revealed: false, flip: 1 - s.flip,
+        history: [{ idx: s.idx, done: s.done, id: card.id, had }, ...s.history].slice(0,5),
+        idx: finished ? s.idx : s.idx + 1, done,
+        screen: finished ? "done" : "study"
       };
     }, () => { this.resetCard(false); this.flying = false; }), 300);
   }
@@ -320,22 +440,12 @@ class Component extends DCLogic {
 
   undo = () => this.setState(s => {
     if(!s.history.length) return null;
-    const [h, ...rest] = s.history;
-    return { ...h, history: rest, revealed: false, screen: "study", flip: 1 - s.flip };
+    const [h, ...rest] = s.history, m = { ...s.prog.m };
+    if(h.had) m[h.id] = 1; else delete m[h.id];
+    const prog = { ...s.prog, m }; saveProgress(prog);
+    return { idx: h.idx, done: h.done, prog, history: rest, revealed: false, screen: "study", flip: 1 - s.flip };
   });
 
-  start(mode){
-    this.setState(s => ({
-      screen: "study", mode, idx: 0, done: 0, history: [], revealed: false, flip: 1 - s.flip, menu: false,
-      order: mode === "shuffle" ? shuffled(DECK.length) : IDENTITY,
-      size: mode === "shuffle" ? DECK.length : s.goal
-    }));
-  }
-  pickTodayM = () => this.start("today");
-  pickShuffleM = () => this.start("shuffle");
-  shuffleAgain = () => this.start("shuffle");
-  toggleMenu = () => this.setState(s => ({ menu: !s.menu }));
-  closeMenu = () => this.setState({ menu: false });
   openStats = () => this.setState({ stats: true });
   closeStats = () => this.setState({ stats: false });
 
@@ -359,8 +469,7 @@ class Component extends DCLogic {
       if(g.axis === "x") this.moveCard(g.dx);
       else {
         const h = (this.panelRef.current ? this.panelRef.current.offsetHeight : 100) + 12;
-        const base = this.state.showEx ? 1 : 0;
-        this.placePanel(Math.max(0, Math.min(1, base + g.dy / h)), false);
+        this.placePanel(Math.max(0, Math.min(1, (this.state.showEx ? 1 : 0) + g.dy / h)), false);
       }
     });
   };
@@ -379,39 +488,62 @@ class Component extends DCLogic {
   };
 
   renderVals(){
-    const s = this.state, d = this.card(), h = highlight(d);
-    const nxt = (k) => DECK[s.order[(s.idx + k) % s.order.length]];
-    const days = ["M","T","W","T","F","S","S"];
-    const week = days.map((label,i) => {
-      const done = i < 5, today = i === 5;
-      return { label, fill: done ? "#24261f" : "#1a1a1d", ring: today ? "#cbd4a6" : "#ffffff0d",
-               dot: done ? "#cbd4a6" : (today ? "#cbd4a666" : "#2e2e34") };
+    const s = this.state, m = s.prog.m;
+    const masteredIn = list => list.filter(c => m[c.id]).length;
+
+    // home: overlapping collection cards
+    const colls = COLLECTIONS.map((c, i) => {
+      const list = CARDS[c.id], dark = lum(c.color) < .25;
+      return {
+        title: c.fr, en: EN_LABEL[c.id] || "", count: list.length + " mots",
+        pct: Math.round(100 * masteredIn(list) / Math.max(1, list.length)) + "%",
+        bg: c.color, fg: dark ? "#ffffff" : "#141414", line: dark ? "#ffffff80" : "#14141459",
+        arrowBg: dark ? "#ffffff" : "#141414", arrowFg: dark ? "#141414" : c.color,
+        z: i + 1, top: i ? "-30px" : "0", delay: (i * 28) + "ms",
+        open: () => this.open(c.id)
+      };
     });
+    const totalM = masteredIn(ALL);
+
+    // study
+    const d = this.card(), h = highlight(d), sess = s.session, n = sess.length || 1;
+    const nxt = k => sess.length ? sess[(s.idx + k) % sess.length] : d;
+    const coll = COLLECTIONS.find(c => c.id === s.coll);
+    const days = s.prog.days, today = new Date(), mon = addDays(today, -((today.getDay() + 6) % 7));
+    const week = ["L","M","M","J","V","S","D"].map((label, i) => {
+      const k = dayKey(addDays(mon, i)), done = days.includes(k), isToday = k === dayKey(today);
+      return { label, done, fill: done ? "#24261f" : "#1a1a1d", ring: isToday ? "#cbd4a6" : "#ffffff0d",
+               dot: done ? "#cbd4a6" : (isToday ? "#cbd4a666" : "#2e2e34") };
+    });
+    const streak = streakOf(days), best = Math.max(streak, bestOf(days));
+
     return {
-      isStudy: s.screen === "study", isDone: s.screen === "done",
+      isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
+      colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " mots maîtrisés",
+      collTitle: s.coll === "all" ? "Tout mélangé" : (coll ? coll.fr : ""),
       cardRef: this.cardRef, panelRef: this.panelRef, btnRef: this.btnRef, noRef: this.noRef, yesRef: this.yesRef,
       paper: paperFor(d.p), back1: paperFor(nxt(1).p), back2: paperFor(nxt(2).p), art: artFor(d.p),
-      kind: kindLabel(d), badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(), kindDot: d.g ? G[d.g].ink : "#1d1b1840",
+      kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#1d1b1840",
+      badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
       word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.ipa || "",
       footMeta: s.showEx ? "tap to flip" : "tap to flip · swipe down for example",
       faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enter: s.flip ? "wn-inA" : "wn-inB",
       exPre: h.pre, exHit: h.hit, exPost: h.post, hitColor: lighten(d.p[4], .55),
       gotBg: lighten(d.p[4], .6), gotFg: "#141414",
-      modeLabel: s.mode === "shuffle" ? "Shuffle" : "Today",
-      menuOp: s.menu ? 1 : 0, menuY: s.menu ? "0" : "-6px", menuPE: s.menu ? "auto" : "none",
-      goal: s.goal, deckSize: DECK.length, streak: s.streak,
-      count: Math.min(s.done + 1, s.size) + " of " + s.size,
-      dashes: Array.from({length: s.size}, (_,i) => ({ bg: i < s.done ? "#eeeae7" : (i === s.done ? lighten(d.p[4], .55) : "#ffffff1c"), grow: i === s.done ? 2 : 1 })),
-      dashMax: Math.min(260, s.size * 17) + "px", undoOp: s.history.length ? 1 : .3,
-      doneTitle: s.mode === "shuffle" ? "Whole deck, done." : "Petit à petit.",
-      doneKicker: s.mode === "shuffle" ? "shuffle complete" : "à demain",
-      doneLine: s.mode === "shuffle" ? s.done + " cards shuffled through. Streak unchanged." : s.done + " cards today. Streak kept alive.",
-      week, weekLine: "5 of 7 days this week",
-      mastered: s.mastered, learning: s.learning, masteredPct: Math.round(100 * s.mastered / (s.mastered + s.learning)) + "%",
+      count: Math.min(s.done + 1, n) + " of " + n,
+      dashes: Array.from({length: n}, (_,i) => ({ bg: i < s.done ? "#eeeae7" : (i === s.done ? lighten(d.p[4], .55) : "#ffffff1c"), grow: i === s.done ? 2 : 1 })),
+      dashMax: Math.min(300, n * 17) + "px",
+      undoOp: s.history.length ? 1 : .3,
+      doneTitle: s.coll === "all" ? "Tout mélangé, fini." : "Petit à petit.",
+      doneKicker: (coll && s.coll !== "all") ? coll.fr : "à demain",
+      doneLine: s.done + " cartes pratiquées. Série : " + streak + (streak === 1 ? " jour." : " jours."),
+      againLabel: s.coll === "all" ? "Encore 20 au hasard" : "Encore " + Math.min(SESSION, (CARDS[s.coll] || []).length),
+      week, weekLine: week.filter(w => w.done).length + " / 7 jours cette semaine",
+      streak, bestLine: "record : " + best + (best === 1 ? " jour" : " jours"),
+      mastered: totalM, learning: ALL.length - totalM, masteredPct: Math.round(100 * totalM / ALL.length) + "%",
       sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#00000080" : "#00000000", sheetPE: s.stats ? "auto" : "none",
       speak: this.speak, undo: this.undo, again: this.again, gotIt: this.gotIt,
-      toggleMenu: this.toggleMenu, closeMenu: this.closeMenu, pickTodayM: this.pickTodayM, pickShuffleM: this.pickShuffleM,
-      shuffleAgain: this.shuffleAgain, openStats: this.openStats, closeStats: this.closeStats,
+      goHome: this.goHome, again12: this.again12, openStats: this.openStats, closeStats: this.closeStats,
       onDown: this.onDown, onMove: this.onMove, onUp: this.onUp
     };
   }
