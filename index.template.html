@@ -178,6 +178,11 @@
     <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px;color:#77777d"><span><b style="font-weight:600;color:#eeeae7">{{ mastered }}</b> mastered</span><span><b style="font-weight:600;color:#eeeae7">{{ learning }}</b> to learn</span></div>
     <div style="height:6px;border-radius:3px;background:#ffffff12;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#cbd4a6;border-radius:3px"></div></div>
   </div>
+  <sc-if value="{{ hasMastered }}" hint-placeholder-val="{{ true }}">
+    <button sc-camel-on-click="{{ resetMastered }}" style="margin-top:22px;width:100%;height:46px;border-radius:999px;background:{{ resetBg }};border:1px solid {{ resetBorder }};color:{{ resetFg }};font-size:13.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s,color .25s,border-color .25s" style-hover="color:#eeeae7">
+      <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>{{ resetLabel }}
+    </button>
+  </sc-if>
 </div>
 
 

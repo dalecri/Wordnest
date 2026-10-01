@@ -152,7 +152,7 @@ class Component extends DCLogic {
     super(props);
     this.state = {
       screen: "home", coll: "mdj", session: [], idx: 0, done: 0, history: [],
-      revealed: false, showEx: true, stats: false, flip: 0, prog: loadProgress()
+      revealed: false, showEx: true, stats: false, confirmReset: false, flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
     this.noRef = React.createRef(); this.yesRef = React.createRef();
@@ -259,7 +259,17 @@ class Component extends DCLogic {
   });
 
   openStats = () => this.setState({ stats: true });
-  closeStats = () => this.setState({ stats: false });
+  closeStats = () => { clearTimeout(this.resetTimer); this.setState({ stats: false, confirmReset: false }); };
+  // two taps: the first arms it for a few seconds, the second wipes mastered words (streak days are kept)
+  resetMastered = () => {
+    clearTimeout(this.resetTimer);
+    if(!this.state.confirmReset){
+      this.setState({ confirmReset: true });
+      this.resetTimer = setTimeout(() => this.setState({ confirmReset: false }), 3500);
+      return;
+    }
+    this.setState(s => { const prog = { ...s.prog, m: {} }; saveProgress(prog); return { prog, confirmReset: false, history: [] }; });
+  };
 
   // gestures: tap flips, drag down shows the example, drag up hides it, left = again, right = got it
   onDown = (e) => {
@@ -355,6 +365,9 @@ class Component extends DCLogic {
       mastered: totalM, learning: ALL.length - totalM, masteredPct: Math.round(100 * totalM / ALL.length) + "%",
       sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#00000080" : "#00000000", sheetPE: s.stats ? "auto" : "none",
       speak: this.speak, undo: this.undo, again: this.again, gotIt: this.gotIt,
+      resetLabel: s.confirmReset ? "Tap again to reset all " + totalM + " mastered words" : "Reset mastered words",
+      resetBg: s.confirmReset ? "#3a1416" : "transparent", resetFg: s.confirmReset ? "#ff9a9f" : "#9a9aa2",
+      resetBorder: s.confirmReset ? "#f16b7366" : "#ffffff14", hasMastered: totalM > 0, resetMastered: this.resetMastered,
       goHome: this.goHome, again12: this.again12, openStats: this.openStats, closeStats: this.closeStats,
       onDown: this.onDown, onMove: this.onMove, onUp: this.onUp
     };
