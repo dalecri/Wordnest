@@ -221,6 +221,44 @@ function makeQuiz(cards, pool){
 }
 
 // ---------- saved progress (this device only) ----------
+// ---------- preferences (set during onboarding, editable from the streak sheet) ----------
+const PREFS = "wordnest.prefs.v1";
+function loadPrefs(){ try { const p = JSON.parse(localStorage.getItem(PREFS)); if(p && p.done) return p; } catch(e) {} return null; }
+function savePrefs(p){ try { localStorage.setItem(PREFS, JSON.stringify(p)); } catch(e) {} }
+const WHY = [
+  { id: "life",    title: "Everyday life", sub: "Living, shopping and chatting in Quebec",
+    order: ["daily","basics","food","home","people","out","time","places","numbers","clothes","body"] },
+  { id: "travel",  title: "Travel",        sub: "Getting around, eating out, asking for help",
+    order: ["basics","out","places","food","numbers","time","nature","daily","clothes"] },
+  { id: "work",    title: "Work or a language test", sub: "Writing, connectors and solid grammar",
+    order: ["grammar","conjugations","verbs","workwords","work","adverbs","adjectives","time"] },
+  { id: "curious", title: "Just curious",  sub: "A little French, a little every day", order: [] }
+];
+const LEVELS = [
+  { id: "new",   title: "Brand new",     sub: "Start from the very first words" },
+  { id: "some",  title: "Some basics",   sub: "I know greetings and a few words",
+    pool: ["basics","daily","food","people","home","numbers"] },
+  { id: "good",  title: "Comfortable",   sub: "I can hold a simple conversation",
+    pool: ["verbs","adverbs","adjectives","grammar","workwords","time"] }
+];
+const GOALS = [
+  { id: 5,  title: "5 cards",  sub: "Light · about 2 minutes" },
+  { id: 12, title: "12 cards", sub: "Steady · about 5 minutes" },
+  { id: 20, title: "20 cards", sub: "Intense · about 8 minutes" }
+];
+const ACCENTS = [
+  { id: "qc", title: "Quebec French", sub: "Canadian voice, déjeuner · dîner · souper" },
+  { id: "fr", title: "France French", sub: "European voice and usage" }
+];
+const ONB_COLORS = ["#a993f0", "#8cc8f5", "#f6d873", "#8fe0c0", "#f5a3c7", "#ff8a7a"];
+function isQuebec(c){ return /\(canada\)|quebec|in canada/i.test(c.en + " " + (c.type || "")); }
+function collectionOrder(prefs){
+  const why = WHY.find(w => w.id === (prefs && prefs.why));
+  if(!why || !why.order.length) return COLLECTIONS;
+  const first = why.order.map(id => COLLECTIONS.find(c => c.id === id)).filter(Boolean);
+  return first.concat(COLLECTIONS.filter(c => !why.order.includes(c.id)));
+}
+
 const STORE = "wordnest.progress.v2";
 function loadProgress(){ try { const p = JSON.parse(localStorage.getItem(STORE)); if(p && p.m && p.days) return p; } catch(e) {} return { m: {}, days: [] }; }
 function saveProgress(p){ try { localStorage.setItem(STORE, JSON.stringify(p)); } catch(e) {} }
@@ -242,12 +280,13 @@ class Component extends DCLogic {
   constructor(props){
     super(props);
     this.state = {
-      screen: "home", coll: "mdj", session: [], idx: 0, done: 0, history: [],
+      prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
+      screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
       revealed: false, showEx: true, stats: false, confirmReset: false,
       mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
-    this.noRef = React.createRef(); this.yesRef = React.createRef();
+    this.noRef = React.createRef(); this.yesRef = React.createRef(); this.obCardRef = React.createRef();
     this.drag = null; this.flying = false; this.raf = 0;
   }
   componentDidMount(){ this.syncPanel(); }
@@ -268,8 +307,9 @@ class Component extends DCLogic {
     if(!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "fr-CA"; u.rate = .82;
-    const v = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith("fr"));
+    const fr = (this.state.prefs && this.state.prefs.accent === "fr") ? "fr-FR" : "fr-CA";
+    u.lang = fr; u.rate = .82;
+    const voices = speechSynthesis.getVoices(), v = voices.find(v => v.lang === fr) || voices.find(v => v.lang.toLowerCase().startsWith("fr"));
     if(v) u.voice = v;
     speechSynthesis.speak(u);
   }
@@ -281,10 +321,10 @@ class Component extends DCLogic {
     let pool;
     // Daily picks and Shuffle all skip mastered words entirely; other collections top up with them for review
     if(id === "all") pool = shuffle(ALL.filter(c => !m[c.id])).slice(0, 20);
-    else if(id === "mdj") pool = shuffle(CARDS.mdj.filter(c => !m[c.id])).slice(0, SESSION);
+    else if(id === "mdj") pool = shuffle(CARDS.mdj.filter(c => !m[c.id])).slice(0, this.goal());
     else {
       const cards = CARDS[id];
-      pool = shuffle(cards.filter(c => !m[c.id])).concat(shuffle(cards.filter(c => m[c.id]))).slice(0, SESSION);
+      pool = shuffle(cards.filter(c => !m[c.id])).concat(shuffle(cards.filter(c => m[c.id]))).slice(0, this.goal());
     }
     if(!pool.length) return this.setState({ screen: "done", coll: id, empty: true, stats: false });
     if(this.state.mode === "quiz"){
@@ -333,7 +373,76 @@ class Component extends DCLogic {
     this.setState(t => ({ qi: t.qi + 1, picked: [], status: "", flip: 1 - t.flip }));
   };
   speakQ = (e) => { if(e) e.stopPropagation(); const q = this.q(); if(q) this.say(q.card.fr); };
+  goal(){ return (this.state.prefs && this.state.prefs.goal) || SESSION; }
   shuffleAll = () => this.open("all");
+
+  // ---- onboarding ----
+  obSteps(ob){ return ["welcome", "why", "level"].concat(ob.level && ob.level !== "new" ? ["check"] : []).concat(["goal", "accent"]); }
+  obGo(delta){ this.setState(s => { const steps = this.obSteps(s.ob), i = Math.max(0, Math.min(steps.length - 1, s.ob.step + delta)); return { ob: { ...s.ob, step: i } }; }); }
+  obNext = () => this.obGo(1);
+  obBack = () => this.obGo(-1);
+  obPick(key, val){
+    if(this.obTimer) return;
+    this.setState(s => {
+      const ob = { ...s.ob, [key]: val };
+      if(key === "level" && val !== "new"){
+        const lv = LEVELS.find(l => l.id === val), pool = [].concat(...lv.pool.map(id => CARDS[id] || []));
+        ob.check = shuffle(pool.filter(c => !s.prog.m[c.id])).slice(0, 10); ob.ci = 0; ob.peek = false; ob.known = [];
+      }
+      return { ob };
+    });
+    // brief pause so the choice visibly lands, then move on (the last step finishes)
+    this.obTimer = setTimeout(() => { this.obTimer = 0; key === "accent" ? this.obFinish() : this.obNext(); }, 260);
+  }
+  obAnswer(known){
+    const el = this.obCardRef.current, ob = this.state.ob, card = ob.check[ob.ci];
+    if(!card || this.obFlying) return;
+    this.obFlying = true;
+    if(el){ el.style.transition = "transform .28s cubic-bezier(.5,0,.75,0), opacity .28s"; el.style.transform = "translate3d(" + (known ? 480 : -480) + "px,-20px,0) rotate(" + (known ? 14 : -14) + "deg)"; el.style.opacity = 0; }
+    setTimeout(() => {
+      this.setState(s => {
+        const ob = { ...s.ob, ci: s.ob.ci + 1, peek: false, known: known ? s.ob.known.concat(card.id) : s.ob.known };
+        return { ob };
+      }, () => {
+        if(el){ el.style.transition = "none"; el.style.transform = "none"; el.style.opacity = 1; }
+        this.obFlying = false;
+        if(this.state.ob.ci >= this.state.ob.check.length) this.obNext();
+      });
+    }, 280);
+  }
+  obKnow = () => this.obAnswer(true);
+  obNotYet = () => this.obAnswer(false);
+  obPeek = () => this.setState(s => ({ ob: { ...s.ob, peek: !s.ob.peek } }));
+  obDown = (e) => { if(e.target.closest("button")) return; this.obDrag = { id: e.pointerId, x: e.clientX, dx: 0, moved: false }; try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {} };
+  obMove = (e) => {
+    const d = this.obDrag; if(!d || d.id !== e.pointerId) return;
+    d.dx = e.clientX - d.x; if(Math.abs(d.dx) > 8) d.moved = true;
+    const el = this.obCardRef.current;
+    if(el && d.moved){ el.style.transition = "none"; el.style.transform = "translate3d(" + d.dx + "px,0,0) rotate(" + (d.dx * .04) + "deg)"; }
+  };
+  obUp = (e) => {
+    const d = this.obDrag; if(!d || d.id !== e.pointerId) return;
+    this.obDrag = null;
+    if(!d.moved) return this.obPeek();
+    if(Math.abs(d.dx) > 80) return this.obAnswer(d.dx > 0);
+    const el = this.obCardRef.current; if(el){ el.style.transition = "transform .4s cubic-bezier(.22,1,.36,1)"; el.style.transform = "none"; }
+  };
+  obFinish = () => {
+    const ob = this.state.ob, prefs = { done: true, why: ob.why || "curious", level: ob.level || "new", goal: ob.goal || 12, accent: ob.accent || "qc" };
+    savePrefs(prefs);
+    const m = { ...this.state.prog.m }; (ob.known || []).forEach(id => { m[id] = 1; });
+    const prog = { ...this.state.prog, m }; saveProgress(prog);
+    const start = collectionOrder(prefs)[0];
+    this.setState({ prefs, prog, mode: "cards" }, () => this.open(start.id));
+  };
+  obSkip = () => {
+    const prefs = this.state.prefs || { done: true, why: "curious", level: "new", goal: 12, accent: "qc" };
+    savePrefs(prefs); this.setState({ prefs, screen: "home" });
+  };
+  redoSetup = () => {
+    const p = this.state.prefs || {};
+    this.setState({ stats: false, screen: "onboard", ob: { step: 1, why: p.why || "", level: "", goal: p.goal || 12, accent: p.accent || "qc", check: [], ci: 0, peek: false, known: [] } });
+  };
   again12 = () => this.open(this.state.coll);
   goHome = () => this.setState({ screen: "home", revealed: false });
 
@@ -453,7 +562,8 @@ class Component extends DCLogic {
     const masteredIn = list => list.filter(c => m[c.id]).length;
 
     // home: overlapping collection cards
-    const colls = COLLECTIONS.map((c, i) => {
+    const ordered = collectionOrder(s.prefs), startId = s.prefs && s.prefs.why && s.prefs.why !== "curious" ? ordered[0].id : "";
+    const colls = ordered.map((c, i) => {
       const list = CARDS[c.id], pal = paletteFor(c.color, 0);
       return {
         title: c.name, en: list[0] ? list[0].fr : "", count: list.length + " words",
@@ -463,6 +573,7 @@ class Component extends DCLogic {
         fg: "#f4f1ec", line: "#ffffff2e", accent: lighten(pal[0], .45),
         arrowBg: "#ffffff1f", arrowFg: "#ffffff",
         z: i + 1, top: i ? "-30px" : "0", delay: (i * 28) + "ms",
+        start: c.id === startId,
         open: () => this.open(c.id)
       };
     });
@@ -493,7 +604,34 @@ class Component extends DCLogic {
     const qBank = q && q.bank ? q.bank.map(b => ({ t: b.t, vis: s.picked.includes(b.i) ? "hidden" : "visible", pick: () => this.pickTile(b.i) })) : [];
     const qn = s.quiz.length || 1;
 
+    // onboarding view
+    const ob = s.ob, steps = this.obSteps(ob), stepName = steps[ob.step] || "welcome";
+    const tile = (list, key, sel) => list.map((o, i) => {
+      const pal = paletteFor(ONB_COLORS[i % ONB_COLORS.length], 0), on = sel === o.id;
+      return { title: o.title, sub: o.sub, bg: ringFor(pal, { wide: true }), edge: edgeOf(pal),
+               ring: on ? "inset 0 0 0 2px #ffffffd0" : "inset 0 0 0 1px #ffffff1c", check: on ? 1 : 0,
+               pick: () => this.obPick(key, o.id) };
+    });
+    const ck = ob.check[ob.ci] || ob.check[ob.check.length - 1] || ALL[0];
+    const hour = new Date().getHours();
+
     return {
+      isOnboard: s.screen === "onboard",
+      obWelcome: stepName === "welcome", obWhy: stepName === "why", obLevel: stepName === "level",
+      obCheck: stepName === "check", obGoal: stepName === "goal", obAccent: stepName === "accent",
+      obCanBack: ob.step > 0, obBack: this.obBack, obNext: this.obNext, obSkip: this.obSkip,
+      obDashes: steps.slice(1).map((_, i) => ({ bg: i < ob.step ? "#eeeae7" : "#ffffff1c", grow: i === ob.step - 1 ? 2 : 1 })),
+      obWhyList: tile(WHY, "why", ob.why), obLevelList: tile(LEVELS, "level", ob.level),
+      obGoalList: tile(GOALS, "goal", ob.goal), obAccentList: tile(ACCENTS, "accent", ob.accent),
+      obCardRef: this.obCardRef, obDown: this.obDown, obMove: this.obMove, obUp: this.obUp,
+      obKnow: this.obKnow, obNotYet: this.obNotYet,
+      obWord: ob.peek ? ck.en : ck.fr, obWordSize: fitSize(ob.peek ? ck.en : ck.fr), obSide: ob.peek ? "EN" : "FR",
+      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.ipa || ""),
+      obCheckDashes: ob.check.map((_, i) => ({ bg: i < ob.ci ? "#eeeae7" : (i === ob.ci ? "#eeeae7" : "#ffffff1c"), grow: i === ob.ci ? 2 : 1 })),
+      greeting: hour < 5 ? "Bonne nuit" : hour < 17 ? "Bonjour" : "Bonsoir",
+      redoSetup: this.redoSetup,
+      prefLine: s.prefs ? (WHY.find(w => w.id === s.prefs.why) || WHY[3]).title + " · " + (s.prefs.goal || 12) + " cards · " + (s.prefs.accent === "fr" ? "France" : "Quebec") : "",
+      isQc: isQuebec(d),
       isCards: !isQuiz, isQuiz, cardsBg: isQuiz ? "transparent" : "#eeeae6", cardsFg: isQuiz ? "#8d8d95" : "#1b1b1e",
       quizBg: isQuiz ? "#eeeae6" : "transparent", quizFg: isQuiz ? "#1b1b1e" : "#8d8d95", setCards: this.setCards, setQuiz: this.setQuiz,
       qLabel: q ? q.label : "", qKind: kindLabel(qc), qKindDot: qc.g ? G[qc.g].ink : "#ffffff55",
@@ -529,7 +667,7 @@ class Component extends DCLogic {
       doneTitle: s.empty ? "All mastered!" : isQuiz ? s.results.filter(Boolean).length + " / " + s.results.length + " correct" : (s.coll === "all" ? "All done." : "Nice work."),
       doneKicker: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
       doneLine: s.empty ? "You know every word here. Reset mastered words from the streak sheet, or pick another collection." : (isQuiz ? (s.results.length && s.results.every(Boolean) ? "Perfect round." : "Missed words go back to learning.") : s.done + " cards practised.") + " Streak: " + streak + (streak === 1 ? " day." : " days."),
-      againLabel: isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(SESSION, (CARDS[s.coll] || []).length),
+      againLabel: isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(this.goal(), (CARDS[s.coll] || []).length),
       week, weekLine: week.filter(w => w.done).length + " / 7 days this week",
       streak, bestLine: "best: " + best + (best === 1 ? " day" : " days"),
       mastered: totalM, learning: ALL.length - totalM, masteredPct: Math.round(100 * totalM / ALL.length) + "%",

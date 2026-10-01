@@ -14,9 +14,116 @@
 <x-dc>
 <div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
+<sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 22px)">
+  <div style="flex:none;height:38px;display:flex;align-items:center;justify-content:space-between">
+    <sc-if value="{{ obCanBack }}" hint-placeholder-val="{{ false }}">
+      <button sc-camel-on-click="{{ obBack }}" aria-label="Back" style="width:38px;height:38px;border-radius:50%;background:#17171a;border:1px solid #ffffff0d;color:#c2c2c9;display:grid;place-items:center"><svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="m14 6-6 6 6 6"></path></svg></button>
+    </sc-if>
+    <span></span>
+    <button sc-camel-on-click="{{ obSkip }}" style="padding:8px 4px;background:transparent;color:#77777d;font-size:13.5px" style-hover="color:#eeeae7">Skip</button>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:14px">
+    <sc-if value="{{ obWelcome }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+        <div style="position:relative;width:180px;height:180px;margin:0 auto 34px;border-radius:44px;background:radial-gradient(ellipse 72% 72% at 50% 50%, #1d1240 0%, #1d1240 36%, #4b33a8 66%, #a993f0 100%);box-shadow:inset 0 0 0 1px #ffffff22,inset 0 0 40px -6px #b9a6ff,0 30px 60px -24px #6b4fe0;display:grid;place-items:center;animation:wn-pop .6s cubic-bezier(.2,.9,.3,1.3) both">
+          <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:58px;letter-spacing:-.04em;color:#fff">Wn</span>
+        </div>
+        <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:44px;letter-spacing:-.04em;text-align:center">WordNest</div>
+        <div style="margin-top:10px;text-align:center;font-size:15px;line-height:1.5;color:#9a9aa2">Un peu de français, every day.<br>Four quick questions and you're in.</div>
+      </div>
+      <button sc-camel-on-click="{{ obNext }}" style="flex:none;height:56px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:16px;font-weight:600" style-active="transform:scale(.98)">Let's go</button>
+    </sc-if>
+
+    <sc-if value="{{ obWhy }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">Why are you learning French?</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">We'll put the most useful collections first.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:26px">
+        <sc-for list="{{ obWhyList }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="position:relative;width:100%;text-align:left;padding:18px 54px 18px 20px;border-radius:24px;background:{{ o.bg }};color:#f4f1ec;box-shadow:{{ o.ring }},inset 0 0 30px -8px {{ o.edge }};transition:box-shadow .2s,transform .15s;animation:wn-inA .45s cubic-bezier(.22,1,.36,1) both" style-active="transform:scale(.98)">
+            <span style="display:block;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ o.title }}</span>
+            <span style="display:block;margin-top:4px;font-size:13px;color:#ffffffb0">{{ o.sub }}</span>
+            <span style="position:absolute;right:18px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:#ffffff;color:#141414;display:grid;place-items:center;opacity:{{ o.check }};transform:scale({{ o.check }});transition:opacity .2s,transform .25s cubic-bezier(.22,1.4,.36,1)"><svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="m5 12 5 5 9-10"></path></svg></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ obLevel }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">How much French do you know?</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">If you know some, we'll do a quick check so you skip what you already know.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:26px">
+        <sc-for list="{{ obLevelList }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="position:relative;width:100%;text-align:left;padding:18px 54px 18px 20px;border-radius:24px;background:{{ o.bg }};color:#f4f1ec;box-shadow:{{ o.ring }},inset 0 0 30px -8px {{ o.edge }};transition:box-shadow .2s,transform .15s;animation:wn-inA .45s cubic-bezier(.22,1,.36,1) both" style-active="transform:scale(.98)">
+            <span style="display:block;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ o.title }}</span>
+            <span style="display:block;margin-top:4px;font-size:13px;color:#ffffffb0">{{ o.sub }}</span>
+            <span style="position:absolute;right:18px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:#ffffff;color:#141414;display:grid;place-items:center;opacity:{{ o.check }};transform:scale({{ o.check }});transition:opacity .2s,transform .25s cubic-bezier(.22,1.4,.36,1)"><svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="m5 12 5 5 9-10"></path></svg></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ obCheck }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">Quick check</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">Swipe right if you know it, left if you don't. Tap the card to peek at the English.</div>
+      <div style="position:relative;flex:1;min-height:220px;max-height:330px;margin-top:24px">
+        <div ref="{{ obCardRef }}" sc-camel-on-pointer-down="{{ obDown }}" sc-camel-on-pointer-move="{{ obMove }}" sc-camel-on-pointer-up="{{ obUp }}" sc-camel-on-pointer-cancel="{{ obUp }}" style="position:absolute;inset:0;touch-action:none;cursor:grab;will-change:transform">
+          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ obPaper }};color:#f4f1ec;box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ obEdge }};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+            <span style="position:absolute;top:14px;left:16px;height:24px;padding:0 8px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">{{ obSide }}</span>
+            <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ obWordSize }};line-height:1.04;letter-spacing:-.03em;text-shadow:0 2px 24px #0006;text-wrap:balance">{{ obWord }}</div>
+            <div style="margin-top:10px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:14px;color:#ffffffb0">{{ obIpa }}</div>
+          </section>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:18px">
+        <button sc-camel-on-click="{{ obNotYet }}" style="height:50px;padding:0 22px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:15px;font-weight:500" style-active="transform:scale(.96)">Not yet</button>
+        <button sc-camel-on-click="{{ obKnow }}" style="height:50px;padding:0 24px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:600" style-active="transform:scale(.96)">I know it</button>
+      </div>
+      <div style="margin:16px auto 0;width:100%;max-width:200px;display:flex;gap:5px">
+        <sc-for list="{{ obCheckDashes }}" as="d" hint-placeholder-count="10"><span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .3s,flex-grow .3s"></span></sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ obGoal }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">How many cards a day?</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">Small and steady beats big and rare. You can change it anytime.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:26px">
+        <sc-for list="{{ obGoalList }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="position:relative;width:100%;text-align:left;padding:18px 54px 18px 20px;border-radius:24px;background:{{ o.bg }};color:#f4f1ec;box-shadow:{{ o.ring }},inset 0 0 30px -8px {{ o.edge }};transition:box-shadow .2s,transform .15s;animation:wn-inA .45s cubic-bezier(.22,1,.36,1) both" style-active="transform:scale(.98)">
+            <span style="display:block;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ o.title }}</span>
+            <span style="display:block;margin-top:4px;font-size:13px;color:#ffffffb0">{{ o.sub }}</span>
+            <span style="position:absolute;right:18px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:#ffffff;color:#141414;display:grid;place-items:center;opacity:{{ o.check }};transform:scale({{ o.check }});transition:opacity .2s,transform .25s cubic-bezier(.22,1.4,.36,1)"><svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="m5 12 5 5 9-10"></path></svg></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ obAccent }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">Quebec or France French?</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">Sets the voice you hear. Quebec words get a small QC tag either way.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:26px">
+        <sc-for list="{{ obAccentList }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="position:relative;width:100%;text-align:left;padding:18px 54px 18px 20px;border-radius:24px;background:{{ o.bg }};color:#f4f1ec;box-shadow:{{ o.ring }},inset 0 0 30px -8px {{ o.edge }};transition:box-shadow .2s,transform .15s;animation:wn-inA .45s cubic-bezier(.22,1,.36,1) both" style-active="transform:scale(.98)">
+            <span style="display:block;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ o.title }}</span>
+            <span style="display:block;margin-top:4px;font-size:13px;color:#ffffffb0">{{ o.sub }}</span>
+            <span style="position:absolute;right:18px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:#ffffff;color:#141414;display:grid;place-items:center;opacity:{{ o.check }};transform:scale({{ o.check }});transition:opacity .2s,transform .25s cubic-bezier(.22,1.4,.36,1)"><svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="m5 12 5 5 9-10"></path></svg></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="flex:none;margin:18px auto 0;width:100%;max-width:160px;display:flex;gap:5px">
+    <sc-for list="{{ obDashes }}" as="d" hint-placeholder-count="5"><span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .3s,flex-grow .3s"></span></sc-for>
+  </div>
+</div>
+</sc-if>
+
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
 <div style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 28px)">
-  <div style="display:flex;justify-content:flex-end;padding:0 4px">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px">
+    <span style="font-size:14px;color:#9a9aa2">{{ greeting }}</span>
     <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
       <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
     </button>
@@ -34,7 +141,7 @@
       <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 0 0 1px #ffffff1c,inset 0 0 30px -8px {{ c.edge }};animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
         <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
           <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.03em">{{ c.title }}</span>
-          <span style="flex:none;padding-top:5px;font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span>
+          <span style="flex:none;display:flex;align-items:center;gap:8px;padding-top:4px"><sc-if value="{{ c.start }}" hint-placeholder-val="{{ false }}"><span style="padding:3px 9px;border-radius:999px;background:#ffffff;color:#141414;font-size:11px;font-weight:600">Start here</span></sc-if><span style="font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span></span>
         </span>
         <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
           <span style="display:flex;flex-wrap:wrap;gap:6px;min-width:0">
@@ -86,7 +193,7 @@
           <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ edge }};display:flex;flex-direction:column">
             <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:transparent;border-bottom:1px solid #ffffff14">
               <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">FR</span>
-              <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
+              <span style="display:flex;align-items:center;gap:8px"><sc-if value="{{ isQc }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 7px;border-radius:6px;border:1px solid #ffffff40;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;letter-spacing:.08em;color:#fff">QC</span></sc-if><span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span></span>
             </div>
             <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:20px 20px 16px">
               <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px 0 10px">
@@ -103,7 +210,7 @@
           <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ edge }};display:flex;flex-direction:column">
             <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:transparent;border-bottom:1px solid #ffffff14">
               <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">EN</span>
-              <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
+              <span style="display:flex;align-items:center;gap:8px"><sc-if value="{{ isQc }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 7px;border-radius:6px;border:1px solid #ffffff40;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;letter-spacing:.08em;color:#fff">QC</span></sc-if><span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span></span>
             </div>
             <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:20px 20px 16px">
               <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px 0 10px">
@@ -260,8 +367,12 @@
     <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px;color:#77777d"><span><b style="font-weight:600;color:#eeeae7">{{ mastered }}</b> mastered</span><span><b style="font-weight:600;color:#eeeae7">{{ learning }}</b> to learn</span></div>
     <div style="height:6px;border-radius:3px;background:#ffffff12;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#cbd4a6;border-radius:3px"></div></div>
   </div>
+  <button sc-camel-on-click="{{ redoSetup }}" style="margin-top:22px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:18px;background:#1a1a1d;border:1px solid #ffffff12;color:#eeeae7;text-align:left" style-hover="background:#1f1f23">
+    <span><span style="display:block;font-size:14px;font-weight:500">Preferences</span><span style="display:block;margin-top:2px;font-size:12px;color:#77777d">{{ prefLine }}</span></span>
+    <span style="flex:none;white-space:nowrap;font-size:12.5px;color:#9a9aa2">Redo setup ›</span>
+  </button>
   <sc-if value="{{ hasMastered }}" hint-placeholder-val="{{ true }}">
-    <button sc-camel-on-click="{{ resetMastered }}" style="margin-top:22px;width:100%;height:46px;border-radius:999px;background:{{ resetBg }};border:1px solid {{ resetBorder }};color:{{ resetFg }};font-size:13.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s,color .25s,border-color .25s" style-hover="color:#eeeae7">
+    <button sc-camel-on-click="{{ resetMastered }}" style="margin-top:10px;width:100%;height:46px;border-radius:999px;background:{{ resetBg }};border:1px solid {{ resetBorder }};color:{{ resetFg }};font-size:13.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s,color .25s,border-color .25s" style-hover="color:#eeeae7">
       <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>{{ resetLabel }}
     </button>
   </sc-if>
@@ -494,6 +605,44 @@ function makeQuiz(cards, pool){
 }
 
 // ---------- saved progress (this device only) ----------
+// ---------- preferences (set during onboarding, editable from the streak sheet) ----------
+const PREFS = "wordnest.prefs.v1";
+function loadPrefs(){ try { const p = JSON.parse(localStorage.getItem(PREFS)); if(p && p.done) return p; } catch(e) {} return null; }
+function savePrefs(p){ try { localStorage.setItem(PREFS, JSON.stringify(p)); } catch(e) {} }
+const WHY = [
+  { id: "life",    title: "Everyday life", sub: "Living, shopping and chatting in Quebec",
+    order: ["daily","basics","food","home","people","out","time","places","numbers","clothes","body"] },
+  { id: "travel",  title: "Travel",        sub: "Getting around, eating out, asking for help",
+    order: ["basics","out","places","food","numbers","time","nature","daily","clothes"] },
+  { id: "work",    title: "Work or a language test", sub: "Writing, connectors and solid grammar",
+    order: ["grammar","conjugations","verbs","workwords","work","adverbs","adjectives","time"] },
+  { id: "curious", title: "Just curious",  sub: "A little French, a little every day", order: [] }
+];
+const LEVELS = [
+  { id: "new",   title: "Brand new",     sub: "Start from the very first words" },
+  { id: "some",  title: "Some basics",   sub: "I know greetings and a few words",
+    pool: ["basics","daily","food","people","home","numbers"] },
+  { id: "good",  title: "Comfortable",   sub: "I can hold a simple conversation",
+    pool: ["verbs","adverbs","adjectives","grammar","workwords","time"] }
+];
+const GOALS = [
+  { id: 5,  title: "5 cards",  sub: "Light · about 2 minutes" },
+  { id: 12, title: "12 cards", sub: "Steady · about 5 minutes" },
+  { id: 20, title: "20 cards", sub: "Intense · about 8 minutes" }
+];
+const ACCENTS = [
+  { id: "qc", title: "Quebec French", sub: "Canadian voice, déjeuner · dîner · souper" },
+  { id: "fr", title: "France French", sub: "European voice and usage" }
+];
+const ONB_COLORS = ["#a993f0", "#8cc8f5", "#f6d873", "#8fe0c0", "#f5a3c7", "#ff8a7a"];
+function isQuebec(c){ return /\(canada\)|quebec|in canada/i.test(c.en + " " + (c.type || "")); }
+function collectionOrder(prefs){
+  const why = WHY.find(w => w.id === (prefs && prefs.why));
+  if(!why || !why.order.length) return COLLECTIONS;
+  const first = why.order.map(id => COLLECTIONS.find(c => c.id === id)).filter(Boolean);
+  return first.concat(COLLECTIONS.filter(c => !why.order.includes(c.id)));
+}
+
 const STORE = "wordnest.progress.v2";
 function loadProgress(){ try { const p = JSON.parse(localStorage.getItem(STORE)); if(p && p.m && p.days) return p; } catch(e) {} return { m: {}, days: [] }; }
 function saveProgress(p){ try { localStorage.setItem(STORE, JSON.stringify(p)); } catch(e) {} }
@@ -515,12 +664,13 @@ class Component extends DCLogic {
   constructor(props){
     super(props);
     this.state = {
-      screen: "home", coll: "mdj", session: [], idx: 0, done: 0, history: [],
+      prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
+      screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
       revealed: false, showEx: true, stats: false, confirmReset: false,
       mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
-    this.noRef = React.createRef(); this.yesRef = React.createRef();
+    this.noRef = React.createRef(); this.yesRef = React.createRef(); this.obCardRef = React.createRef();
     this.drag = null; this.flying = false; this.raf = 0;
   }
   componentDidMount(){ this.syncPanel(); }
@@ -541,8 +691,9 @@ class Component extends DCLogic {
     if(!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "fr-CA"; u.rate = .82;
-    const v = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith("fr"));
+    const fr = (this.state.prefs && this.state.prefs.accent === "fr") ? "fr-FR" : "fr-CA";
+    u.lang = fr; u.rate = .82;
+    const voices = speechSynthesis.getVoices(), v = voices.find(v => v.lang === fr) || voices.find(v => v.lang.toLowerCase().startsWith("fr"));
     if(v) u.voice = v;
     speechSynthesis.speak(u);
   }
@@ -554,10 +705,10 @@ class Component extends DCLogic {
     let pool;
     // Daily picks and Shuffle all skip mastered words entirely; other collections top up with them for review
     if(id === "all") pool = shuffle(ALL.filter(c => !m[c.id])).slice(0, 20);
-    else if(id === "mdj") pool = shuffle(CARDS.mdj.filter(c => !m[c.id])).slice(0, SESSION);
+    else if(id === "mdj") pool = shuffle(CARDS.mdj.filter(c => !m[c.id])).slice(0, this.goal());
     else {
       const cards = CARDS[id];
-      pool = shuffle(cards.filter(c => !m[c.id])).concat(shuffle(cards.filter(c => m[c.id]))).slice(0, SESSION);
+      pool = shuffle(cards.filter(c => !m[c.id])).concat(shuffle(cards.filter(c => m[c.id]))).slice(0, this.goal());
     }
     if(!pool.length) return this.setState({ screen: "done", coll: id, empty: true, stats: false });
     if(this.state.mode === "quiz"){
@@ -606,7 +757,76 @@ class Component extends DCLogic {
     this.setState(t => ({ qi: t.qi + 1, picked: [], status: "", flip: 1 - t.flip }));
   };
   speakQ = (e) => { if(e) e.stopPropagation(); const q = this.q(); if(q) this.say(q.card.fr); };
+  goal(){ return (this.state.prefs && this.state.prefs.goal) || SESSION; }
   shuffleAll = () => this.open("all");
+
+  // ---- onboarding ----
+  obSteps(ob){ return ["welcome", "why", "level"].concat(ob.level && ob.level !== "new" ? ["check"] : []).concat(["goal", "accent"]); }
+  obGo(delta){ this.setState(s => { const steps = this.obSteps(s.ob), i = Math.max(0, Math.min(steps.length - 1, s.ob.step + delta)); return { ob: { ...s.ob, step: i } }; }); }
+  obNext = () => this.obGo(1);
+  obBack = () => this.obGo(-1);
+  obPick(key, val){
+    if(this.obTimer) return;
+    this.setState(s => {
+      const ob = { ...s.ob, [key]: val };
+      if(key === "level" && val !== "new"){
+        const lv = LEVELS.find(l => l.id === val), pool = [].concat(...lv.pool.map(id => CARDS[id] || []));
+        ob.check = shuffle(pool.filter(c => !s.prog.m[c.id])).slice(0, 10); ob.ci = 0; ob.peek = false; ob.known = [];
+      }
+      return { ob };
+    });
+    // brief pause so the choice visibly lands, then move on (the last step finishes)
+    this.obTimer = setTimeout(() => { this.obTimer = 0; key === "accent" ? this.obFinish() : this.obNext(); }, 260);
+  }
+  obAnswer(known){
+    const el = this.obCardRef.current, ob = this.state.ob, card = ob.check[ob.ci];
+    if(!card || this.obFlying) return;
+    this.obFlying = true;
+    if(el){ el.style.transition = "transform .28s cubic-bezier(.5,0,.75,0), opacity .28s"; el.style.transform = "translate3d(" + (known ? 480 : -480) + "px,-20px,0) rotate(" + (known ? 14 : -14) + "deg)"; el.style.opacity = 0; }
+    setTimeout(() => {
+      this.setState(s => {
+        const ob = { ...s.ob, ci: s.ob.ci + 1, peek: false, known: known ? s.ob.known.concat(card.id) : s.ob.known };
+        return { ob };
+      }, () => {
+        if(el){ el.style.transition = "none"; el.style.transform = "none"; el.style.opacity = 1; }
+        this.obFlying = false;
+        if(this.state.ob.ci >= this.state.ob.check.length) this.obNext();
+      });
+    }, 280);
+  }
+  obKnow = () => this.obAnswer(true);
+  obNotYet = () => this.obAnswer(false);
+  obPeek = () => this.setState(s => ({ ob: { ...s.ob, peek: !s.ob.peek } }));
+  obDown = (e) => { if(e.target.closest("button")) return; this.obDrag = { id: e.pointerId, x: e.clientX, dx: 0, moved: false }; try { e.currentTarget.setPointerCapture(e.pointerId); } catch(err) {} };
+  obMove = (e) => {
+    const d = this.obDrag; if(!d || d.id !== e.pointerId) return;
+    d.dx = e.clientX - d.x; if(Math.abs(d.dx) > 8) d.moved = true;
+    const el = this.obCardRef.current;
+    if(el && d.moved){ el.style.transition = "none"; el.style.transform = "translate3d(" + d.dx + "px,0,0) rotate(" + (d.dx * .04) + "deg)"; }
+  };
+  obUp = (e) => {
+    const d = this.obDrag; if(!d || d.id !== e.pointerId) return;
+    this.obDrag = null;
+    if(!d.moved) return this.obPeek();
+    if(Math.abs(d.dx) > 80) return this.obAnswer(d.dx > 0);
+    const el = this.obCardRef.current; if(el){ el.style.transition = "transform .4s cubic-bezier(.22,1,.36,1)"; el.style.transform = "none"; }
+  };
+  obFinish = () => {
+    const ob = this.state.ob, prefs = { done: true, why: ob.why || "curious", level: ob.level || "new", goal: ob.goal || 12, accent: ob.accent || "qc" };
+    savePrefs(prefs);
+    const m = { ...this.state.prog.m }; (ob.known || []).forEach(id => { m[id] = 1; });
+    const prog = { ...this.state.prog, m }; saveProgress(prog);
+    const start = collectionOrder(prefs)[0];
+    this.setState({ prefs, prog, mode: "cards" }, () => this.open(start.id));
+  };
+  obSkip = () => {
+    const prefs = this.state.prefs || { done: true, why: "curious", level: "new", goal: 12, accent: "qc" };
+    savePrefs(prefs); this.setState({ prefs, screen: "home" });
+  };
+  redoSetup = () => {
+    const p = this.state.prefs || {};
+    this.setState({ stats: false, screen: "onboard", ob: { step: 1, why: p.why || "", level: "", goal: p.goal || 12, accent: p.accent || "qc", check: [], ci: 0, peek: false, known: [] } });
+  };
   again12 = () => this.open(this.state.coll);
   goHome = () => this.setState({ screen: "home", revealed: false });
 
@@ -726,7 +946,8 @@ class Component extends DCLogic {
     const masteredIn = list => list.filter(c => m[c.id]).length;
 
     // home: overlapping collection cards
-    const colls = COLLECTIONS.map((c, i) => {
+    const ordered = collectionOrder(s.prefs), startId = s.prefs && s.prefs.why && s.prefs.why !== "curious" ? ordered[0].id : "";
+    const colls = ordered.map((c, i) => {
       const list = CARDS[c.id], pal = paletteFor(c.color, 0);
       return {
         title: c.name, en: list[0] ? list[0].fr : "", count: list.length + " words",
@@ -736,6 +957,7 @@ class Component extends DCLogic {
         fg: "#f4f1ec", line: "#ffffff2e", accent: lighten(pal[0], .45),
         arrowBg: "#ffffff1f", arrowFg: "#ffffff",
         z: i + 1, top: i ? "-30px" : "0", delay: (i * 28) + "ms",
+        start: c.id === startId,
         open: () => this.open(c.id)
       };
     });
@@ -766,7 +988,34 @@ class Component extends DCLogic {
     const qBank = q && q.bank ? q.bank.map(b => ({ t: b.t, vis: s.picked.includes(b.i) ? "hidden" : "visible", pick: () => this.pickTile(b.i) })) : [];
     const qn = s.quiz.length || 1;
 
+    // onboarding view
+    const ob = s.ob, steps = this.obSteps(ob), stepName = steps[ob.step] || "welcome";
+    const tile = (list, key, sel) => list.map((o, i) => {
+      const pal = paletteFor(ONB_COLORS[i % ONB_COLORS.length], 0), on = sel === o.id;
+      return { title: o.title, sub: o.sub, bg: ringFor(pal, { wide: true }), edge: edgeOf(pal),
+               ring: on ? "inset 0 0 0 2px #ffffffd0" : "inset 0 0 0 1px #ffffff1c", check: on ? 1 : 0,
+               pick: () => this.obPick(key, o.id) };
+    });
+    const ck = ob.check[ob.ci] || ob.check[ob.check.length - 1] || ALL[0];
+    const hour = new Date().getHours();
+
     return {
+      isOnboard: s.screen === "onboard",
+      obWelcome: stepName === "welcome", obWhy: stepName === "why", obLevel: stepName === "level",
+      obCheck: stepName === "check", obGoal: stepName === "goal", obAccent: stepName === "accent",
+      obCanBack: ob.step > 0, obBack: this.obBack, obNext: this.obNext, obSkip: this.obSkip,
+      obDashes: steps.slice(1).map((_, i) => ({ bg: i < ob.step ? "#eeeae7" : "#ffffff1c", grow: i === ob.step - 1 ? 2 : 1 })),
+      obWhyList: tile(WHY, "why", ob.why), obLevelList: tile(LEVELS, "level", ob.level),
+      obGoalList: tile(GOALS, "goal", ob.goal), obAccentList: tile(ACCENTS, "accent", ob.accent),
+      obCardRef: this.obCardRef, obDown: this.obDown, obMove: this.obMove, obUp: this.obUp,
+      obKnow: this.obKnow, obNotYet: this.obNotYet,
+      obWord: ob.peek ? ck.en : ck.fr, obWordSize: fitSize(ob.peek ? ck.en : ck.fr), obSide: ob.peek ? "EN" : "FR",
+      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.ipa || ""),
+      obCheckDashes: ob.check.map((_, i) => ({ bg: i < ob.ci ? "#eeeae7" : (i === ob.ci ? "#eeeae7" : "#ffffff1c"), grow: i === ob.ci ? 2 : 1 })),
+      greeting: hour < 5 ? "Bonne nuit" : hour < 17 ? "Bonjour" : "Bonsoir",
+      redoSetup: this.redoSetup,
+      prefLine: s.prefs ? (WHY.find(w => w.id === s.prefs.why) || WHY[3]).title + " · " + (s.prefs.goal || 12) + " cards · " + (s.prefs.accent === "fr" ? "France" : "Quebec") : "",
+      isQc: isQuebec(d),
       isCards: !isQuiz, isQuiz, cardsBg: isQuiz ? "transparent" : "#eeeae6", cardsFg: isQuiz ? "#8d8d95" : "#1b1b1e",
       quizBg: isQuiz ? "#eeeae6" : "transparent", quizFg: isQuiz ? "#1b1b1e" : "#8d8d95", setCards: this.setCards, setQuiz: this.setQuiz,
       qLabel: q ? q.label : "", qKind: kindLabel(qc), qKindDot: qc.g ? G[qc.g].ink : "#ffffff55",
@@ -802,7 +1051,7 @@ class Component extends DCLogic {
       doneTitle: s.empty ? "All mastered!" : isQuiz ? s.results.filter(Boolean).length + " / " + s.results.length + " correct" : (s.coll === "all" ? "All done." : "Nice work."),
       doneKicker: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
       doneLine: s.empty ? "You know every word here. Reset mastered words from the streak sheet, or pick another collection." : (isQuiz ? (s.results.length && s.results.every(Boolean) ? "Perfect round." : "Missed words go back to learning.") : s.done + " cards practised.") + " Streak: " + streak + (streak === 1 ? " day." : " days."),
-      againLabel: isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(SESSION, (CARDS[s.coll] || []).length),
+      againLabel: isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(this.goal(), (CARDS[s.coll] || []).length),
       week, weekLine: week.filter(w => w.done).length + " / 7 days this week",
       streak, bestLine: "best: " + best + (best === 1 ? " day" : " days"),
       mastered: totalM, learning: ALL.length - totalM, masteredPct: Math.round(100 * totalM / ALL.length) + "%",

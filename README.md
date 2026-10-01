@@ -16,6 +16,13 @@ and no network access: every dependency, font and word ships in the repo.
 
 ## Features
 
+- **Onboarding**: four quick, skippable questions on first launch: why you're
+  learning (reorders the collections and pins a "Start here"), how much French
+  you know (anything above "brand new" runs a 10-card swipe check that
+  pre-masters words you know and teaches the gestures), cards per day (5, 12
+  or 20) and Quebec or France French (sets the speech voice). It ends in your
+  recommended collection. Preferences → Redo setup in the streak sheet runs it
+  again without touching progress.
 - **Collections home**: 20 colour-coded collections (a hand-picked "Daily picks"
   mix plus the 19 vocabulary categories), each showing its word count and how
   much of it you've mastered. "Shuffle all" serves 20 random cards from
@@ -27,7 +34,8 @@ and no network access: every dependency, font and word ships in the repo.
   highlighted. Swipe down on the card to show it, up to hide it.
 - **Swipe to grade**: right = got it (mastered), left = again. Buttons do the
   same. Undo steps back through the last few grades.
-- **Sessions**: 12 cards per collection session, unmastered cards first.
+- **Sessions**: your daily goal (5, 12 or 20 cards) per collection session,
+  unmastered cards first. Quebec-specific words carry a small QC tag.
   Daily picks and Shuffle all leave mastered words out entirely.
   Progress shows as a row of dashes under the buttons.
 - **Quiz mode**: a Cards / Quiz switch in every collection. A quiz is 10
@@ -39,8 +47,8 @@ and no network access: every dependency, font and word ships in the repo.
 - **Streak**: finishing a session counts the day. The streak chip opens a
   sheet with the current and best streak, this week's days and overall
   mastery.
-- **Saved progress**: mastered cards and practice days are kept in
-  `localStorage` on this device.
+- **Saved progress**: mastered cards, practice days and preferences are kept
+  in `localStorage` on this device.
 
 ## Project structure
 

@@ -14,9 +14,116 @@
 <x-dc>
 <div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
+<sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 22px)">
+  <div style="flex:none;height:38px;display:flex;align-items:center;justify-content:space-between">
+    <sc-if value="{{ obCanBack }}" hint-placeholder-val="{{ false }}">
+      <button sc-camel-on-click="{{ obBack }}" aria-label="Back" style="width:38px;height:38px;border-radius:50%;background:#17171a;border:1px solid #ffffff0d;color:#c2c2c9;display:grid;place-items:center"><svg sc-camel-view-box="0 0 24 24" style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="m14 6-6 6 6 6"></path></svg></button>
+    </sc-if>
+    <span></span>
+    <button sc-camel-on-click="{{ obSkip }}" style="padding:8px 4px;background:transparent;color:#77777d;font-size:13.5px" style-hover="color:#eeeae7">Skip</button>
+  </div>
+
+  <div style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:14px">
+    <sc-if value="{{ obWelcome }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+        <div style="position:relative;width:180px;height:180px;margin:0 auto 34px;border-radius:44px;background:radial-gradient(ellipse 72% 72% at 50% 50%, #1d1240 0%, #1d1240 36%, #4b33a8 66%, #a993f0 100%);box-shadow:inset 0 0 0 1px #ffffff22,inset 0 0 40px -6px #b9a6ff,0 30px 60px -24px #6b4fe0;display:grid;place-items:center;animation:wn-pop .6s cubic-bezier(.2,.9,.3,1.3) both">
+          <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:58px;letter-spacing:-.04em;color:#fff">Wn</span>
+        </div>
+        <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:44px;letter-spacing:-.04em;text-align:center">WordNest</div>
+        <div style="margin-top:10px;text-align:center;font-size:15px;line-height:1.5;color:#9a9aa2">Un peu de français, every day.<br>Four quick questions and you're in.</div>
+      </div>
+      <button sc-camel-on-click="{{ obNext }}" style="flex:none;height:56px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:16px;font-weight:600" style-active="transform:scale(.98)">Let's go</button>
+    </sc-if>
+
+    <sc-if value="{{ obWhy }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">Why are you learning French?</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">We'll put the most useful collections first.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:26px">
+        <sc-for list="{{ obWhyList }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="position:relative;width:100%;text-align:left;padding:18px 54px 18px 20px;border-radius:24px;background:{{ o.bg }};color:#f4f1ec;box-shadow:{{ o.ring }},inset 0 0 30px -8px {{ o.edge }};transition:box-shadow .2s,transform .15s;animation:wn-inA .45s cubic-bezier(.22,1,.36,1) both" style-active="transform:scale(.98)">
+            <span style="display:block;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ o.title }}</span>
+            <span style="display:block;margin-top:4px;font-size:13px;color:#ffffffb0">{{ o.sub }}</span>
+            <span style="position:absolute;right:18px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:#ffffff;color:#141414;display:grid;place-items:center;opacity:{{ o.check }};transform:scale({{ o.check }});transition:opacity .2s,transform .25s cubic-bezier(.22,1.4,.36,1)"><svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="m5 12 5 5 9-10"></path></svg></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ obLevel }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">How much French do you know?</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">If you know some, we'll do a quick check so you skip what you already know.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:26px">
+        <sc-for list="{{ obLevelList }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="position:relative;width:100%;text-align:left;padding:18px 54px 18px 20px;border-radius:24px;background:{{ o.bg }};color:#f4f1ec;box-shadow:{{ o.ring }},inset 0 0 30px -8px {{ o.edge }};transition:box-shadow .2s,transform .15s;animation:wn-inA .45s cubic-bezier(.22,1,.36,1) both" style-active="transform:scale(.98)">
+            <span style="display:block;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ o.title }}</span>
+            <span style="display:block;margin-top:4px;font-size:13px;color:#ffffffb0">{{ o.sub }}</span>
+            <span style="position:absolute;right:18px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:#ffffff;color:#141414;display:grid;place-items:center;opacity:{{ o.check }};transform:scale({{ o.check }});transition:opacity .2s,transform .25s cubic-bezier(.22,1.4,.36,1)"><svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="m5 12 5 5 9-10"></path></svg></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ obCheck }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">Quick check</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">Swipe right if you know it, left if you don't. Tap the card to peek at the English.</div>
+      <div style="position:relative;flex:1;min-height:220px;max-height:330px;margin-top:24px">
+        <div ref="{{ obCardRef }}" sc-camel-on-pointer-down="{{ obDown }}" sc-camel-on-pointer-move="{{ obMove }}" sc-camel-on-pointer-up="{{ obUp }}" sc-camel-on-pointer-cancel="{{ obUp }}" style="position:absolute;inset:0;touch-action:none;cursor:grab;will-change:transform">
+          <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ obPaper }};color:#f4f1ec;box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ obEdge }};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+            <span style="position:absolute;top:14px;left:16px;height:24px;padding:0 8px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">{{ obSide }}</span>
+            <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ obWordSize }};line-height:1.04;letter-spacing:-.03em;text-shadow:0 2px 24px #0006;text-wrap:balance">{{ obWord }}</div>
+            <div style="margin-top:10px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:14px;color:#ffffffb0">{{ obIpa }}</div>
+          </section>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:18px">
+        <button sc-camel-on-click="{{ obNotYet }}" style="height:50px;padding:0 22px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:15px;font-weight:500" style-active="transform:scale(.96)">Not yet</button>
+        <button sc-camel-on-click="{{ obKnow }}" style="height:50px;padding:0 24px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:600" style-active="transform:scale(.96)">I know it</button>
+      </div>
+      <div style="margin:16px auto 0;width:100%;max-width:200px;display:flex;gap:5px">
+        <sc-for list="{{ obCheckDashes }}" as="d" hint-placeholder-count="10"><span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .3s,flex-grow .3s"></span></sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ obGoal }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">How many cards a day?</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">Small and steady beats big and rare. You can change it anytime.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:26px">
+        <sc-for list="{{ obGoalList }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="position:relative;width:100%;text-align:left;padding:18px 54px 18px 20px;border-radius:24px;background:{{ o.bg }};color:#f4f1ec;box-shadow:{{ o.ring }},inset 0 0 30px -8px {{ o.edge }};transition:box-shadow .2s,transform .15s;animation:wn-inA .45s cubic-bezier(.22,1,.36,1) both" style-active="transform:scale(.98)">
+            <span style="display:block;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ o.title }}</span>
+            <span style="display:block;margin-top:4px;font-size:13px;color:#ffffffb0">{{ o.sub }}</span>
+            <span style="position:absolute;right:18px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:#ffffff;color:#141414;display:grid;place-items:center;opacity:{{ o.check }};transform:scale({{ o.check }});transition:opacity .2s,transform .25s cubic-bezier(.22,1.4,.36,1)"><svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="m5 12 5 5 9-10"></path></svg></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ obAccent }}" hint-placeholder-val="{{ false }}">
+      <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(34px,10vw,42px);line-height:1.02;letter-spacing:-.035em;margin-top:8px;animation:wn-inA .4s cubic-bezier(.22,1,.36,1) both">Quebec or France French?</div>
+      <div style="margin-top:10px;font-size:14.5px;line-height:1.5;color:#9a9aa2;max-width:32ch">Sets the voice you hear. Quebec words get a small QC tag either way.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:26px">
+        <sc-for list="{{ obAccentList }}" as="o" hint-placeholder-count="4">
+          <button sc-camel-on-click="{{ o.pick }}" style="position:relative;width:100%;text-align:left;padding:18px 54px 18px 20px;border-radius:24px;background:{{ o.bg }};color:#f4f1ec;box-shadow:{{ o.ring }},inset 0 0 30px -8px {{ o.edge }};transition:box-shadow .2s,transform .15s;animation:wn-inA .45s cubic-bezier(.22,1,.36,1) both" style-active="transform:scale(.98)">
+            <span style="display:block;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:21px;letter-spacing:-.02em">{{ o.title }}</span>
+            <span style="display:block;margin-top:4px;font-size:13px;color:#ffffffb0">{{ o.sub }}</span>
+            <span style="position:absolute;right:18px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:#ffffff;color:#141414;display:grid;place-items:center;opacity:{{ o.check }};transform:scale({{ o.check }});transition:opacity .2s,transform .25s cubic-bezier(.22,1.4,.36,1)"><svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round"><path d="m5 12 5 5 9-10"></path></svg></span>
+          </button>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+
+  <div style="flex:none;margin:18px auto 0;width:100%;max-width:160px;display:flex;gap:5px">
+    <sc-for list="{{ obDashes }}" as="d" hint-placeholder-count="5"><span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .3s,flex-grow .3s"></span></sc-for>
+  </div>
+</div>
+</sc-if>
+
 <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
 <div style="flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 18px) 18px calc(env(safe-area-inset-bottom,0px) + 28px)">
-  <div style="display:flex;justify-content:flex-end;padding:0 4px">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px">
+    <span style="font-size:14px;color:#9a9aa2">{{ greeting }}</span>
     <button sc-camel-on-click="{{ openStats }}" aria-label="Your streak" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d;color:#eeeae7;font-size:13px;font-weight:600;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif" style-hover="background:#1f1f23">
       <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
     </button>
@@ -34,7 +141,7 @@
       <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 0 0 1px #ffffff1c,inset 0 0 30px -8px {{ c.edge }};animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
         <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
           <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.03em">{{ c.title }}</span>
-          <span style="flex:none;padding-top:5px;font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span>
+          <span style="flex:none;display:flex;align-items:center;gap:8px;padding-top:4px"><sc-if value="{{ c.start }}" hint-placeholder-val="{{ false }}"><span style="padding:3px 9px;border-radius:999px;background:#ffffff;color:#141414;font-size:11px;font-weight:600">Start here</span></sc-if><span style="font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span></span>
         </span>
         <span style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px">
           <span style="display:flex;flex-wrap:wrap;gap:6px;min-width:0">
@@ -86,7 +193,7 @@
           <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ edge }};display:flex;flex-direction:column">
             <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:transparent;border-bottom:1px solid #ffffff14">
               <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">FR</span>
-              <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
+              <span style="display:flex;align-items:center;gap:8px"><sc-if value="{{ isQc }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 7px;border-radius:6px;border:1px solid #ffffff40;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;letter-spacing:.08em;color:#fff">QC</span></sc-if><span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span></span>
             </div>
             <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:20px 20px 16px">
               <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px 0 10px">
@@ -103,7 +210,7 @@
           <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ paper }};color:#f4f1ec;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ edge }};display:flex;flex-direction:column">
             <div style="flex:none;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 14px 0 16px;background:transparent;border-bottom:1px solid #ffffff14">
               <span style="min-width:30px;height:24px;padding:0 7px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">EN</span>
-              <span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span>
+              <span style="display:flex;align-items:center;gap:8px"><sc-if value="{{ isQc }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 7px;border-radius:6px;border:1px solid #ffffff40;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;letter-spacing:.08em;color:#fff">QC</span></sc-if><span style="display:flex;align-items:center;gap:7px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#ffffffb8"><span style="width:7px;height:7px;border-radius:50%;background:{{ kindDot }}"></span>{{ kind }}</span></span>
             </div>
             <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:20px 20px 16px">
               <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:4px 0 10px">
@@ -260,8 +367,12 @@
     <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:8px;color:#77777d"><span><b style="font-weight:600;color:#eeeae7">{{ mastered }}</b> mastered</span><span><b style="font-weight:600;color:#eeeae7">{{ learning }}</b> to learn</span></div>
     <div style="height:6px;border-radius:3px;background:#ffffff12;overflow:hidden"><div style="height:100%;width:{{ masteredPct }};background:#cbd4a6;border-radius:3px"></div></div>
   </div>
+  <button sc-camel-on-click="{{ redoSetup }}" style="margin-top:22px;width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:18px;background:#1a1a1d;border:1px solid #ffffff12;color:#eeeae7;text-align:left" style-hover="background:#1f1f23">
+    <span><span style="display:block;font-size:14px;font-weight:500">Preferences</span><span style="display:block;margin-top:2px;font-size:12px;color:#77777d">{{ prefLine }}</span></span>
+    <span style="flex:none;white-space:nowrap;font-size:12.5px;color:#9a9aa2">Redo setup ›</span>
+  </button>
   <sc-if value="{{ hasMastered }}" hint-placeholder-val="{{ true }}">
-    <button sc-camel-on-click="{{ resetMastered }}" style="margin-top:22px;width:100%;height:46px;border-radius:999px;background:{{ resetBg }};border:1px solid {{ resetBorder }};color:{{ resetFg }};font-size:13.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s,color .25s,border-color .25s" style-hover="color:#eeeae7">
+    <button sc-camel-on-click="{{ resetMastered }}" style="margin-top:10px;width:100%;height:46px;border-radius:999px;background:{{ resetBg }};border:1px solid {{ resetBorder }};color:{{ resetFg }};font-size:13.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .25s,color .25s,border-color .25s" style-hover="color:#eeeae7">
       <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>{{ resetLabel }}
     </button>
   </sc-if>
