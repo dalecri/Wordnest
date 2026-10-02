@@ -289,7 +289,11 @@ class Component extends DCLogic {
     this.noRef = React.createRef(); this.yesRef = React.createRef(); this.obCardRef = React.createRef();
     this.drag = null; this.flying = false; this.raf = 0;
   }
-  componentDidMount(){ this.syncPanel(); }
+  componentDidMount(){
+    this.syncPanel();
+    // Chrome loads voices asynchronously; ask early so they're ready by the first tap
+    if("speechSynthesis" in window) speechSynthesis.getVoices();
+  }
   componentDidUpdate(){ this.syncPanel(); }
   // the runtime doesn't pass previous state, so remember what was last applied to the panel
   syncPanel(){
@@ -309,15 +313,23 @@ class Component extends DCLogic {
     const cap = window.Capacitor;
     if(cap && cap.isNativePlatform && cap.isNativePlatform() && cap.registerPlugin){
       if(!this.tts) this.tts = cap.registerPlugin("TextToSpeech");
-      this.tts.speak({ text, lang: fr, rate: .82 }).catch(() => {});
+      // fall back to the other French when the device has no voice for the chosen one
+      const other = fr === "fr-CA" ? "fr-FR" : "fr-CA";
+      this.tts.isLanguageSupported({ lang: fr })
+        .then(r => this.tts.speak({ text, lang: r && r.supported === false ? other : fr, rate: .82 }))
+        .catch(err => console.warn("WordNest TTS:", err));
       return;
     }
     if(!("speechSynthesis" in window)) return;
-    speechSynthesis.cancel();
+    // Chrome on Android can drop an utterance spoken straight after cancel(), so only cancel when busy
+    if(speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = fr; u.rate = .82;
-    const voices = speechSynthesis.getVoices(), v = voices.find(v => v.lang === fr) || voices.find(v => v.lang.toLowerCase().startsWith("fr"));
+    // Android names voices fr_CA rather than fr-CA
+    const norm = l => (l || "").replace("_", "-").toLowerCase();
+    const voices = speechSynthesis.getVoices(), v = voices.find(v => norm(v.lang) === fr.toLowerCase()) || voices.find(v => norm(v.lang).startsWith("fr"));
     if(v) u.voice = v;
+    u.onerror = e => console.warn("WordNest speech:", e.error);
     speechSynthesis.speak(u);
   }
   speak = (e) => { if(e) e.stopPropagation(); this.say(this.card().fr); };
