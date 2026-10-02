@@ -378,6 +378,11 @@
   </sc-if>
 </div>
 
+<sc-if value="{{ noAudio }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:absolute;left:16px;right:16px;bottom:28px;z-index:60;pointer-events:none;display:flex;justify-content:center;animation:wn-rise .25s ease-out">
+    <div style="max-width:360px;padding:12px 18px;border-radius:16px;background:#1c1c20;border:1px solid #ffffff1f;box-shadow:0 10px 30px #0008;font-size:14px;line-height:1.4;text-align:center;color:#eeeae7">Audio isn't available in this browser. Try Chrome or Safari.</div>
+  </div>
+</sc-if>
 
 </div>
 </x-dc>

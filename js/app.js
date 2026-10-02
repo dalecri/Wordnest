@@ -282,7 +282,7 @@ class Component extends DCLogic {
     this.state = {
       prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
       screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
-      revealed: false, showEx: true, stats: false, confirmReset: false,
+      revealed: false, showEx: true, stats: false, confirmReset: false, noAudio: false,
       mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
@@ -320,7 +320,13 @@ class Component extends DCLogic {
         .catch(err => console.warn("WordNest TTS:", err));
       return;
     }
-    if(!("speechSynthesis" in window)) return;
+    // some Android browsers (Arc and others built on WebView) have no speech at all
+    if(!("speechSynthesis" in window)){
+      clearTimeout(this.noAudioTimer);
+      this.setState({ noAudio: true });
+      this.noAudioTimer = setTimeout(() => this.setState({ noAudio: false }), 3500);
+      return;
+    }
     // Chrome on Android can drop an utterance spoken straight after cancel(), so only cancel when busy
     if(speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
@@ -693,7 +699,7 @@ class Component extends DCLogic {
       sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#00000080" : "#00000000", sheetPE: s.stats ? "auto" : "none",
       speak: this.speak, undo: this.undo, again: this.again, gotIt: this.gotIt,
       resetLabel: s.confirmReset ? "Tap again to reset all " + totalM + " mastered words" : "Reset mastered words",
-      resetBg: s.confirmReset ? "#3a1416" : "transparent", resetFg: s.confirmReset ? "#ff9a9f" : "#9a9aa2",
+      noAudio: s.noAudio, resetBg: s.confirmReset ? "#3a1416" : "transparent", resetFg: s.confirmReset ? "#ff9a9f" : "#9a9aa2",
       resetBorder: s.confirmReset ? "#f16b7366" : "#ffffff14", hasMastered: totalM > 0, resetMastered: this.resetMastered,
       goHome: this.goHome, again12: this.again12, openStats: this.openStats, closeStats: this.closeStats,
       onDown: this.onDown, onMove: this.onMove, onUp: this.onUp
