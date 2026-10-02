@@ -27,8 +27,8 @@ and no network access: every dependency, font and word ships in the repo.
   mix plus the 19 vocabulary categories), each showing its word count and how
   much of it you've mastered. "Shuffle all" serves 20 random cards from
   everything.
-- **Cards**: the French word with its gender or word type, IPA pronunciation
-  and a speaker button (browser `speechSynthesis`, French voice when
+- **Cards**: the French word with its gender or word type, an easy
+  pronunciation respelling (e.g. bohn-ZHOOR) and a speaker button (browser `speechSynthesis`, French voice when
   available). Tap to flip to the English.
 - **Word in use**: an example sentence under the card with the word
   highlighted. Swipe down on the card to show it, up to hide it.
@@ -63,6 +63,7 @@ js/react*.min.js      React, used by the rendering engine
 fonts/                Space Grotesk (SIL OFL, see SpaceGrotesk-OFL.txt)
 vocabulary.json       803 French cards in 19 categories, with IPA and examples
 tools/add_ipa.py      fills in missing IPA with espeak-ng
+tools/add_say.py      fills in missing pronunciation respellings from the IPA
 wordnest.png          app icon / preview image
 build.py              regenerates index.html and js/deck.js
 capacitor.config.json Capacitor settings (app ID, webDir www/)
@@ -131,7 +132,12 @@ greetings, food, body, places, verbs, numbers, être/avoir forms and more.
 Every card has an English meaning, an example sentence (`ex` / `exEn`) and an
 IPA pronunciation. The IPA was generated with espeak-ng
 (`python3 tools/add_ipa.py`) and is a good approximation of standard French;
-hand-edit any card to refine it and the script will leave it alone. Card IDs
+hand-edit any card to refine it and the script will leave it alone.
+
+The app shows each card's `say` field instead of the IPA: an English-letter
+respelling such as `bohn-ZHOOR`, with the stressed (last) syllable in
+capitals. It's generated from the IPA by `python3 tools/add_say.py`, which
+likewise leaves hand-edited ones alone (`--preview` prints without saving). Card IDs
 are stable, so saved progress survives edits.
 
 ## Tech notes

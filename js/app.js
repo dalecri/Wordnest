@@ -206,7 +206,7 @@ const FORMATS = {
       const toEn = Math.random() < .6, others = pickOthers(pool, c, 3, () => true);
       const opts = shuffle([{ t: toEn ? c.en : c.fr, ok: true }].concat(others.map(o => ({ t: toEn ? o.en : o.fr, ok: false }))));
       return toEn
-        ? { prompt: c.fr, sub: c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
+        ? { prompt: c.fr, sub: c.say || c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
         : { prompt: c.en, sub: "", ask: "How do you say it in French?", big: true, options: opts, reveal: c.en + " = " + c.fr };
     }
   }
@@ -645,7 +645,7 @@ class Component extends DCLogic {
       obCardRef: this.obCardRef, obDown: this.obDown, obMove: this.obMove, obUp: this.obUp,
       obKnow: this.obKnow, obNotYet: this.obNotYet,
       obWord: ob.peek ? ck.en : ck.fr, obWordSize: fitSize(ob.peek ? ck.en : ck.fr), obSide: ob.peek ? "EN" : "FR",
-      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.ipa || ""),
+      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.say || ck.ipa || ""),
       obCheckDashes: ob.check.map((_, i) => ({ bg: i < ob.ci ? "#eeeae7" : (i === ob.ci ? "#eeeae7" : "#ffffff1c"), grow: i === ob.ci ? 2 : 1 })),
       greeting: hour < 5 ? "Bonne nuit" : hour < 17 ? "Bonjour" : "Bonsoir",
       redoSetup: this.redoSetup,
@@ -673,7 +673,7 @@ class Component extends DCLogic {
       paper: ringFor(d.p), edge: edgeOf(d.p), back1: ringFor(nxt(1).p, { dim: true }), back2: ringFor(nxt(2).p, { dim: true }), accent: lighten(d.p[0], .4), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
       badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
-      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.ipa || "",
+      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.say || d.ipa || "",
       footMeta: s.showEx ? "tap to flip" : "tap to flip · swipe down for example",
       faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enter: s.flip ? "wn-inA" : "wn-inB",
       exPre: h.pre, exHit: h.hit, exPost: h.post, hitColor: lighten(d.p[4], .55),

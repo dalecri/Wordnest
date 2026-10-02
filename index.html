@@ -72,7 +72,7 @@
           <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ obPaper }};color:#f4f1ec;box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ obEdge }};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
             <span style="position:absolute;top:14px;left:16px;height:24px;padding:0 8px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">{{ obSide }}</span>
             <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ obWordSize }};line-height:1.04;letter-spacing:-.03em;text-shadow:0 2px 24px #0006;text-wrap:balance">{{ obWord }}</div>
-            <div style="margin-top:10px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:14px;color:#ffffffb0">{{ obIpa }}</div>
+            <div style="margin-top:10px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:14px;color:#ffffffb0">{{ obIpa }}</div>
           </section>
         </div>
       </div>
@@ -202,7 +202,7 @@
 
               <div style="height:1px;background:#ffffff1f;margin-bottom:12px"></div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div style="min-width:0"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ ipa }}</div><div style="margin-top:4px;font-size:12.5px;color:#ffffff8c">{{ footMeta }}</div></div>
+                <div style="min-width:0"><div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:.2px">{{ ipa }}</div><div style="margin-top:4px;font-size:12.5px;color:#ffffff8c">{{ footMeta }}</div></div>
                 <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="flex:none;width:40px;height:40px;border-radius:50%;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
               </div>
             </div>
@@ -219,7 +219,7 @@
 
               <div style="height:1px;background:#ffffff1f;margin-bottom:12px"></div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div style="min-width:0"><div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ word }}</div><div style="margin-top:3px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#ffffffa6">{{ ipa }}</div></div>
+                <div style="min-width:0"><div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ word }}</div><div style="margin-top:3px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:13px;color:#ffffffa6">{{ ipa }}</div></div>
                 <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="flex:none;width:40px;height:40px;border-radius:50%;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
               </div>
             </div>
@@ -590,7 +590,7 @@ const FORMATS = {
       const toEn = Math.random() < .6, others = pickOthers(pool, c, 3, () => true);
       const opts = shuffle([{ t: toEn ? c.en : c.fr, ok: true }].concat(others.map(o => ({ t: toEn ? o.en : o.fr, ok: false }))));
       return toEn
-        ? { prompt: c.fr, sub: c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
+        ? { prompt: c.fr, sub: c.say || c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
         : { prompt: c.en, sub: "", ask: "How do you say it in French?", big: true, options: opts, reveal: c.en + " = " + c.fr };
     }
   }
@@ -1029,7 +1029,7 @@ class Component extends DCLogic {
       obCardRef: this.obCardRef, obDown: this.obDown, obMove: this.obMove, obUp: this.obUp,
       obKnow: this.obKnow, obNotYet: this.obNotYet,
       obWord: ob.peek ? ck.en : ck.fr, obWordSize: fitSize(ob.peek ? ck.en : ck.fr), obSide: ob.peek ? "EN" : "FR",
-      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.ipa || ""),
+      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.say || ck.ipa || ""),
       obCheckDashes: ob.check.map((_, i) => ({ bg: i < ob.ci ? "#eeeae7" : (i === ob.ci ? "#eeeae7" : "#ffffff1c"), grow: i === ob.ci ? 2 : 1 })),
       greeting: hour < 5 ? "Bonne nuit" : hour < 17 ? "Bonjour" : "Bonsoir",
       redoSetup: this.redoSetup,
@@ -1057,7 +1057,7 @@ class Component extends DCLogic {
       paper: ringFor(d.p), edge: edgeOf(d.p), back1: ringFor(nxt(1).p, { dim: true }), back2: ringFor(nxt(2).p, { dim: true }), accent: lighten(d.p[0], .4), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
       badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
-      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.ipa || "",
+      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.say || d.ipa || "",
       footMeta: s.showEx ? "tap to flip" : "tap to flip · swipe down for example",
       faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enter: s.flip ? "wn-inA" : "wn-inB",
       exPre: h.pre, exHit: h.hit, exPost: h.post, hitColor: lighten(d.p[4], .55),
