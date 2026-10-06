@@ -280,6 +280,7 @@ class Component extends DCLogic {
   constructor(props){
     super(props);
     this.state = {
+      wide: typeof window !== "undefined" && window.innerWidth >= 900,
       prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
       screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
       revealed: false, showEx: true, stats: false, confirmReset: false, noAudio: false,
@@ -291,10 +292,44 @@ class Component extends DCLogic {
   }
   componentDidMount(){
     this.syncPanel();
+    // desktop: track the window width for the wider layouts, and listen for keyboard shortcuts
+    this.onResize = () => { if(this.rz) return; this.rz = requestAnimationFrame(() => { this.rz = 0; if((window.innerWidth >= 900) !== this.state.wide) this.setState({ wide: window.innerWidth >= 900 }); }); };
+    window.addEventListener("resize", this.onResize);
+    window.addEventListener("keydown", this.onKey);
     // Chrome loads voices asynchronously; ask early so they're ready by the first tap
     if("speechSynthesis" in window) speechSynthesis.getVoices();
   }
   componentDidUpdate(){ this.syncPanel(); }
+  componentWillUnmount(){ window.removeEventListener("resize", this.onResize); window.removeEventListener("keydown", this.onKey); }
+
+  // keyboard: ← again, → got it, space flip, ↓/↑ show/hide example, S speak, Z undo, 1–4 answer, Enter continue, Esc back
+  onKey = (e) => {
+    if(e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test((e.target && e.target.tagName) || "")) return;
+    const s = this.state, k = e.key, hit = (fn) => { e.preventDefault(); fn(); };
+    if(s.stats){ if(k === "Escape") hit(this.closeStats); return; }
+    if(s.screen === "onboard"){
+      const step = this.obSteps(s.ob)[s.ob.step];
+      if(step === "check"){ if(k === "ArrowRight") hit(this.obKnow); else if(k === "ArrowLeft") hit(this.obNotYet); else if(k === " ") hit(this.obPeek); }
+      else if(step === "welcome" && k === "Enter") hit(this.obNext);
+      return;
+    }
+    if(s.screen === "done"){ if(k === "Enter" && !s.empty) hit(this.again12); else if(k === "Escape") hit(this.goHome); return; }
+    if(s.screen !== "study") return;
+    if(k === "Escape") return hit(this.goHome);
+    if(s.mode === "quiz"){
+      const q = s.quiz[s.qi]; if(!q) return;
+      if(/^[1-4]$/.test(k) && q.options && q.options[+k - 1]) return hit(() => this.choose(+k - 1));
+      if(k === "Enter") return hit(s.status ? this.next : this.check);
+      if(k === "Backspace" && q.bank && s.picked.length) return hit(() => this.dropTile(s.picked[s.picked.length - 1]));
+      return;
+    }
+    if(k === "ArrowRight") hit(this.gotIt);
+    else if(k === "ArrowLeft") hit(this.again);
+    else if(k === " " || k === "Enter") hit(() => this.setState(t => ({ revealed: !t.revealed })));
+    else if(k === "ArrowDown" || k === "ArrowUp"){ const show = k === "ArrowDown"; hit(() => { this.placePanel(show ? 1 : 0, true); if(show !== s.showEx) this.setState({ showEx: show }); }); }
+    else if(k === "s" || k === "S") hit(() => this.speak());
+    else if(k === "z" || k === "Z") hit(this.undo);
+  };
   // the runtime doesn't pass previous state, so remember what was last applied to the panel
   syncPanel(){
     const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode;
@@ -597,7 +632,7 @@ class Component extends DCLogic {
         bg: ringFor(pal, { wide: true }), edge: edgeOf(pal),
         fg: "#f4f1ec", line: "#ffffff2e", accent: lighten(pal[0], .45),
         arrowBg: "#ffffff1f", arrowFg: "#ffffff",
-        z: i + 1, top: i ? "-30px" : "0", delay: (i * 28) + "ms",
+        z: i + 1, top: i && !s.wide ? "-30px" : "0", padB: s.wide ? "20px" : "46px", delay: (i * 28) + "ms",
         start: c.id === startId,
         open: () => this.open(c.id)
       };
@@ -672,6 +707,9 @@ class Component extends DCLogic {
       next: this.next,
       qDashes: Array.from({length: qn}, (_,i) => ({ bg: i < s.results.length ? (s.results[i] ? GOOD : BAD) : (i === s.qi ? "#eeeae7" : "#ffffff1c"), grow: i === s.qi && !s.status ? 2 : 1 })),
       qCount: "Question " + Math.min(s.qi + 1, qn) + " of " + qn,
+      wide: s.wide, rootMax: s.wide && s.screen === "home" ? "1120px" : (s.wide ? "520px" : "480px"),
+      listDisplay: s.wide ? "grid" : "flex", listGap: s.wide ? "16px" : "0", brDisp: s.wide ? "none" : "inline",
+      deskHint: s.wide,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
       colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),

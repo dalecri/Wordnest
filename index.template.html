@@ -12,7 +12,7 @@
 </head>
 <body>
 <x-dc>
-<div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
+<div style="width:100%;max-width:{{ rootMax }};margin:0 auto;height:100svh;transition:max-width .3s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
 <sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
 <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 22px)">
@@ -128,7 +128,7 @@
       <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
     </button>
   </div>
-  <div style="padding:14px 4px 0;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(38px,11vw,46px);line-height:1;letter-spacing:-.035em">My<br>collections</div>
+  <div style="padding:14px 4px 0;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(38px,11vw,46px);line-height:1;letter-spacing:-.035em">My <br style="display:{{ brDisp }}">collections</div>
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 4px 22px">
     <button sc-camel-on-click="{{ shuffleAll }}" style="display:flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:13.5px;font-weight:500" style-hover="background:#1f1f23" style-active="transform:scale(.96)">
       <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>Shuffle all
@@ -136,9 +136,9 @@
     <span style="font-size:11.5px;color:#6d6d74;text-align:right">{{ totalLine }}</span>
   </div>
 
-  <div style="display:flex;flex-direction:column">
+  <div style="position:relative;z-index:0;isolation:isolate;display:{{ listDisplay }};flex-direction:column;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:{{ listGap }}">
     <sc-for list="{{ colls }}" as="c" hint-placeholder-count="6">
-      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 0 0 1px #ffffff1c,inset 0 0 30px -8px {{ c.edge }};animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
+      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px {{ c.padB }} 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 0 0 1px #ffffff1c,inset 0 0 30px -8px {{ c.edge }};animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both;transition:transform .2s cubic-bezier(.22,1,.36,1)" style-hover="transform:translateY(-3px)" style-active="transform:translateY(-1px)">
         <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
           <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.03em">{{ c.title }}</span>
           <span style="flex:none;display:flex;align-items:center;gap:8px;padding-top:4px"><sc-if value="{{ c.start }}" hint-placeholder-val="{{ false }}"><span style="padding:3px 9px;border-radius:999px;background:#ffffff;color:#141414;font-size:11px;font-weight:600">Start here</span></sc-if><span style="font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span></span>
@@ -255,6 +255,9 @@
             <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
           </sc-for>
         </div>
+        <sc-if value="{{ deskHint }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px;text-align:center;font-size:11.5px;color:#55555c;letter-spacing:.02em">← again · space flip · → got it · ↓↑ example · S speak · Z undo</div>
+        </sc-if>
       </div>
     </div>
   </div>
@@ -323,6 +326,9 @@
         <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
       </sc-for>
     </div>
+    <sc-if value="{{ deskHint }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:12px;text-align:center;font-size:11.5px;color:#55555c">1–4 answer · Enter check / continue · Backspace remove tile · Esc back</div>
+    </sc-if>
   </div>
   </sc-if>
 </div>
@@ -345,7 +351,7 @@
 </sc-if>
 
 <div sc-camel-on-click="{{ closeStats }}" style="position:absolute;inset:0;z-index:10;background:{{ sheetBg }};transition:background .3s;pointer-events:{{ sheetPE }}"></div>
-<div style="position:absolute;left:0;right:0;bottom:0;z-index:11;transform:translateY({{ sheetY }});transition:transform .38s cubic-bezier(.2,.8,.3,1);background:#141416;border-top:1px solid #ffffff12;border-radius:28px 28px 0 0;padding:12px 22px calc(env(safe-area-inset-bottom,0px) + 26px)">
+<div style="position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:520px;z-index:11;transform:translateY({{ sheetY }});transition:transform .38s cubic-bezier(.2,.8,.3,1);background:#141416;border-top:1px solid #ffffff12;border-radius:28px 28px 0 0;padding:12px 22px calc(env(safe-area-inset-bottom,0px) + 26px)">
   <div style="width:36px;height:4px;border-radius:2px;background:#ffffff22;margin:0 auto 18px"></div>
   <div style="display:flex;align-items:flex-end;justify-content:space-between">
     <div style="display:flex;align-items:flex-end;gap:10px">

@@ -47,6 +47,11 @@ and no network access: every dependency, font and word ships in the repo.
 - **Streak**: finishing a session counts the day. The streak chip opens a
   sheet with the current and best streak, this week's days and overall
   mastery.
+- **Desktop**: from 900px wide the home page becomes a grid of collection
+  tiles, study screens get a centred column and the streak sheet a centred
+  panel. Keyboard: ← again, → got it, space flip, ↓/↑ show or hide the
+  example, S speak, Z undo; in quizzes 1–4 answer, Enter checks or continues,
+  Backspace removes the last tile; Esc goes back.
 - **Saved progress**: mastered cards, practice days and preferences are kept
   in `localStorage` on this device.
 
