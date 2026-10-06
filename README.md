@@ -70,6 +70,8 @@ vocabulary.json       803 French cards in 19 categories, with IPA and examples
 tools/add_ipa.py      fills in missing IPA with espeak-ng
 tools/add_say.py      fills in missing pronunciation respellings from the IPA
 wordnest.png          app icon / preview image
+privacy.html          privacy policy (App Store / Play listing URL)
+support.html          support page with FAQ and contact (App Store support URL)
 build.py              regenerates index.html and js/deck.js
 capacitor.config.json Capacitor settings (app ID, webDir www/)
 scripts/copy-web.mjs  copies the app into www/ for Capacitor
