@@ -1,0 +1,61 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main, claude/upbeat-carson-4jn3jv]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Build web app and sync Capacitor
+        run: |
+          npm ci
+          npm run build
+          npx cap sync android
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Rename APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk WordNest-debug.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: WordNest-debug-apk
+          path: WordNest-debug.apk
+
+      # A fixed "android-test" pre-release, replaced on every build, so the
+      # download link never changes and works straight from a phone.
+      - name: Publish to the android-test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete android-test --yes --cleanup-tag || true
+          gh release create android-test WordNest-debug.apk \
+            --prerelease --target "$GITHUB_SHA" \
+            --title "WordNest Android test build" \
+            --notes "Debug APK built from ${GITHUB_REF_NAME} at ${GITHUB_SHA::7}. On your phone, download WordNest-debug.apk and allow installs from your browser when asked."
