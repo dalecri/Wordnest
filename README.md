@@ -115,8 +115,9 @@ npm run run:android    # sync and launch on a connected device/emulator
   (`@capacitor-community/text-to-speech`) in the app, because Android's
   WebView has no `speechSynthesis`. In a browser it still uses
   `speechSynthesis`.
-- App icons and splash screens are generated from `assets/logo.png` with
-  `npx @capacitor/assets generate` (dark background `#0a0a0b`).
+- App icons and splash screens (the "Wn" tile from onboarding) are generated
+  from `assets/` (icon-only, icon-foreground/background, splash) with
+  `npx @capacitor/assets generate --android --ios`.
 - App ID: `com.twostorytails.wordnest` (in `capacitor.config.json`).
 
 ## Editing
