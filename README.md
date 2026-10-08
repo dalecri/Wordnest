@@ -27,8 +27,8 @@ and no network access: every dependency, font and word ships in the repo.
   mix plus the 19 vocabulary categories), each showing its word count and how
   much of it you've mastered. "Shuffle all" serves 20 random cards from
   everything.
-- **Cards**: the French word with its gender or word type, IPA pronunciation
-  and a speaker button (browser `speechSynthesis`, French voice when
+- **Cards**: the French word with its gender or word type, an easy
+  pronunciation respelling (e.g. bohn-ZHOOR) and a speaker button (browser `speechSynthesis`, French voice when
   available). Tap to flip to the English.
 - **Word in use**: an example sentence under the card with the word
   highlighted. Swipe down on the card to show it, up to hide it.
@@ -47,6 +47,11 @@ and no network access: every dependency, font and word ships in the repo.
 - **Streak**: finishing a session counts the day. The streak chip opens a
   sheet with the current and best streak, this week's days and overall
   mastery.
+- **Desktop**: from 900px wide the home page becomes a grid of collection
+  tiles, study screens get a centred column and the streak sheet a centred
+  panel. Keyboard: ← again, → got it, space flip, ↓/↑ show or hide the
+  example, S speak, Z undo; in quizzes 1–4 answer, Enter checks or continues,
+  Backspace removes the last tile; Esc goes back.
 - **Saved progress**: mastered cards, practice days and preferences are kept
   in `localStorage` on this device.
 
@@ -63,7 +68,10 @@ js/react*.min.js      React, used by the rendering engine
 fonts/                Space Grotesk (SIL OFL, see SpaceGrotesk-OFL.txt)
 vocabulary.json       803 French cards in 19 categories, with IPA and examples
 tools/add_ipa.py      fills in missing IPA with espeak-ng
+tools/add_say.py      fills in missing pronunciation respellings from the IPA
 wordnest.png          app icon / preview image
+privacy.html          privacy policy (App Store / Play listing URL)
+support.html          support page with FAQ and contact (App Store support URL)
 build.py              regenerates index.html and js/deck.js
 capacitor.config.json Capacitor settings (app ID, webDir www/)
 scripts/copy-web.mjs  copies the app into www/ for Capacitor
@@ -131,7 +139,12 @@ greetings, food, body, places, verbs, numbers, être/avoir forms and more.
 Every card has an English meaning, an example sentence (`ex` / `exEn`) and an
 IPA pronunciation. The IPA was generated with espeak-ng
 (`python3 tools/add_ipa.py`) and is a good approximation of standard French;
-hand-edit any card to refine it and the script will leave it alone. Card IDs
+hand-edit any card to refine it and the script will leave it alone.
+
+The app shows each card's `say` field instead of the IPA: an English-letter
+respelling such as `bohn-ZHOOR`, with the stressed (last) syllable in
+capitals. It's generated from the IPA by `python3 tools/add_say.py`, which
+likewise leaves hand-edited ones alone (`--preview` prints without saving). Card IDs
 are stable, so saved progress survives edits.
 
 ## Tech notes

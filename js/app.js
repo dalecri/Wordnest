@@ -206,7 +206,7 @@ const FORMATS = {
       const toEn = Math.random() < .6, others = pickOthers(pool, c, 3, () => true);
       const opts = shuffle([{ t: toEn ? c.en : c.fr, ok: true }].concat(others.map(o => ({ t: toEn ? o.en : o.fr, ok: false }))));
       return toEn
-        ? { prompt: c.fr, sub: c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
+        ? { prompt: c.fr, sub: c.say || c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
         : { prompt: c.en, sub: "", ask: "How do you say it in French?", big: true, options: opts, reveal: c.en + " = " + c.fr };
     }
   }
@@ -280,9 +280,10 @@ class Component extends DCLogic {
   constructor(props){
     super(props);
     this.state = {
+      wide: typeof window !== "undefined" && window.innerWidth >= 900,
       prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
       screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
-      revealed: false, showEx: true, stats: false, confirmReset: false,
+      revealed: false, showEx: true, stats: false, confirmReset: false, noAudio: false,
       mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
@@ -291,10 +292,44 @@ class Component extends DCLogic {
   }
   componentDidMount(){
     this.syncPanel();
+    // desktop: track the window width for the wider layouts, and listen for keyboard shortcuts
+    this.onResize = () => { if(this.rz) return; this.rz = requestAnimationFrame(() => { this.rz = 0; if((window.innerWidth >= 900) !== this.state.wide) this.setState({ wide: window.innerWidth >= 900 }); }); };
+    window.addEventListener("resize", this.onResize);
+    window.addEventListener("keydown", this.onKey);
     // Chrome loads voices asynchronously; ask early so they're ready by the first tap
     if("speechSynthesis" in window) speechSynthesis.getVoices();
   }
   componentDidUpdate(){ this.syncPanel(); }
+  componentWillUnmount(){ window.removeEventListener("resize", this.onResize); window.removeEventListener("keydown", this.onKey); }
+
+  // keyboard: ← again, → got it, space flip, ↓/↑ show/hide example, S speak, Z undo, 1–4 answer, Enter continue, Esc back
+  onKey = (e) => {
+    if(e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test((e.target && e.target.tagName) || "")) return;
+    const s = this.state, k = e.key, hit = (fn) => { e.preventDefault(); fn(); };
+    if(s.stats){ if(k === "Escape") hit(this.closeStats); return; }
+    if(s.screen === "onboard"){
+      const step = this.obSteps(s.ob)[s.ob.step];
+      if(step === "check"){ if(k === "ArrowRight") hit(this.obKnow); else if(k === "ArrowLeft") hit(this.obNotYet); else if(k === " ") hit(this.obPeek); }
+      else if(step === "welcome" && k === "Enter") hit(this.obNext);
+      return;
+    }
+    if(s.screen === "done"){ if(k === "Enter" && !s.empty) hit(this.again12); else if(k === "Escape") hit(this.goHome); return; }
+    if(s.screen !== "study") return;
+    if(k === "Escape") return hit(this.goHome);
+    if(s.mode === "quiz"){
+      const q = s.quiz[s.qi]; if(!q) return;
+      if(/^[1-4]$/.test(k) && q.options && q.options[+k - 1]) return hit(() => this.choose(+k - 1));
+      if(k === "Enter") return hit(s.status ? this.next : this.check);
+      if(k === "Backspace" && q.bank && s.picked.length) return hit(() => this.dropTile(s.picked[s.picked.length - 1]));
+      return;
+    }
+    if(k === "ArrowRight") hit(this.gotIt);
+    else if(k === "ArrowLeft") hit(this.again);
+    else if(k === " " || k === "Enter") hit(() => this.setState(t => ({ revealed: !t.revealed })));
+    else if(k === "ArrowDown" || k === "ArrowUp"){ const show = k === "ArrowDown"; hit(() => { this.placePanel(show ? 1 : 0, true); if(show !== s.showEx) this.setState({ showEx: show }); }); }
+    else if(k === "s" || k === "S") hit(() => this.speak());
+    else if(k === "z" || k === "Z") hit(this.undo);
+  };
   // the runtime doesn't pass previous state, so remember what was last applied to the panel
   syncPanel(){
     const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode;
@@ -320,7 +355,13 @@ class Component extends DCLogic {
         .catch(err => console.warn("WordNest TTS:", err));
       return;
     }
-    if(!("speechSynthesis" in window)) return;
+    // some Android browsers (Arc and others built on WebView) have no speech at all
+    if(!("speechSynthesis" in window)){
+      clearTimeout(this.noAudioTimer);
+      this.setState({ noAudio: true });
+      this.noAudioTimer = setTimeout(() => this.setState({ noAudio: false }), 3500);
+      return;
+    }
     // Chrome on Android can drop an utterance spoken straight after cancel(), so only cancel when busy
     if(speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
@@ -591,7 +632,7 @@ class Component extends DCLogic {
         bg: ringFor(pal, { wide: true }), edge: edgeOf(pal),
         fg: "#f4f1ec", line: "#ffffff2e", accent: lighten(pal[0], .45),
         arrowBg: "#ffffff1f", arrowFg: "#ffffff",
-        z: i + 1, top: i ? "-30px" : "0", delay: (i * 28) + "ms",
+        z: i + 1, top: i && !s.wide ? "-30px" : "0", padB: s.wide ? "20px" : "46px", delay: (i * 28) + "ms",
         start: c.id === startId,
         open: () => this.open(c.id)
       };
@@ -645,7 +686,7 @@ class Component extends DCLogic {
       obCardRef: this.obCardRef, obDown: this.obDown, obMove: this.obMove, obUp: this.obUp,
       obKnow: this.obKnow, obNotYet: this.obNotYet,
       obWord: ob.peek ? ck.en : ck.fr, obWordSize: fitSize(ob.peek ? ck.en : ck.fr), obSide: ob.peek ? "EN" : "FR",
-      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.ipa || ""),
+      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.say || ck.ipa || ""),
       obCheckDashes: ob.check.map((_, i) => ({ bg: i < ob.ci ? "#eeeae7" : (i === ob.ci ? "#eeeae7" : "#ffffff1c"), grow: i === ob.ci ? 2 : 1 })),
       greeting: hour < 5 ? "Bonne nuit" : hour < 17 ? "Bonjour" : "Bonsoir",
       redoSetup: this.redoSetup,
@@ -666,6 +707,9 @@ class Component extends DCLogic {
       next: this.next,
       qDashes: Array.from({length: qn}, (_,i) => ({ bg: i < s.results.length ? (s.results[i] ? GOOD : BAD) : (i === s.qi ? "#eeeae7" : "#ffffff1c"), grow: i === s.qi && !s.status ? 2 : 1 })),
       qCount: "Question " + Math.min(s.qi + 1, qn) + " of " + qn,
+      wide: s.wide, rootMax: s.wide && s.screen === "home" ? "1120px" : (s.wide ? "520px" : "480px"),
+      listDisplay: s.wide ? "grid" : "flex", listGap: s.wide ? "16px" : "0", brDisp: s.wide ? "none" : "inline",
+      deskHint: s.wide,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
       colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
@@ -673,7 +717,7 @@ class Component extends DCLogic {
       paper: ringFor(d.p), edge: edgeOf(d.p), back1: ringFor(nxt(1).p, { dim: true }), back2: ringFor(nxt(2).p, { dim: true }), accent: lighten(d.p[0], .4), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
       badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
-      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.ipa || "",
+      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.say || d.ipa || "",
       footMeta: s.showEx ? "tap to flip" : "tap to flip · swipe down for example",
       faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enter: s.flip ? "wn-inA" : "wn-inB",
       exPre: h.pre, exHit: h.hit, exPost: h.post, hitColor: lighten(d.p[4], .55),
@@ -693,7 +737,7 @@ class Component extends DCLogic {
       sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#00000080" : "#00000000", sheetPE: s.stats ? "auto" : "none",
       speak: this.speak, undo: this.undo, again: this.again, gotIt: this.gotIt,
       resetLabel: s.confirmReset ? "Tap again to reset all " + totalM + " mastered words" : "Reset mastered words",
-      resetBg: s.confirmReset ? "#3a1416" : "transparent", resetFg: s.confirmReset ? "#ff9a9f" : "#9a9aa2",
+      noAudio: s.noAudio, resetBg: s.confirmReset ? "#3a1416" : "transparent", resetFg: s.confirmReset ? "#ff9a9f" : "#9a9aa2",
       resetBorder: s.confirmReset ? "#f16b7366" : "#ffffff14", hasMastered: totalM > 0, resetMastered: this.resetMastered,
       goHome: this.goHome, again12: this.again12, openStats: this.openStats, closeStats: this.closeStats,
       onDown: this.onDown, onMove: this.onMove, onUp: this.onUp

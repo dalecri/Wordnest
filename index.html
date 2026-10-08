@@ -12,7 +12,7 @@
 </head>
 <body>
 <x-dc>
-<div style="width:100%;max-width:480px;margin:0 auto;height:100svh;display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
+<div style="width:100%;max-width:{{ rootMax }};margin:0 auto;height:100svh;transition:max-width .3s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
 
 <sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
 <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 22px)">
@@ -72,7 +72,7 @@
           <section style="position:absolute;inset:0;border-radius:24px;overflow:hidden;background:{{ obPaper }};color:#f4f1ec;box-shadow:0 28px 50px -22px #000,inset 0 0 0 1px #ffffff1f,inset 0 0 34px -6px {{ obEdge }};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
             <span style="position:absolute;top:14px;left:16px;height:24px;padding:0 8px;border-radius:7px;background:#ffffff1f;border:1px solid #ffffff26;font-size:11px;font-weight:700;letter-spacing:.6px;display:grid;place-items:center">{{ obSide }}</span>
             <div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:{{ obWordSize }};line-height:1.04;letter-spacing:-.03em;text-shadow:0 2px 24px #0006;text-wrap:balance">{{ obWord }}</div>
-            <div style="margin-top:10px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:14px;color:#ffffffb0">{{ obIpa }}</div>
+            <div style="margin-top:10px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:14px;color:#ffffffb0">{{ obIpa }}</div>
           </section>
         </div>
       </div>
@@ -128,7 +128,7 @@
       <svg sc-camel-view-box="0 0 24 24" style="width:14px;height:14px;fill:#f2c98a"><path d="M12 2c1 3.5-1.5 5-1.5 7.5A2.5 2.5 0 0 0 13 12c1.8 0 2.6-1.6 2.3-3.4C17.7 10.3 19 13 19 15a7 7 0 1 1-14 0c0-3.9 3-6.2 4.5-8.5C11 4.3 11.6 3 12 2Z"></path></svg>{{ streak }}
     </button>
   </div>
-  <div style="padding:14px 4px 0;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(38px,11vw,46px);line-height:1;letter-spacing:-.035em">My<br>collections</div>
+  <div style="padding:14px 4px 0;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(38px,11vw,46px);line-height:1;letter-spacing:-.035em">My <br style="display:{{ brDisp }}">collections</div>
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 4px 22px">
     <button sc-camel-on-click="{{ shuffleAll }}" style="display:flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:999px;background:#17171a;border:1px solid #ffffff14;color:#eeeae7;font-size:13.5px;font-weight:500" style-hover="background:#1f1f23" style-active="transform:scale(.96)">
       <svg sc-camel-view-box="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path></svg>Shuffle all
@@ -136,9 +136,9 @@
     <span style="font-size:11.5px;color:#6d6d74;text-align:right">{{ totalLine }}</span>
   </div>
 
-  <div style="display:flex;flex-direction:column">
+  <div style="position:relative;z-index:0;isolation:isolate;display:{{ listDisplay }};flex-direction:column;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:{{ listGap }}">
     <sc-for list="{{ colls }}" as="c" hint-placeholder-count="6">
-      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px 46px 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 0 0 1px #ffffff1c,inset 0 0 30px -8px {{ c.edge }};animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both" style-active="transform:translateY(-3px)">
+      <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px {{ c.padB }} 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 0 0 1px #ffffff1c,inset 0 0 30px -8px {{ c.edge }};animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both;transition:transform .2s cubic-bezier(.22,1,.36,1)" style-hover="transform:translateY(-3px)" style-active="transform:translateY(-1px)">
         <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
           <span style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.03em">{{ c.title }}</span>
           <span style="flex:none;display:flex;align-items:center;gap:8px;padding-top:4px"><sc-if value="{{ c.start }}" hint-placeholder-val="{{ false }}"><span style="padding:3px 9px;border-radius:999px;background:#ffffff;color:#141414;font-size:11px;font-weight:600">Start here</span></sc-if><span style="font-size:13px;font-weight:500;opacity:.8">{{ c.pct }}</span></span>
@@ -202,7 +202,7 @@
 
               <div style="height:1px;background:#ffffff1f;margin-bottom:12px"></div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div style="min-width:0"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ ipa }}</div><div style="margin-top:4px;font-size:12.5px;color:#ffffff8c">{{ footMeta }}</div></div>
+                <div style="min-width:0"><div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:.2px">{{ ipa }}</div><div style="margin-top:4px;font-size:12.5px;color:#ffffff8c">{{ footMeta }}</div></div>
                 <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="flex:none;width:40px;height:40px;border-radius:50%;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
               </div>
             </div>
@@ -219,7 +219,7 @@
 
               <div style="height:1px;background:#ffffff1f;margin-bottom:12px"></div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
-                <div style="min-width:0"><div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ word }}</div><div style="margin-top:3px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:13px;color:#ffffffa6">{{ ipa }}</div></div>
+                <div style="min-width:0"><div style="font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:600;font-size:17px;letter-spacing:-.2px">{{ word }}</div><div style="margin-top:3px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-size:13px;color:#ffffffa6">{{ ipa }}</div></div>
                 <button sc-camel-on-click="{{ speak }}" aria-label="Hear it in French" style="flex:none;width:40px;height:40px;border-radius:50%;background:#ffffff1f;border:1px solid #ffffff26;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:{{ accent }};display:grid;place-items:center" style-active="transform:scale(.9)"><svg sc-camel-view-box="0 0 24 24" style="width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round"><path d="M11 4 6 8H3v8h3l5 4V4Zm4 4c2 2 2 6 0 8m3-11c4 4 4 10 0 14"></path></svg></button>
               </div>
             </div>
@@ -255,6 +255,9 @@
             <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
           </sc-for>
         </div>
+        <sc-if value="{{ deskHint }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px;text-align:center;font-size:11.5px;color:#55555c;letter-spacing:.02em">← again · space flip · → got it · ↓↑ example · S speak · Z undo</div>
+        </sc-if>
       </div>
     </div>
   </div>
@@ -323,6 +326,9 @@
         <span style="flex:{{ d.grow }};height:3px;border-radius:2px;background:{{ d.bg }};transition:background .35s cubic-bezier(.22,1,.36,1),flex-grow .35s cubic-bezier(.22,1,.36,1)"></span>
       </sc-for>
     </div>
+    <sc-if value="{{ deskHint }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:12px;text-align:center;font-size:11.5px;color:#55555c">1–4 answer · Enter check / continue · Backspace remove tile · Esc back</div>
+    </sc-if>
   </div>
   </sc-if>
 </div>
@@ -345,7 +351,7 @@
 </sc-if>
 
 <div sc-camel-on-click="{{ closeStats }}" style="position:absolute;inset:0;z-index:10;background:{{ sheetBg }};transition:background .3s;pointer-events:{{ sheetPE }}"></div>
-<div style="position:absolute;left:0;right:0;bottom:0;z-index:11;transform:translateY({{ sheetY }});transition:transform .38s cubic-bezier(.2,.8,.3,1);background:#141416;border-top:1px solid #ffffff12;border-radius:28px 28px 0 0;padding:12px 22px calc(env(safe-area-inset-bottom,0px) + 26px)">
+<div style="position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:520px;z-index:11;transform:translateY({{ sheetY }});transition:transform .38s cubic-bezier(.2,.8,.3,1);background:#141416;border-top:1px solid #ffffff12;border-radius:28px 28px 0 0;padding:12px 22px calc(env(safe-area-inset-bottom,0px) + 26px)">
   <div style="width:36px;height:4px;border-radius:2px;background:#ffffff22;margin:0 auto 18px"></div>
   <div style="display:flex;align-items:flex-end;justify-content:space-between">
     <div style="display:flex;align-items:flex-end;gap:10px">
@@ -378,6 +384,11 @@
   </sc-if>
 </div>
 
+<sc-if value="{{ noAudio }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:absolute;left:16px;right:16px;bottom:28px;z-index:60;pointer-events:none;display:flex;justify-content:center;animation:wn-rise .25s ease-out">
+    <div style="max-width:360px;padding:12px 18px;border-radius:16px;background:#1c1c20;border:1px solid #ffffff1f;box-shadow:0 10px 30px #0008;font-size:14px;line-height:1.4;text-align:center;color:#eeeae7">Audio isn't available in this browser. Try Chrome or Safari.</div>
+  </div>
+</sc-if>
 
 </div>
 </x-dc>
@@ -590,7 +601,7 @@ const FORMATS = {
       const toEn = Math.random() < .6, others = pickOthers(pool, c, 3, () => true);
       const opts = shuffle([{ t: toEn ? c.en : c.fr, ok: true }].concat(others.map(o => ({ t: toEn ? o.en : o.fr, ok: false }))));
       return toEn
-        ? { prompt: c.fr, sub: c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
+        ? { prompt: c.fr, sub: c.say || c.ipa || "", ask: "What does it mean?", big: true, options: opts, speak: true, reveal: c.fr + " = " + c.en }
         : { prompt: c.en, sub: "", ask: "How do you say it in French?", big: true, options: opts, reveal: c.en + " = " + c.fr };
     }
   }
@@ -664,9 +675,10 @@ class Component extends DCLogic {
   constructor(props){
     super(props);
     this.state = {
+      wide: typeof window !== "undefined" && window.innerWidth >= 900,
       prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
       screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
-      revealed: false, showEx: true, stats: false, confirmReset: false,
+      revealed: false, showEx: true, stats: false, confirmReset: false, noAudio: false,
       mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
@@ -675,10 +687,44 @@ class Component extends DCLogic {
   }
   componentDidMount(){
     this.syncPanel();
+    // desktop: track the window width for the wider layouts, and listen for keyboard shortcuts
+    this.onResize = () => { if(this.rz) return; this.rz = requestAnimationFrame(() => { this.rz = 0; if((window.innerWidth >= 900) !== this.state.wide) this.setState({ wide: window.innerWidth >= 900 }); }); };
+    window.addEventListener("resize", this.onResize);
+    window.addEventListener("keydown", this.onKey);
     // Chrome loads voices asynchronously; ask early so they're ready by the first tap
     if("speechSynthesis" in window) speechSynthesis.getVoices();
   }
   componentDidUpdate(){ this.syncPanel(); }
+  componentWillUnmount(){ window.removeEventListener("resize", this.onResize); window.removeEventListener("keydown", this.onKey); }
+
+  // keyboard: ← again, → got it, space flip, ↓/↑ show/hide example, S speak, Z undo, 1–4 answer, Enter continue, Esc back
+  onKey = (e) => {
+    if(e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test((e.target && e.target.tagName) || "")) return;
+    const s = this.state, k = e.key, hit = (fn) => { e.preventDefault(); fn(); };
+    if(s.stats){ if(k === "Escape") hit(this.closeStats); return; }
+    if(s.screen === "onboard"){
+      const step = this.obSteps(s.ob)[s.ob.step];
+      if(step === "check"){ if(k === "ArrowRight") hit(this.obKnow); else if(k === "ArrowLeft") hit(this.obNotYet); else if(k === " ") hit(this.obPeek); }
+      else if(step === "welcome" && k === "Enter") hit(this.obNext);
+      return;
+    }
+    if(s.screen === "done"){ if(k === "Enter" && !s.empty) hit(this.again12); else if(k === "Escape") hit(this.goHome); return; }
+    if(s.screen !== "study") return;
+    if(k === "Escape") return hit(this.goHome);
+    if(s.mode === "quiz"){
+      const q = s.quiz[s.qi]; if(!q) return;
+      if(/^[1-4]$/.test(k) && q.options && q.options[+k - 1]) return hit(() => this.choose(+k - 1));
+      if(k === "Enter") return hit(s.status ? this.next : this.check);
+      if(k === "Backspace" && q.bank && s.picked.length) return hit(() => this.dropTile(s.picked[s.picked.length - 1]));
+      return;
+    }
+    if(k === "ArrowRight") hit(this.gotIt);
+    else if(k === "ArrowLeft") hit(this.again);
+    else if(k === " " || k === "Enter") hit(() => this.setState(t => ({ revealed: !t.revealed })));
+    else if(k === "ArrowDown" || k === "ArrowUp"){ const show = k === "ArrowDown"; hit(() => { this.placePanel(show ? 1 : 0, true); if(show !== s.showEx) this.setState({ showEx: show }); }); }
+    else if(k === "s" || k === "S") hit(() => this.speak());
+    else if(k === "z" || k === "Z") hit(this.undo);
+  };
   // the runtime doesn't pass previous state, so remember what was last applied to the panel
   syncPanel(){
     const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode;
@@ -704,7 +750,13 @@ class Component extends DCLogic {
         .catch(err => console.warn("WordNest TTS:", err));
       return;
     }
-    if(!("speechSynthesis" in window)) return;
+    // some Android browsers (Arc and others built on WebView) have no speech at all
+    if(!("speechSynthesis" in window)){
+      clearTimeout(this.noAudioTimer);
+      this.setState({ noAudio: true });
+      this.noAudioTimer = setTimeout(() => this.setState({ noAudio: false }), 3500);
+      return;
+    }
     // Chrome on Android can drop an utterance spoken straight after cancel(), so only cancel when busy
     if(speechSynthesis.speaking || speechSynthesis.pending) speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
@@ -975,7 +1027,7 @@ class Component extends DCLogic {
         bg: ringFor(pal, { wide: true }), edge: edgeOf(pal),
         fg: "#f4f1ec", line: "#ffffff2e", accent: lighten(pal[0], .45),
         arrowBg: "#ffffff1f", arrowFg: "#ffffff",
-        z: i + 1, top: i ? "-30px" : "0", delay: (i * 28) + "ms",
+        z: i + 1, top: i && !s.wide ? "-30px" : "0", padB: s.wide ? "20px" : "46px", delay: (i * 28) + "ms",
         start: c.id === startId,
         open: () => this.open(c.id)
       };
@@ -1029,7 +1081,7 @@ class Component extends DCLogic {
       obCardRef: this.obCardRef, obDown: this.obDown, obMove: this.obMove, obUp: this.obUp,
       obKnow: this.obKnow, obNotYet: this.obNotYet,
       obWord: ob.peek ? ck.en : ck.fr, obWordSize: fitSize(ob.peek ? ck.en : ck.fr), obSide: ob.peek ? "EN" : "FR",
-      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.ipa || ""),
+      obPaper: ringFor(ck.p), obEdge: edgeOf(ck.p), obIpa: ob.peek ? ck.fr : (ck.say || ck.ipa || ""),
       obCheckDashes: ob.check.map((_, i) => ({ bg: i < ob.ci ? "#eeeae7" : (i === ob.ci ? "#eeeae7" : "#ffffff1c"), grow: i === ob.ci ? 2 : 1 })),
       greeting: hour < 5 ? "Bonne nuit" : hour < 17 ? "Bonjour" : "Bonsoir",
       redoSetup: this.redoSetup,
@@ -1050,6 +1102,9 @@ class Component extends DCLogic {
       next: this.next,
       qDashes: Array.from({length: qn}, (_,i) => ({ bg: i < s.results.length ? (s.results[i] ? GOOD : BAD) : (i === s.qi ? "#eeeae7" : "#ffffff1c"), grow: i === s.qi && !s.status ? 2 : 1 })),
       qCount: "Question " + Math.min(s.qi + 1, qn) + " of " + qn,
+      wide: s.wide, rootMax: s.wide && s.screen === "home" ? "1120px" : (s.wide ? "520px" : "480px"),
+      listDisplay: s.wide ? "grid" : "flex", listGap: s.wide ? "16px" : "0", brDisp: s.wide ? "none" : "inline",
+      deskHint: s.wide,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
       colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
@@ -1057,7 +1112,7 @@ class Component extends DCLogic {
       paper: ringFor(d.p), edge: edgeOf(d.p), back1: ringFor(nxt(1).p, { dim: true }), back2: ringFor(nxt(2).p, { dim: true }), accent: lighten(d.p[0], .4), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
       badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
-      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.ipa || "",
+      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.say || d.ipa || "",
       footMeta: s.showEx ? "tap to flip" : "tap to flip · swipe down for example",
       faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enter: s.flip ? "wn-inA" : "wn-inB",
       exPre: h.pre, exHit: h.hit, exPost: h.post, hitColor: lighten(d.p[4], .55),
@@ -1077,7 +1132,7 @@ class Component extends DCLogic {
       sheetY: s.stats ? "0" : "105%", sheetBg: s.stats ? "#00000080" : "#00000000", sheetPE: s.stats ? "auto" : "none",
       speak: this.speak, undo: this.undo, again: this.again, gotIt: this.gotIt,
       resetLabel: s.confirmReset ? "Tap again to reset all " + totalM + " mastered words" : "Reset mastered words",
-      resetBg: s.confirmReset ? "#3a1416" : "transparent", resetFg: s.confirmReset ? "#ff9a9f" : "#9a9aa2",
+      noAudio: s.noAudio, resetBg: s.confirmReset ? "#3a1416" : "transparent", resetFg: s.confirmReset ? "#ff9a9f" : "#9a9aa2",
       resetBorder: s.confirmReset ? "#f16b7366" : "#ffffff14", hasMastered: totalM > 0, resetMastered: this.resetMastered,
       goHome: this.goHome, again12: this.again12, openStats: this.openStats, closeStats: this.closeStats,
       onDown: this.onDown, onMove: this.onMove, onUp: this.onUp
