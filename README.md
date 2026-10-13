@@ -44,14 +44,23 @@ and no network access: every dependency, font and word ships in the repo.
   choice, French to English or back). Wrong answers in multiple choice skip
   words with the same meaning. Right answers mark the word mastered, misses
   send it back to learning.
-- **Grammar practice**: five collections cover de/du/des, à/au/aux,
+- **Grammar practice**: seven collections cover de/du/des, à/au/aux,
   masculine/feminine and singular/plural agreement, present-tense parler,
-  être, avoir and aller, and common question patterns. The sliding example
+  être, avoir and aller, common question patterns, negatives and article
+  exceptions, and choosing à versus de after common verbs. The sliding example
   panel has Example / The rule buttons, translated sentences, form tables
   and usage notes. Swipe down/up or use the show/hide button to reveal it.
   Related vocabulary cards also offer a rule. Grammar quizzes ask you to
   choose the correct form and explain why; press Continue when you have
   finished reading. They retain the same mastery and streak tracking.
+- **Mistake review**: missed grammar quiz answers enter a saved queue on the
+  home screen. Each rule has an alternate sentence, and review rotates
+  contexts instead of repeating the same prompt. Two correct reviews in
+  different contexts clear a rule; another miss resets that progress.
+  Each batch includes up to ten queued rules, oldest first. Grammar accuracy
+  shows actual correct/total quiz answers overall and per collection,
+  separately from flashcard mastery. Marking a card “Got it” does not clear
+  a queued mistake. Everything stays on this device in localStorage.
 - **Streak**: finishing a session counts the day. The streak chip opens a
   sheet with the current and best streak, this week's days and overall
   mastery.
@@ -72,6 +81,7 @@ css/app.css           global styles, animations and @font-face rules
 js/app.js             collections, curated deck and app logic (source of truth)
 js/deck.js            vocabulary.json as a script (generated)
 js/grammar.js         grammar lessons, worked examples and practice exercises
+js/grammar-review.js  grammar accuracy, saved mistake queue and review rotation
 js/dc-runtime.js      the templating/rendering engine that powers the UI
 js/react*.min.js      React, used by the rendering engine
 fonts/                Space Grotesk (SIL OFL, see SpaceGrotesk-OFL.txt)
@@ -152,8 +162,11 @@ node --test tests/grammar.test.cjs
 
 With Python Playwright and Chromium installed, serve `www/` on port 8000
 and run `python3 tests/grammar-browser.py` for functional checks of all
-five collections at phone and desktop sizes. These cover panel controls,
+seven collections at phone and desktop sizes. These cover panel controls,
 swipes, quiz answers and explanations, saved mastery, and final scores.
+Run `python3 tests/review-browser.py` to verify queue persistence, alternate
+sentences, clearing mistakes, accuracy tracking, and preservation of existing
+vocabulary progress.
 
 Changes to `js/grammar.js` work immediately in the browser; run
 `npm run build` to refresh the Capacitor `www/` output.

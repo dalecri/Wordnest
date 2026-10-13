@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/app.css">
 <script src="js/deck.js"></script>
 <script src="js/grammar.js"></script>
+<script src="js/grammar-review.js"></script>
 <script src="js/react.production.min.js"></script>
 <script src="js/react-dom.production.min.js"></script>
 <script src="js/dc-runtime.js"></script>
@@ -140,11 +141,16 @@
   <section class="grammar-home" aria-label="Grammar practice">
     <h2>Grammar practice</h2>
     <p>Learn the pattern. Try it in Quiz.</p>
+    <div class="grammar-review-bar">
+      <div><span class="grammar-accuracy">{{ grammarAccuracyLine }}</span><span class="grammar-review-detail">Missed rules return with different sentences.</span></div>
+      <button class="review-button" sc-camel-on-click="{{ openReview }}" sc-camel-disabled="{{ !hasReview }}">{{ reviewLabel }}</button>
+    </div>
     <div class="grammar-shortcuts">
       <sc-for list="{{ grammarColls }}" as="c" hint-placeholder-count="5">
         <button class="grammar-shortcut" sc-camel-on-click="{{ c.open }}" style="background:{{ c.bg }};border-color:{{ c.edge }}">
           <span class="grammar-shortcut-title">{{ c.title }}</span>
-          <span class="grammar-shortcut-count">{{ c.count }} · {{ c.pct }}</span>
+          <span class="grammar-shortcut-count">{{ c.count }}</span>
+          <span class="grammar-shortcut-accuracy">{{ c.accuracy }}</span>
           <span class="grammar-shortcut-sample">{{ c.en }}</span>
         </button>
       </sc-for>
@@ -188,6 +194,7 @@
     </div>
   </div>
   <div style="flex:none;margin-top:14px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(32px,9.5vw,42px);line-height:1;letter-spacing:-.035em;text-wrap:balance">{{ collTitle }}</div>
+  <sc-if value="{{ notReview }}" hint-placeholder-val="{{ true }}">
   <div style="flex:none;margin-top:14px;display:flex">
     <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d">
       <button sc-camel-on-click="{{ setCards }}" style="padding:8px 16px;border-radius:999px;background:{{ cardsBg }};color:{{ cardsFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Cards</button>
@@ -195,6 +202,8 @@
     </div>
   </div>
 
+  </sc-if>
+  <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}"><p class="review-study-hint">{{ reviewHint }}</p></sc-if>
   <sc-if value="{{ isCards }}" hint-placeholder-val="{{ true }}">
   <div class="study-cards" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:28px">
     <div style="position:relative;z-index:2;flex:1;min-height:230px;max-height:380px">

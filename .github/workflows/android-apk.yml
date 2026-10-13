@@ -33,6 +33,7 @@ jobs:
       - name: Build web app and sync Capacitor
         run: |
           npm ci
+          node --test tests/grammar.test.cjs
           npm run build
           npx cap sync android
 

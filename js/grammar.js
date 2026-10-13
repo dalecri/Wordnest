@@ -36,6 +36,32 @@ window.WN_GRAMMAR = (() => {
       ],
       note: "Au and aux are contractions, not conjugations. A vowel or silent h uses l’ even for a masculine noun: à l’hôtel. Cities usually take à alone: à Paris.",
     },
+    negatives: {
+      title: "Negatives & articles",
+      intro: "Put ne (n’ before a vowel) before the conjugated verb and pas after it. Then check which kind of article follows.",
+      rows: [
+        ["Not any · ordinary negative", "un / une / des / du / de la → de", "J’ai un chien → Je n’ai pas de chien."],
+        ["Before a vowel / silent h", "de → d’", "J’ai de l’eau → Je n’ai pas d’eau."],
+        ["Specific things / general preferences", "le / la / l’ / les stay", "J’aime le café → Je n’aime pas le café."],
+        ["After être", "keep the article", "C’est une pomme → Ce n’est pas une pomme."],
+        ["Never / no longer", "ne…jamais / ne…plus", "Je ne mange jamais de viande."],
+        ["Only · not a negative", "ne…que keeps the article", "Je ne mange que du pain."]
+      ],
+      note: "These are the normal forms; explicit contrasts can keep an article: Je ne veux pas du thé, mais du café. In everyday speech, ne is often omitted, but learn the full form for writing. With a compound tense, surround the auxiliary: Je n’ai pas mangé de pain.",
+    },
+    prepositions: {
+      title: "Choose à or de",
+      intro: "Learn the verb together with its preposition. À often points toward a person, destination or activity; de can introduce a topic, origin or need. Meaning matters more than the English word.",
+      rows: [
+        ["Person you speak to", "parler à quelqu’un", "Je parle à Marie."],
+        ["Topic you speak about", "parler de quelque chose", "Je parle de mon voyage."],
+        ["Destination / origin", "aller à / venir de", "Je vais à Paris. Je viens de Paris."],
+        ["Need / want", "avoir besoin de / envie de", "J’ai besoin de repos. J’ai envie de dormir."],
+        ["Before an infinitive", "apprendre à / essayer de", "J’apprends à nager. J’essaie de comprendre."],
+        ["Two different meanings", "penser à / penser de", "Je pense à toi. Que penses-tu de ce film ?"]
+      ],
+      note: "Do not add a preposition after every verb: J’aime lire. Once you choose à or de, apply the article rule when needed: parler au professeur, parler du film. Before a vowel, de elides: envie d’apprendre; à stays à: apprendre à écrire.",
+    },
     agreement: {
       title: "Gender & number agree",
       intro: "Articles and adjectives follow the noun. A verb follows its subject’s person and number, not masculine/feminine gender.",
@@ -87,6 +113,8 @@ window.WN_GRAMMAR = (() => {
     }
   };
   const collections = [
+    { id: "rules-negatives", name: "Negatives & articles", color: "#ff8a7a" },
+    { id: "rules-prepositions", name: "À or de?", color: "#7fd1d8" },
     { id: "rules-de", name: "De, du & des", color: "#cdb4f5" },
     { id: "rules-a", name: "À, au & aux", color: "#8cc8f5" },
     { id: "rules-agreement", name: "Gender & number", color: "#f5a3c7" },
@@ -99,6 +127,30 @@ window.WN_GRAMMAR = (() => {
     cards.push({ id: "rule-" + id, deck: "rules-" + deck, ruleId, fr, en, ex, exEn,
       type: "grammar rule", exercise: { prompt, answer, wrong, explanation, hint } });
   }
+  add("neg-order", "negatives", "negatives", "ne + verb + pas", "Put the negative around the verb", "Je ne parle pas français.", "I don’t speak French.", "Je ____ parle pas français.", "ne", ["pas", "de", "que"], "Ne goes before the conjugated verb; pas goes after it.");
+  add("neg-elision", "negatives", "negatives", "ne → n’", "Before a vowel, shorten ne", "Elle n’aime pas le café.", "She doesn’t like coffee.", "Elle ____ aime pas le café.", "n’", ["ne", "pas", "de"], "Aime begins with a vowel: ne becomes n’. The definite article le stays.");
+  add("neg-du", "negatives", "negatives", "du riz → pas de riz", "Some rice → not any rice", "Je ne mange pas de riz.", "I’m not eating any rice.", "Je ne mange pas ____ riz.", "de", ["du", "des", "de la"], "In an ordinary negative, the partitive du becomes de.");
+  add("neg-dela", "negatives", "negatives", "de la viande → pas de viande", "Feminine partitive → de", "Je ne mange pas de viande.", "I’m not eating any meat.", "Je ne mange pas ____ viande.", "de", ["de la", "du", "des"], "De la becomes de after an ordinary negative, even though viande is feminine.");
+  add("neg-des", "negatives", "negatives", "des carottes → pas de carottes", "Plural indefinite → de", "Je n’achète pas de carottes.", "I’m not buying any carrots.", "Je n’achète pas ____ carottes.", "de", ["des", "du", "de les"], "The indefinite plural des becomes de in this negative.");
+  add("neg-vowel", "negatives", "negatives", "de l’argent → pas d’argent", "De becomes d’ before a vowel", "Je n’ai pas d’argent.", "I don’t have any money.", "Je n’ai pas ____ argent.", "d’", ["de l’", "du", "des"], "The negative uses de; before the vowel in argent it becomes d’.");
+  add("neg-definite", "negatives", "negatives", "Je n’aime pas le café.", "A preference keeps the definite article", "Je n’aime pas le café.", "I don’t like coffee.", "Je n’aime pas ____ café.", "le", ["de", "du", "la"], "This is a general preference: the definite article le stays in the negative.", "Say you dislike coffee in general.");
+  add("neg-definite-pl", "negatives", "negatives", "Je n’aime pas les épinards.", "Definite plural stays les", "Je n’aime pas les épinards.", "I don’t like spinach.", "Je n’aime pas ____ épinards.", "les", ["de", "des", "le"], "For this general preference, keep the definite article les.", "Say you dislike spinach in general.");
+  add("neg-etre", "negatives", "negatives", "Ce n’est pas une pomme.", "After être, keep un / une", "Ce n’est pas une pomme.", "It isn’t an apple.", "Ce n’est pas ____ pomme.", "une", ["de", "un", "du"], "With être, the indefinite article stays. Pomme is feminine: une pomme.");
+  add("neg-never", "negatives", "negatives", "ne…jamais", "Never · replace pas with jamais", "Je ne mange jamais de viande.", "I never eat meat.", "Je ne mange ____ de viande.", "jamais", ["pas jamais", "que", "toujours"], "Jamais already supplies the negative meaning never. Do not add pas.", "Say you never eat meat.");
+  add("neg-anymore", "negatives", "negatives", "ne…plus", "No longer / not anymore", "Je ne bois plus de café.", "I don’t drink coffee anymore.", "Je ne bois ____ de café.", "plus", ["pas plus", "que", "encore"], "Ne…plus means not anymore. Do not also add pas.", "Say you no longer drink coffee.");
+  add("neg-only", "negatives", "negatives", "ne…que", "Only · keep the partitive", "Je ne mange que du pain.", "I only eat bread.", "Je ne mange que ____ pain.", "du", ["de", "des", "de la"], "Ne…que means only, not not any. Keep the partitive du pain.");
+  add("prep-person", "prepositions", "prepositions", "parler à", "Speak to someone", "Je parle à Marie.", "I’m speaking to Marie.", "Je parle ____ Marie.", "à", ["de", "du", "au"], "To say who you speak to, use parler à. Marie is a person’s name, so no article contraction.", "Say you are speaking to Marie.");
+  add("prep-topic", "prepositions", "prepositions", "parler de", "Speak about something", "Je parle de mon voyage.", "I’m talking about my trip.", "Je parle ____ mon voyage.", "de", ["à", "du", "au"], "The topic takes parler de. Mon is a possessive, so de does not contract.", "Say your trip is the topic.");
+  add("prep-destination", "prepositions", "prepositions", "aller à", "Go to a destination", "Je vais à Montréal.", "I’m going to Montréal.", "Je vais ____ Montréal.", "à", ["de", "au", "du"], "A city destination normally takes à without an article.", "Say Montréal is your destination.");
+  add("prep-origin", "prepositions", "prepositions", "venir de", "Come from a place", "Je viens de Montréal.", "I’m coming from Montréal.", "Je viens ____ Montréal.", "de", ["à", "au", "du"], "Use venir de for the place you come from. The city name has no article.", "Say Montréal is where you are coming from.");
+  add("prep-need", "prepositions", "prepositions", "avoir besoin de", "Need something", "J’ai besoin de repos.", "I need rest.", "J’ai besoin ____ repos.", "de", ["à", "au", "pour"], "Learn avoir besoin de as a phrase. Here repos is an unspecified need, with no definite article.");
+  add("prep-want", "prepositions", "prepositions", "avoir envie de", "Feel like doing something", "J’ai envie de dormir.", "I feel like sleeping.", "J’ai envie ____ dormir.", "de", ["à", "au", "du"], "Avoir envie de is followed by a noun or infinitive. Dormir stays in the infinitive.");
+  add("prep-learn", "prepositions", "prepositions", "apprendre à", "Learn to do something", "J’apprends à nager.", "I’m learning to swim.", "J’apprends ____ nager.", "à", ["de", "au", "du"], "Apprendre à introduces an infinitive: apprendre à nager.");
+  add("prep-try", "prepositions", "prepositions", "essayer de", "Try to do something", "J’essaie de comprendre.", "I’m trying to understand.", "J’essaie ____ comprendre.", "de", ["à", "au", "du"], "Essayer takes de before an infinitive: essayer de comprendre.");
+  add("prep-think-about", "prepositions", "prepositions", "penser à", "Have someone in mind", "Je pense à toi.", "I’m thinking of you.", "Je pense ____ toi.", "à", ["de", "du", "au"], "Penser à means have someone or something in mind.", "Say someone is on your mind.");
+  add("prep-opinion", "prepositions", "prepositions", "penser de", "Give an opinion about something", "Que penses-tu de ce film ?", "What do you think of this film?", "Que penses-tu ____ ce film ?", "de", ["à", "du", "au"], "For an opinion, use penser de. Ce is a demonstrative, so de stays de.", "Ask for an opinion about the film.");
+  add("prep-contraction", "prepositions", "prepositions", "parler à + le → parler au", "Choose the preposition, then the article", "Je parle au professeur.", "I’m speaking to the teacher.", "Je parle ____ professeur.", "au", ["du", "à le", "de le"], "Speaking to someone takes à. With le professeur, à + le becomes au.", "le professeur · speak to the teacher");
+  add("prep-no-preposition", "prepositions", "prepositions", "aimer + infinitive", "Some verbs take no preposition", "J’aime lire.", "I like reading.", "Choose the usual modern sentence for “I like reading.”", "J’aime lire.", ["J’aime à lire.", "J’aime de lire.", "J’aime du lire."], "In ordinary modern French, aimer is followed directly by the infinitive.");
   add("de-m", "de", "de", "de + le → du", "Of / from the · masculine singular", "Je viens du marché.", "I’m coming from the market.", "Je viens ____ marché.", "du", ["de le", "de la", "des"], "Marché is masculine singular: de + le contracts to du.", "le marché · the market");
   add("de-f", "de", "de", "de + la → de la", "Of / from the · feminine singular", "Je viens de la gare.", "I’m coming from the station.", "Je viens ____ gare.", "de la", ["du", "des", "de le"], "Gare is feminine singular: keep de la.", "la gare · the station");
   add("de-vowel", "de", "de", "de + l’ → de l’", "Of / from the · before a vowel", "Je viens de l’école.", "I’m coming from the school.", "Je viens ____ école.", "de l’", ["du", "de la", "des"], "École starts with a vowel: la becomes l’, so use de l’.", "l’école · feminine");
@@ -141,5 +193,79 @@ window.WN_GRAMMAR = (() => {
   add("question-why", "questions", "questionWords", "Pourquoi est-ce qu’il part ?", "Pourquoi · ask why", "Pourquoi est-ce qu’il part ?", "Why is he leaving?", "____ est-ce qu’il part ?", "Pourquoi", ["Quand", "Qui", "Combien"], "Pourquoi asks for a reason. Que becomes qu’ before il.", "Ask the reason for leaving.");
   add("question-how", "questions", "questionWords", "Comment est-ce que tu vas ?", "Comment · ask how", "Comment est-ce que tu vas ?", "How are you?", "____ est-ce que tu vas ?", "Comment", ["Qui", "Combien", "Quand"], "Comment asks how. Tu takes vas, the present-tense form of aller.", "Ask how someone is doing.");
   add("question-who", "questions", "questionWords", "Qui vient ?", "Qui · ask who", "Qui vient ce soir ?", "Who is coming tonight?", "____ vient ce soir ?", "Qui", ["Qu’est-ce que", "Combien", "Où"], "Qui is the subject here, so use a singular verb: qui vient ?", "Ask who is coming.");
+  // Each rule has a second context for mistake review, not a reordered answer.
+  function vary(id, ex, exEn, prompt, explanation, hint = ""){
+    const card = cards.find(c => c.id === "rule-" + id);
+    card.exercise.variants = [{ ...card.exercise, ex, exEn, prompt, explanation, hint }];
+  }
+  vary("de-m", "Je viens du musée.", "I’m coming from the museum.", "Je viens ____ musée.", "Musée is masculine singular: de + le → du.", "le musée");
+  vary("de-f", "Il sort de la maison.", "He’s coming out of the house.", "Il sort ____ maison.", "Maison is feminine singular. De la stays as two words.", "la maison");
+  vary("de-vowel", "Je viens de l’hôpital.", "I’m coming from the hospital.", "Je viens ____ hôpital.", "Hôpital starts with a silent h: use de l’, even though it is masculine.", "l’hôpital · masculine");
+  vary("de-pl", "Je parle des écoles du quartier.", "I’m talking about the schools in the neighbourhood.", "Je parle ____ écoles du quartier.", "These specific schools take les: de + les → des, including before a vowel.", "les écoles · the specific schools in the neighbourhood");
+  vary("partitive", "Elle boit de l’eau.", "She’s drinking some water.", "Elle boit ____ eau.", "Eau begins with a vowel, so the partitive is de l’eau.");
+  vary("quantity", "Elle a beaucoup de questions.", "She has a lot of questions.", "Elle a beaucoup ____ questions.", "After beaucoup, use de rather than the indefinite plural des.");
+  vary("negative", "Nous ne mangeons pas de fromage.", "We’re not eating any cheese.", "Nous ne mangeons pas ____ fromage.", "The partitive du fromage becomes de fromage in this ordinary negative.");
+  vary("negative-etre", "Ce n’est pas du café.", "It isn’t coffee.", "Ce n’est pas ____ café.", "After être, keep the partitive du. Café is masculine.");
+  vary("a-m", "Il va au cinéma.", "He’s going to the cinema.", "Il va ____ cinéma.", "Cinéma is masculine singular: à + le → au.", "le cinéma");
+  vary("a-f", "Elle va à la banque.", "She’s going to the bank.", "Elle va ____ banque.", "Banque is feminine singular, so use à la.", "la banque");
+  vary("a-vowel", "Elle va à l’université.", "She’s going to the university.", "Elle va ____ université.", "Université begins with a vowel: à l’université.", "l’université · feminine");
+  vary("a-h", "Nous allons à l’hôpital.", "We’re going to the hospital.", "Nous allons ____ hôpital.", "Hôpital has a silent h. Le becomes l’, giving à l’hôpital.", "l’hôpital · masculine");
+  vary("a-pl-m", "Elle parle aux voisins.", "She’s speaking to the neighbours.", "Elle parle ____ voisins.", "Voisins is plural: à + les → aux.", "les voisins");
+  vary("a-pl-f", "Il parle aux étudiantes.", "He’s speaking to the female students.", "Il parle ____ étudiantes.", "Plural feminine nouns also take aux: à + les → aux.", "les étudiantes");
+  vary("agree-m", "Le chien est petit.", "The dog is small.", "Le chien est ____.", "Chien is masculine singular: petit.", "le chien");
+  vary("agree-f", "Ma sœur est contente.", "My sister is happy.", "Ma sœur est ____.", "Sœur is feminine singular, so use contente.");
+  vary("agree-mp", "Les garçons sont contents.", "The boys are happy.", "Les garçons sont ____.", "Garçons is masculine plural, so add -s: contents.");
+  vary("agree-fp", "Les filles sont contentes.", "The girls are happy.", "Les filles sont ____.", "Filles is feminine plural: contente + s → contentes.");
+  vary("agree-irregular", "La fleur est belle.", "The flower is beautiful.", "La fleur est ____.", "Fleur is feminine singular. The feminine of beau is belle.", "la fleur");
+  vary("noun-plural", "Les journaux sont ici.", "The newspapers are here.", "Les ____ sont ici.", "The plural of journal is journaux, not journals.", "le journal");
+  vary("quel-fp", "Quelles chaussures préfères-tu ?", "Which shoes do you prefer?", "____ chaussures préfères-tu ?", "Chaussures is feminine plural, so use quelles.", "la chaussure");
+  vary("verb-je", "Tu parles anglais.", "You speak English.", "Tu ____ anglais.", "Tu takes the regular -er ending -es: tu parles.", "parler · present");
+  vary("verb-nous", "Nous parlons anglais.", "We speak English.", "Nous ____ anglais.", "Nous takes -ons: nous parlons.", "parler · present");
+  vary("verb-vous", "Vous parlez espagnol.", "You speak Spanish.", "Vous ____ espagnol.", "Vous takes -ez: vous parlez, including polite singular vous.", "parler · present");
+  vary("verb-elles", "Elles parlent anglais.", "They speak English.", "Elles ____ anglais.", "Elles takes -ent, just like ils: elles parlent.", "parler · present");
+  vary("verb-etre", "Nous sommes ici.", "We’re here.", "Nous ____ ici.", "The present of être with nous is sommes.", "être · present");
+  vary("verb-avoir", "Elles ont deux chats.", "They have two cats.", "Elles ____ deux chats.", "The present of avoir with elles is ont.", "avoir · present");
+  vary("verb-aller", "Ils vont à la gare.", "They’re going to the station.", "Ils ____ à la gare.", "The present of aller with ils is vont.", "aller · present");
+  vary("verb-on", "On va au cinéma.", "We’re going to the cinema.", "On ____ au cinéma.", "On takes a singular verb: on va, even when it means we.", "aller · present");
+  vary("question-intonation", "Tu viens demain ?", "Are you coming tomorrow?", "For tomorrow’s plans, ask “Are you coming?” using informal statement order.", "Use tu viens ? with rising intonation. Demain specifies tomorrow.");
+  vary("question-estce", "Est-ce que tu viens demain ?", "Are you coming tomorrow?", "Est-ce que ____ demain ?", "After est-ce que, keep tu before the conjugated verb viens.");
+  vary("question-inversion", "Parlez-vous français au travail ?", "Do you speak French at work?", "You are at work. Ask “Do you speak French?” formally with inversion.", "Use parlez-vous with a hyphen; vous takes parlez.");
+  vary("question-t", "Parle-t-elle français à la maison ?", "Does she speak French at home?", "For a conversation about home, invert “elle parle français”.", "Parle ends in a vowel. Insert -t- before elle: parle-t-elle.");
+  vary("question-elision", "Est-ce qu’il vient demain ?", "Is he coming tomorrow?", "____ il vient demain ?", "Que becomes qu’ before il. Use est-ce qu’il.");
+  vary("question-where", "Où est-ce que tu travailles ?", "Where do you work?", "____ est-ce que tu travailles ?", "Où asks for a place, here someone’s workplace.", "Ask where someone works.");
+  vary("question-what", "Qu’est-ce que tu fais demain ?", "What are you doing tomorrow?", "____ tu fais demain ?", "Tu is the subject. Ask about the activity with qu’est-ce que.", "Ask what someone is doing tomorrow.");
+  vary("question-subject", "Qu’est-ce qui se passe ici ?", "What’s happening here?", "____ se passe ici ?", "The unknown thing is the subject: qu’est-ce qui se passe.", "Ask what is happening here.");
+  vary("question-howmany", "Combien de chats as-tu ?", "How many cats do you have?", "Combien ____ chats as-tu ?", "Use combien de to ask a quantity, without des.");
+  vary("question-when", "Quand est-ce que tu arrives ?", "When are you arriving?", "____ est-ce que tu arrives ?", "Quand asks for a time.", "Ask when someone is arriving.");
+  vary("question-why", "Pourquoi est-ce qu’il reste ?", "Why is he staying?", "____ est-ce qu’il reste ?", "Pourquoi asks for a reason.", "Ask the reason someone is staying.");
+  vary("question-how", "Comment est-ce que tu vas au travail ?", "How do you get to work?", "____ est-ce que tu vas au travail ?", "Comment asks about the method or means of travel.", "Ask how someone travels to work.");
+  vary("question-who", "Qui vient demain ?", "Who is coming tomorrow?", "____ vient demain ?", "Qui asks which person is the subject; use the singular vient.", "Ask who is coming tomorrow.");
+  vary("neg-order", "Nous ne parlons pas anglais.", "We don’t speak English.", "Nous ____ parlons pas anglais.", "Ne comes before the conjugated verb parlons; pas follows it.");
+  vary("neg-elision", "Il n’habite pas ici.", "He doesn’t live here.", "Il ____ habite pas ici.", "Habite has a silent h, so ne elides to n’.");
+  vary("neg-du", "Elle ne mange pas de fromage.", "She’s not eating any cheese.", "Elle ne mange pas ____ fromage.", "In this ordinary negative, du fromage becomes de fromage.");
+  vary("neg-dela", "Il ne mange pas de soupe.", "He’s not eating any soup.", "Il ne mange pas ____ soupe.", "The feminine partitive de la soupe becomes de soupe in this negative.");
+  vary("neg-des", "Nous n’achetons pas de pommes.", "We’re not buying any apples.", "Nous n’achetons pas ____ pommes.", "The plural indefinite des becomes de after an ordinary negative.");
+  vary("neg-vowel", "Elle n’a pas d’eau.", "She doesn’t have any water.", "Elle n’a pas ____ eau.", "De l’eau becomes de in the negative, then d’ before the vowel.");
+  vary("neg-definite", "Elle n’aime pas le chocolat.", "She doesn’t like chocolate.", "Elle n’aime pas ____ chocolat.", "A general preference keeps the definite article le, even in the negative.", "Say she dislikes chocolate in general.");
+  vary("neg-definite-pl", "Il n’aime pas les carottes.", "He doesn’t like carrots.", "Il n’aime pas ____ carottes.", "This preference uses the definite plural les, which stays in the negative.", "Say he dislikes carrots in general.");
+  vary("neg-etre", "Ce n’est pas une orange.", "It isn’t an orange.", "Ce n’est pas ____ orange.", "After être, keep the indefinite article une. Orange is feminine.");
+  vary("neg-never", "Elle ne boit jamais de café.", "She never drinks coffee.", "Elle ne boit ____ de café.", "Ne…jamais means never. Jamais replaces pas.", "Say she never drinks coffee.");
+  vary("neg-anymore", "Il ne mange plus de viande.", "He doesn’t eat meat anymore.", "Il ne mange ____ de viande.", "Ne…plus means not anymore. Do not add pas.", "Say he no longer eats meat.");
+  vary("neg-only", "Elle ne boit que du café.", "She only drinks coffee.", "Elle ne boit que ____ café.", "Ne…que means only, so keep the partitive du café.");
+  vary("prep-person", "Elle parle à Paul.", "She’s speaking to Paul.", "Elle parle ____ Paul.", "Speaking to a person takes parler à; a person’s name needs no article.", "Say she is speaking to Paul.");
+  vary("prep-topic", "Elle parle de son travail.", "She’s talking about her work.", "Elle parle ____ son travail.", "A topic takes parler de. Son is a possessive, so no contraction.", "Say her work is the topic.");
+  vary("prep-destination", "Nous allons à Québec.", "We’re going to Québec City.", "Nous allons ____ Québec.", "To Québec City takes à. The province instead takes au Québec.", "Québec City · your destination");
+  vary("prep-origin", "Elle vient de Paris.", "She’s coming from Paris.", "Elle vient ____ Paris.", "The place you come from takes venir de. Paris has no article.", "Say Paris is where she is coming from.");
+  vary("prep-need", "Elle a besoin de calme.", "She needs quiet.", "Elle a besoin ____ calme.", "Use avoir besoin de. Here calme is an unspecified need.");
+  vary("prep-want", "Elle a envie de partir.", "She feels like leaving.", "Elle a envie ____ partir.", "Avoir envie takes de before an infinitive.");
+  vary("prep-learn", "Nous apprenons à cuisiner.", "We’re learning to cook.", "Nous apprenons ____ cuisiner.", "Apprendre takes à before an infinitive.");
+  vary("prep-try", "Elle essaie de dormir.", "She’s trying to sleep.", "Elle essaie ____ dormir.", "Essayer takes de before an infinitive.");
+  vary("prep-think-about", "Elle pense à toi.", "She’s thinking of you.", "Elle pense ____ toi.", "Having someone in mind uses penser à.", "Say someone is on her mind.");
+  vary("prep-opinion", "Que penses-tu de ce livre ?", "What do you think of this book?", "Que penses-tu ____ ce livre ?", "To ask an opinion, use penser de. Ce does not contract.", "Ask for an opinion about the book.");
+  vary("prep-contraction", "Elle parle au médecin.", "She’s speaking to the doctor.", "Elle parle ____ médecin.", "Speaking to someone takes à; à + le médecin → au médecin.", "le médecin · speak to the doctor");
+  vary("prep-no-preposition", "Nous aimons lire.", "We like reading.", "Choose the correct sentence for “I like reading”, using the usual modern construction.", "J’aime is directly followed by the infinitive lire, without à or de.");
+  const readingReview = cards.find(c => c.id === "rule-prep-no-preposition").exercise.variants[0];
+  Object.assign(readingReview, { prompt: "Choose the correct sentence for “We like reading.”",
+    answer: "Nous aimons lire.", wrong: ["Nous aimons à lire.", "Nous aimons de lire.", "Nous aimons du lire."] });
   return { rules, collections, cards };
 })();

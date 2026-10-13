@@ -43,5 +43,12 @@ button{transition:transform .15s cubic-bezier(.4,0,.2,1),background .2s}
 .grammar-shortcut-title{display:block;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:600}
 .grammar-shortcut-count{display:block;margin-top:6px;color:#ffffffb8;font-size:11px}
 .grammar-shortcut-sample{display:block;margin-top:16px;font-size:11px;color:#ffffffd9}
-@media(min-width:900px){.grammar-shortcuts{display:grid;grid-template-columns:repeat(5,1fr)}}
+.grammar-review-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin:0 4px 16px;padding:14px;border-radius:18px;background:#ffffff06;border:1px solid #ffffff0d}
+.grammar-accuracy{display:block;font-size:13px;font-weight:600;color:#e3d4ff}
+.grammar-review-detail{display:block;margin-top:4px;font-size:11px;line-height:1.5;color:#9a9aa2}
+.review-button{padding:11px 16px;border-radius:999px;background:#e3d4ff;color:#18141f;font-size:12px;font-weight:600}
+.review-button:disabled{background:#ffffff0a;color:#9a9aa2;cursor:default}
+.grammar-shortcut-accuracy{display:block;margin-top:7px;font-size:10px;line-height:1.4;color:#e3d4ff}
+.review-study-hint{font-size:12px;color:#aaaab3;line-height:1.5;margin:14px 0 0}
+@media(min-width:900px){.grammar-shortcuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
 @media(max-height:700px){.rule-content{max-height:160px}}

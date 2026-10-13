@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/app.css">
 <script src="js/deck.js"></script>
 <script src="js/grammar.js"></script>
+<script src="js/grammar-review.js"></script>
 <script src="js/react.production.min.js"></script>
 <script src="js/react-dom.production.min.js"></script>
 <script src="js/dc-runtime.js"></script>
@@ -140,11 +141,16 @@
   <section class="grammar-home" aria-label="Grammar practice">
     <h2>Grammar practice</h2>
     <p>Learn the pattern. Try it in Quiz.</p>
+    <div class="grammar-review-bar">
+      <div><span class="grammar-accuracy">{{ grammarAccuracyLine }}</span><span class="grammar-review-detail">Missed rules return with different sentences.</span></div>
+      <button class="review-button" sc-camel-on-click="{{ openReview }}" sc-camel-disabled="{{ !hasReview }}">{{ reviewLabel }}</button>
+    </div>
     <div class="grammar-shortcuts">
       <sc-for list="{{ grammarColls }}" as="c" hint-placeholder-count="5">
         <button class="grammar-shortcut" sc-camel-on-click="{{ c.open }}" style="background:{{ c.bg }};border-color:{{ c.edge }}">
           <span class="grammar-shortcut-title">{{ c.title }}</span>
-          <span class="grammar-shortcut-count">{{ c.count }} · {{ c.pct }}</span>
+          <span class="grammar-shortcut-count">{{ c.count }}</span>
+          <span class="grammar-shortcut-accuracy">{{ c.accuracy }}</span>
           <span class="grammar-shortcut-sample">{{ c.en }}</span>
         </button>
       </sc-for>
@@ -188,6 +194,7 @@
     </div>
   </div>
   <div style="flex:none;margin-top:14px;font-family:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;font-weight:700;font-size:clamp(32px,9.5vw,42px);line-height:1;letter-spacing:-.035em;text-wrap:balance">{{ collTitle }}</div>
+  <sc-if value="{{ notReview }}" hint-placeholder-val="{{ true }}">
   <div style="flex:none;margin-top:14px;display:flex">
     <div style="display:flex;gap:4px;padding:4px;border-radius:999px;background:#17171a;border:1px solid #ffffff0d">
       <button sc-camel-on-click="{{ setCards }}" style="padding:8px 16px;border-radius:999px;background:{{ cardsBg }};color:{{ cardsFg }};font-size:13px;font-weight:500;transition:background .25s,color .25s">Cards</button>
@@ -195,6 +202,8 @@
     </div>
   </div>
 
+  </sc-if>
+  <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}"><p class="review-study-hint">{{ reviewHint }}</p></sc-if>
   <sc-if value="{{ isCards }}" hint-placeholder-val="{{ true }}">
   <div class="study-cards" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:28px">
     <div style="position:relative;z-index:2;flex:1;min-height:230px;max-height:380px">
@@ -449,6 +458,7 @@ const CURATED = [
 ];
 
 const GRAMMAR = window.WN_GRAMMAR || { rules: {}, collections: [], cards: [] };
+const PRACTICE = window.WN_RULE_PRACTICE;
 
 // ---------- collections ----------
 // collection names; each card on the home page also shows a sample French word as a chip
@@ -582,6 +592,7 @@ GRAMMAR.cards.forEach(d => {
 // Offer a related rule alongside ordinary vocabulary cards too.
 function ruleFor(card){
   if(card.ruleId) return GRAMMAR.rules[card.ruleId];
+  if(/\b(?:ne|pas|jamais)\b|n['’]/.test(card.ex || "")) return GRAMMAR.rules.negatives;
   const text = card.fr + " " + (card.ex || "");
   if(/(?:beaucoup|combien|pas)\s+d(?:e\b|['’])|(?:mange|bois|boit|manger|boire)\s+(?:du\b|des\b|de la\b|de l['’])/i.test(text)) return GRAMMAR.rules.quantity;
   if(/(?:^|\s)(?:(?:au|aux|à la)\s|à l['’])/i.test(text)) return GRAMMAR.rules.a;
@@ -659,15 +670,16 @@ const FORMATS = {
   }
 };
 const ROTATION = ["gender", "fill", "build", "mc", "fill", "build", "gender", "mc", "build", "fill"];
+function makeRuleQuestion(card, variant = 0){
+  const exercises = [card.exercise, ...(card.exercise.variants || [])], e = exercises[variant];
+  return { card, variant, kind: "rule", label: "Apply the rule", prompt: e.prompt,
+    sub: e.hint || "", ask: "Choose the correct form", big: false,
+    options: shuffle([{ t: e.answer, ok: true }, ...e.wrong.map(t => ({ t, ok: false }))]),
+    reveal: e.ex || card.ex, explanation: e.explanation };
+}
 function makeQuiz(cards, pool){
   return cards.map((c, i) => {
-    if(c.exercise){
-      const e = c.exercise;
-      return { card: c, kind: "rule", label: "Apply the rule", prompt: e.prompt,
-        sub: e.hint || "", ask: "Choose the correct form", big: false,
-        options: shuffle([{ t: e.answer, ok: true }, ...e.wrong.map(t => ({ t, ok: false }))]),
-        reveal: c.ex, explanation: e.explanation };
-    }
+    if(c.exercise) return makeRuleQuestion(c);
     let kind = ROTATION[i % ROTATION.length];
     if(!FORMATS[kind].ok(c)) kind = shuffle(Object.keys(FORMATS).filter(k => FORMATS[k].ok(c)))[0];
     return { card: c, kind, label: FORMATS[kind].label, ...FORMATS[kind].make(c, pool) };
@@ -738,7 +750,7 @@ class Component extends DCLogic {
       prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
       screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
       revealed: false, showEx: true, panelTab: "example", stats: false, confirmReset: false, noAudio: false,
-      mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
+      mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress(), grammarStats: PRACTICE.load()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
     this.noRef = React.createRef(); this.yesRef = React.createRef(); this.obCardRef = React.createRef();
@@ -831,6 +843,7 @@ class Component extends DCLogic {
 
   // ---- sessions ----
   open(id){
+    if(id === "review") return this.openReview();
     clearTimeout(this.nextTimer);
     this.setState({ panelTab: id.startsWith("rules-") ? "rule" : "example", showEx: true });
     const m = this.state.prog.m;
@@ -851,12 +864,21 @@ class Component extends DCLogic {
     }
     this.setState(s => ({ screen: "study", empty: false, coll: id, session: pool, idx: 0, done: 0, history: [], revealed: false, flip: 1 - s.flip, stats: false }));
   }
-  setCards = () => { if(this.state.mode !== "cards"){ this.state.mode = "cards"; this.setState({ mode: "cards" }); this.open(this.state.coll); } };
+  setCards = () => { if(this.state.coll === "review") return; if(this.state.mode !== "cards"){ this.state.mode = "cards"; this.setState({ mode: "cards" }); this.open(this.state.coll); } };
   setQuiz = () => { if(this.state.mode !== "quiz"){ this.state.mode = "quiz"; this.setState({ mode: "quiz" }); this.open(this.state.coll); } };
 
   toggleExample = () => this.setState(s => ({ showEx: !s.showEx }));
   showExample = () => this.setState({ panelTab: "example", showEx: true });
   showRule = () => this.setState({ panelTab: "rule", showEx: true });
+
+  openReview = () => {
+    clearTimeout(this.nextTimer);
+    const cards = PRACTICE.queue(this.state.grammarStats, ALL).slice(0, QUIZ);
+    if(!cards.length) return this.setState({ screen: "home" });
+    const quiz = cards.map(c => makeRuleQuestion(c, PRACTICE.nextVariant(this.state.grammarStats, c)));
+    this.setState(s => ({ screen: "study", mode: "quiz", coll: "review", quiz, qi: 0,
+      picked: [], status: "", results: [], empty: false, stats: false, flip: 1 - s.flip }));
+  };
 
   // ---- quiz ----
   q(){ return this.state.quiz[this.state.qi]; }
@@ -877,7 +899,10 @@ class Component extends DCLogic {
       const m = { ...s.prog.m };
       if(ok) m[q.card.id] = 1; else delete m[q.card.id];
       const prog = { ...s.prog, m }; saveProgress(prog);
-      return { status: ok ? "right" : "wrong", picked, prog, results: s.results.concat(ok) };
+      const grammarStats = q.kind === "rule"
+        ? PRACTICE.record(s.grammarStats, q.card.id, q.variant, ok, s.coll === "review") : s.grammarStats;
+      if(q.kind === "rule") PRACTICE.save(grammarStats);
+      return { status: ok ? "right" : "wrong", picked, prog, grammarStats, results: s.results.concat(ok) };
     });
     if(ok && q.kind !== "rule") this.nextTimer = setTimeout(this.next, 900);
   }
@@ -1098,7 +1123,9 @@ class Component extends DCLogic {
         open: () => this.open(c.id)
       };
     });
-    const totalM = masteredIn(ALL);
+    const totalM = masteredIn(ALL), reviewCount = PRACTICE.queue(s.grammarStats, ALL).length;
+    const grammarAccuracy = PRACTICE.accuracy(s.grammarStats, ALL);
+    const accuracyLine = ({ attempts, correct }) => attempts ? Math.round(100 * correct / attempts) + "% accuracy · " + correct + "/" + attempts + " correct" : "No quiz answers yet";
 
     // study
     const d = this.card(), h = highlight(d), rule = ruleFor(d), sess = s.session, n = sess.length || 1;
@@ -1113,7 +1140,7 @@ class Component extends DCLogic {
     const streak = streakOf(days), best = Math.max(streak, bestOf(days));
 
     // quiz view
-    const isQuiz = s.mode === "quiz", q = s.quiz[s.qi], qc = q ? q.card : d;
+    const isReview = s.coll === "review", isQuiz = s.mode === "quiz", q = s.quiz[s.qi], qc = q ? q.card : d;
     const GOOD = "#77ce9c", BAD = "#f16b73";
     const qOptions = q && q.options ? q.options.map((o, i) => {
       const chosen = s.picked.includes(i), show = !!s.status;
@@ -1163,6 +1190,11 @@ class Component extends DCLogic {
       qSel, qBank, qHasSel: qSel.length > 0, qCanCheck: !!(q && q.bank) && !s.status, qCheckOp: s.picked.length && !s.status ? 1 : .35, check: this.check,
       qAnswered: !!s.status, qRight: s.status === "right", qWrong: s.status === "wrong",
       qFeedBg: s.status === "right" ? "#16271d" : "#2a1416", qFeedBd: s.status === "right" ? GOOD + "66" : BAD + "66", qFeedFg: s.status === "right" ? GOOD : BAD,
+      isReview, notReview: !isReview,
+      reviewHint: "Different sentences · two correct reviews clear a rule",
+      reviewCount, hasReview: reviewCount > 0, openReview: this.openReview,
+      reviewLabel: reviewCount ? "Review mistakes · " + reviewCount : "No mistakes to review",
+      grammarAccuracyLine: accuracyLine(grammarAccuracy),
       qExplanation: q ? q.explanation || "" : "", qHasExplanation: !!(q && q.explanation),
       qFeedTitle: s.status === "right" ? "Correct!" : "Not quite", qReveal: q ? q.reveal : "",
       qGlow: s.status === "right" ? "0 0 0 2px " + GOOD + ", 0 28px 50px -22px #000" : s.status === "wrong" ? "0 0 0 2px " + BAD + ", 0 28px 50px -22px #000" : "0 28px 50px -22px #000, inset 0 0 0 1px #ffffff1f, inset 0 0 34px -6px " + edgeOf(qc.p),
@@ -1173,9 +1205,10 @@ class Component extends DCLogic {
       listDisplay: s.wide ? "grid" : "flex", listGap: s.wide ? "16px" : "0", brDisp: s.wide ? "none" : "inline",
       deskHint: s.wide,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
-      colls: colls.filter(c => !c.id.startsWith("rules-")), grammarColls: colls.filter(c => c.id.startsWith("rules-")),
+      colls: colls.filter(c => !c.id.startsWith("rules-")), grammarColls: colls.filter(c => c.id.startsWith("rules-")).map(c => ({ ...c,
+        accuracy: accuracyLine(PRACTICE.accuracy(s.grammarStats, CARDS[c.id])) })),
       shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " cards mastered",
-      collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
+      collTitle: isReview ? "Review mistakes" : s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
       cardRef: this.cardRef, panelRef: this.panelRef, btnRef: this.btnRef, noRef: this.noRef, yesRef: this.yesRef,
       paper: ringFor(d.p), edge: edgeOf(d.p), back1: ringFor(nxt(1).p, { dim: true }), back2: ringFor(nxt(2).p, { dim: true }), accent: lighten(d.p[0], .4), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
@@ -1198,11 +1231,11 @@ class Component extends DCLogic {
       dashes: Array.from({length: n}, (_,i) => ({ bg: i < s.done ? "#eeeae7" : (i === s.done ? lighten(d.p[4], .55) : "#ffffff1c"), grow: i === s.done ? 2 : 1 })),
       dashMax: Math.min(300, n * 17) + "px",
       undoOp: s.history.length ? 1 : .3,
-      isEmpty: !!s.empty, notEmpty: !s.empty,
+      isEmpty: !!s.empty, notEmpty: !s.empty && (!isReview || reviewCount > 0),
       doneTitle: s.empty ? "All mastered!" : isQuiz ? s.results.filter(Boolean).length + " / " + s.results.length + " correct" : (s.coll === "all" ? "All done." : "Nice work."),
-      doneKicker: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
-      doneLine: s.empty ? "You know every word here. Reset mastered words from the streak sheet, or pick another collection." : (isQuiz ? (s.results.length && s.results.every(Boolean) ? "Perfect round." : "Missed words go back to learning.") : s.done + " cards practised.") + " Streak: " + streak + (streak === 1 ? " day." : " days."),
-      againLabel: isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(this.goal(), (CARDS[s.coll] || []).length),
+      doneKicker: isReview ? "Mistake review" : s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
+      doneLine: isReview ? (reviewCount ? reviewCount + " rules still to review. Get each right in two different reviews to clear it." : "All caught up. Your missed rules are cleared.") : s.empty ? "You know every word here. Reset mastered words from the streak sheet, or pick another collection." : (isQuiz ? (s.results.length && s.results.every(Boolean) ? "Perfect round." : "Missed words go back to learning.") : s.done + " cards practised.") + " Streak: " + streak + (streak === 1 ? " day." : " days."),
+      againLabel: isReview ? (reviewCount ? "Review again · " + reviewCount : "All caught up") : isQuiz ? "Another quiz" : s.coll === "all" ? "Another 20 at random" : "Another " + Math.min(this.goal(), (CARDS[s.coll] || []).length),
       week, weekLine: week.filter(w => w.done).length + " / 7 days this week",
       streak, bestLine: "best: " + best + (best === 1 ? " day" : " days"),
       mastered: totalM, learning: ALL.length - totalM, masteredPct: Math.round(100 * totalM / ALL.length) + "%",

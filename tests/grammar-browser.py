@@ -52,6 +52,6 @@ with sync_playwright() as p:
             expect(page.get_by_text(f"{min(10,len([c for c in data['cards'] if c['deck']==coll['id']]))-1} / {min(10,len([c for c in data['cards'] if c['deck']==coll['id']]))} correct",exact=True)).to_be_visible()
             page.keyboard.press('Escape')
         assert not errors,errors
-        print(f'PASS {width}x{height}: five collections, examples/rules, show/hide controls, keyboard panel, correct/incorrect explanations, complete quizzes and score')
+        print(f'PASS {width}x{height}: {len(data["collections"])} collections, examples/rules, show/hide controls, keyboard panel, correct/incorrect explanations, complete quizzes and score')
         page.close()
     browser.close()
