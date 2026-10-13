@@ -44,6 +44,14 @@ and no network access: every dependency, font and word ships in the repo.
   choice, French to English or back). Wrong answers in multiple choice skip
   words with the same meaning. Right answers mark the word mastered, misses
   send it back to learning.
+- **Grammar practice**: five collections cover de/du/des, à/au/aux,
+  masculine/feminine and singular/plural agreement, present-tense parler,
+  être, avoir and aller, and common question patterns. The sliding example
+  panel has Example / The rule buttons, translated sentences, form tables
+  and usage notes. Swipe down/up or use the show/hide button to reveal it.
+  Related vocabulary cards also offer a rule. Grammar quizzes ask you to
+  choose the correct form and explain why; press Continue when you have
+  finished reading. They retain the same mastery and streak tracking.
 - **Streak**: finishing a session counts the day. The streak chip opens a
   sheet with the current and best streak, this week's days and overall
   mastery.
@@ -63,6 +71,7 @@ index.template.html   HTML shell + markup (source of truth)
 css/app.css           global styles, animations and @font-face rules
 js/app.js             collections, curated deck and app logic (source of truth)
 js/deck.js            vocabulary.json as a script (generated)
+js/grammar.js         grammar lessons, worked examples and practice exercises
 js/dc-runtime.js      the templating/rendering engine that powers the UI
 js/react*.min.js      React, used by the rendering engine
 fonts/                Space Grotesk (SIL OFL, see SpaceGrotesk-OFL.txt)
@@ -132,6 +141,22 @@ python3 build.py
 ```
 
 Changes to `css/app.css` take effect immediately and don't need a rebuild.
+
+Grammar lessons live in `js/grammar.js`. Keep card IDs stable so saved
+mastery survives edits. Each exercise defines one correct answer,
+three distinct distractors, and an explanation. Run the lesson checks with:
+
+```bash
+node --test tests/grammar.test.cjs
+```
+
+With Python Playwright and Chromium installed, serve `www/` on port 8000
+and run `python3 tests/grammar-browser.py` for functional checks of all
+five collections at phone and desktop sizes. These cover panel controls,
+swipes, quiz answers and explanations, saved mastery, and final scores.
+
+Changes to `js/grammar.js` work immediately in the browser; run
+`npm run build` to refresh the Capacitor `www/` output.
 
 ## Vocabulary data
 

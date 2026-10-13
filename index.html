@@ -6,13 +6,14 @@
 <title>WordNest</title>
 <link rel="stylesheet" href="css/app.css">
 <script src="js/deck.js"></script>
+<script src="js/grammar.js"></script>
 <script src="js/react.production.min.js"></script>
 <script src="js/react-dom.production.min.js"></script>
 <script src="js/dc-runtime.js"></script>
 </head>
 <body>
 <x-dc>
-<div style="width:100%;max-width:{{ rootMax }};margin:0 auto;height:100svh;transition:max-width .3s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none">
+<div style="width:100%;max-width:{{ rootMax }};margin:0 auto;height:100svh;transition:max-width .3s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;background:#0a0a0b;color:#eeeae7;position:relative;overflow:clip;user-select:none;-webkit-user-select:none">
 
 <sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
 <div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 18px) 22px calc(env(safe-area-inset-bottom,0px) + 22px)">
@@ -136,6 +137,19 @@
     <span style="font-size:11.5px;color:#6d6d74;text-align:right">{{ totalLine }}</span>
   </div>
 
+  <section class="grammar-home" aria-label="Grammar practice">
+    <h2>Grammar practice</h2>
+    <p>Learn the pattern. Try it in Quiz.</p>
+    <div class="grammar-shortcuts">
+      <sc-for list="{{ grammarColls }}" as="c" hint-placeholder-count="5">
+        <button class="grammar-shortcut" sc-camel-on-click="{{ c.open }}" style="background:{{ c.bg }};border-color:{{ c.edge }}">
+          <span class="grammar-shortcut-title">{{ c.title }}</span>
+          <span class="grammar-shortcut-count">{{ c.count }} · {{ c.pct }}</span>
+          <span class="grammar-shortcut-sample">{{ c.en }}</span>
+        </button>
+      </sc-for>
+    </div>
+  </section>
   <div style="position:relative;z-index:0;isolation:isolate;display:{{ listDisplay }};flex-direction:column;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:{{ listGap }}">
     <sc-for list="{{ colls }}" as="c" hint-placeholder-count="6">
       <button sc-camel-on-click="{{ c.open }}" style="position:relative;z-index:{{ c.z }};margin-top:{{ c.top }};display:block;width:100%;text-align:left;padding:20px 18px {{ c.padB }} 22px;border-radius:30px;background:{{ c.bg }};color:{{ c.fg }};box-shadow:0 -14px 26px -14px #000,inset 0 0 0 1px #ffffff1c,inset 0 0 30px -8px {{ c.edge }};animation:wn-inA .5s {{ c.delay }} cubic-bezier(.22,1,.36,1) both;transition:transform .2s cubic-bezier(.22,1,.36,1)" style-hover="transform:translateY(-3px)" style-active="transform:translateY(-1px)">
@@ -182,7 +196,7 @@
   </div>
 
   <sc-if value="{{ isCards }}" hint-placeholder-val="{{ true }}">
-  <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;padding-top:28px">
+  <div class="study-cards" style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;padding-top:28px">
     <div style="position:relative;z-index:2;flex:1;min-height:230px;max-height:380px">
       <div style="position:absolute;inset:0;transform:translate3d(18px,-26px,0) rotate(6deg) scale(.9);border-radius:24px;background:{{ back2 }};opacity:.55;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff08;border-bottom:1px solid #ffffff0f"></div></div>
       <div style="position:absolute;inset:0;transform:translate3d(-14px,-12px,0) rotate(-4.5deg) scale(.95);border-radius:24px;background:{{ back1 }};opacity:.8;box-shadow:0 20px 40px -24px #000"><div style="height:52px;border-radius:24px 24px 0 0;background:#ffffff08;border-bottom:1px solid #ffffff0f"></div></div>
@@ -233,12 +247,29 @@
     </div>
 
     <div style="position:relative;z-index:1;flex:none;margin-top:12px">
-      <div ref="{{ panelRef }}" style="border-radius:20px;overflow:hidden;background:#141416;border:1px solid #ffffff0f;will-change:transform,opacity">
-        <div style="height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#1a1a1d;border-bottom:1px solid #ffffff0a">
-          <span style="font-size:12px;font-weight:600;color:#c2c2c9">Word in use</span>
-          <span style="font-size:10.5px;color:#55555c">swipe up to hide</span>
+      <button class="panel-toggle" sc-camel-on-click="{{ toggleExample }}" aria-expanded="{{ panelExpanded }}" aria-controls="example-rule-panel">{{ panelToggleLabel }}</button>
+      <div id="example-rule-panel" ref="{{ panelRef }}" aria-hidden="{{ panelHidden }}" style="visibility:{{ panelVisibility }};border-radius:20px;overflow:hidden;background:#141416;border:1px solid #ffffff0f;will-change:transform,opacity">
+        <div class="rule-tabs">
+          <button sc-camel-on-click="{{ showExample }}" aria-pressed="{{ exampleTab }}" sc-camel-tab-index="{{ panelTabIndex }}" style="background:{{ exampleTabBg }}">Example</button>
+          <sc-if value="{{ hasRule }}" hint-placeholder-val="{{ false }}"><button sc-camel-on-click="{{ showRule }}" aria-pressed="{{ ruleTab }}" sc-camel-tab-index="{{ panelTabIndex }}" style="background:{{ ruleTabBg }}">The rule</button></sc-if>
+          <span>↓ show · ↑ hide</span>
         </div>
-        <div style="padding:12px 16px 15px;font-size:15px;line-height:1.5;color:#dcdce2">{{ exPre }}<span style="color:{{ hitColor }};font-weight:600">{{ exHit }}</span>{{ exPost }}</div>
+        <div class="rule-content">
+          <sc-if value="{{ exampleTab }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:15px;line-height:1.5;color:#dcdce2">{{ exPre }}<span style="color:{{ hitColor }};font-weight:600">{{ exHit }}</span>{{ exPost }}</div>
+            <div class="example-translation">{{ exampleTranslation }}</div>
+          </sc-if>
+          <sc-if value="{{ ruleTab }}" hint-placeholder-val="{{ false }}">
+            <h3 class="rule-title">{{ ruleTitle }}</h3>
+            <p class="rule-intro">{{ ruleIntro }}</p>
+            <div class="rule-forms">
+              <sc-for list="{{ ruleRows }}" as="r" hint-placeholder-count="4">
+                <div class="rule-row"><div class="rule-label">{{ r.label }}</div><div class="rule-form">{{ r.form }}</div><div class="rule-example">{{ r.example }}</div></div>
+              </sc-for>
+            </div>
+            <p class="rule-note">{{ ruleNote }}</p>
+          </sc-if>
+        </div>
       </div>
 
       <div ref="{{ btnRef }}" style="will-change:transform">
@@ -312,6 +343,7 @@
       <div style="margin-top:12px;padding:12px 16px;border-radius:16px;background:{{ qFeedBg }};border:1px solid {{ qFeedBd }};animation:wn-inA .3s cubic-bezier(.22,1,.36,1) both">
         <div style="font-size:13px;font-weight:600;color:{{ qFeedFg }}">{{ qFeedTitle }}</div>
         <div style="margin-top:3px;font-size:14.5px;line-height:1.45;color:#dcdce2">{{ qReveal }}</div>
+        <sc-if value="{{ qHasExplanation }}" hint-placeholder-val="{{ false }}"><p class="quiz-explanation">{{ qExplanation }}</p></sc-if>
       </div>
       <button sc-camel-on-click="{{ next }}" style="margin-top:12px;width:100%;height:52px;border-radius:999px;background:#eeeae6;color:#1b1b1e;font-size:15px;font-weight:600" style-active="transform:scale(.98)">Continue</button>
     </sc-if>
@@ -416,6 +448,8 @@ const CURATED = [
   {fr:"Bonne journée", en:"Have a good day", type:"farewell", g:"f", un:"une journée", note:"bonne agrees with journée (f).", ipa:"/bɔn ʒuʁ.ne/", say:"bun zhoor-NAY", ex:"Merci, bonne journée !", exEn:"Thank you, have a good day!", p:["#54053a","#8d0028","#0b0414","#270317","#f04431"]}
 ];
 
+const GRAMMAR = window.WN_GRAMMAR || { rules: {}, collections: [], cards: [] };
+
 // ---------- collections ----------
 // collection names; each card on the home page also shows a sample French word as a chip
 const COLLECTIONS = [
@@ -438,7 +472,8 @@ const COLLECTIONS = [
   { id: "grammar",      name: "Small words" },
   { id: "workwords",    name: "Work & study" },
   { id: "numbers",      name: "Numbers" },
-  { id: "conjugations", name: "Être & avoir" }
+  { id: "conjugations", name: "Être & avoir" },
+  ...GRAMMAR.collections
 ];
 const SWATCHES = ["#cdb4f5","#dff07a","#4b5fd6","#f2683a","#8fe0c0","#f5a3c7","#8cc8f5","#f6d873","#ff8a7a","#b9d39b","#a993f0","#7fd1d8"];
 const SESSION = 12;
@@ -503,6 +538,7 @@ function artFor(p){
 function genderOf(type){ return /^masculine noun/.test(type) ? "m" : /^feminine noun/.test(type) ? "f" : ""; }
 function kindLabel(d){
   const t = d.type || "";
+  if(d.ruleId) return "Grammar rule";
   if(d.g) return d.g === "f" ? "Feminine noun" : "Masculine noun";
   if(/^pronoun/.test(t)) return "Small word";
   if(/^plural noun/.test(t)) return "Plural noun";
@@ -532,13 +568,29 @@ function highlight(d){
 // ---------- data ----------
 const VOCAB = window.WN_VOCAB || { categories: [], cards: [] };
 const CARDS = {};   // collection id -> cards
-COLLECTIONS.forEach((c, ci) => { c.color = SWATCHES[ci % SWATCHES.length]; CARDS[c.id] = []; });
+COLLECTIONS.forEach((c, ci) => { c.color = c.color || SWATCHES[ci % SWATCHES.length]; CARDS[c.id] = []; });
 CURATED.forEach((d, i) => CARDS.mdj.push({ ...d, id: "mdj" + i, deck: "mdj" }));
 VOCAB.cards.forEach(d => {
   const list = CARDS[d.deck]; if(!list) return;
   const coll = COLLECTIONS.find(c => c.id === d.deck);
   list.push({ ...d, g: genderOf(d.type), p: paletteFor(coll.color, list.length) });
 });
+GRAMMAR.cards.forEach(d => {
+  const coll = COLLECTIONS.find(c => c.id === d.deck), list = CARDS[d.deck];
+  list.push({ ...d, p: paletteFor(coll.color, list.length) });
+});
+// Offer a related rule alongside ordinary vocabulary cards too.
+function ruleFor(card){
+  if(card.ruleId) return GRAMMAR.rules[card.ruleId];
+  const text = card.fr + " " + (card.ex || "");
+  if(/(?:beaucoup|combien|pas)\s+d(?:e\b|['’])|(?:mange|bois|boit|manger|boire)\s+(?:du\b|des\b|de la\b|de l['’])/i.test(text)) return GRAMMAR.rules.quantity;
+  if(/(?:^|\s)(?:(?:au|aux|à la)\s|à l['’])/i.test(text)) return GRAMMAR.rules.a;
+  if(/(?:^|\s)(?:(?:du|des|de la)\s|de l['’])/i.test(text)) return GRAMMAR.rules.de;
+  if(/\?/.test(card.ex || "")) return /\b(?:qui|quand|pourquoi|comment|combien|quel|quelle|quels|quelles)\b|où|qu['’]est-ce/i.test(text) ? GRAMMAR.rules.questionWords : GRAMMAR.rules.questions;
+  if(card.g || /^adjective/.test(card.type || "")) return GRAMMAR.rules.agreement;
+  if(/^(verb|être|avoir)/.test(card.type || "") || card.aux) return GRAMMAR.rules.verbs;
+  return null;
+}
 const ALL = [].concat(...COLLECTIONS.map(c => CARDS[c.id]));
 
 // ---------- quiz ----------
@@ -609,6 +661,13 @@ const FORMATS = {
 const ROTATION = ["gender", "fill", "build", "mc", "fill", "build", "gender", "mc", "build", "fill"];
 function makeQuiz(cards, pool){
   return cards.map((c, i) => {
+    if(c.exercise){
+      const e = c.exercise;
+      return { card: c, kind: "rule", label: "Apply the rule", prompt: e.prompt,
+        sub: e.hint || "", ask: "Choose the correct form", big: false,
+        options: shuffle([{ t: e.answer, ok: true }, ...e.wrong.map(t => ({ t, ok: false }))]),
+        reveal: c.ex, explanation: e.explanation };
+    }
     let kind = ROTATION[i % ROTATION.length];
     if(!FORMATS[kind].ok(c)) kind = shuffle(Object.keys(FORMATS).filter(k => FORMATS[k].ok(c)))[0];
     return { card: c, kind, label: FORMATS[kind].label, ...FORMATS[kind].make(c, pool) };
@@ -678,7 +737,7 @@ class Component extends DCLogic {
       wide: typeof window !== "undefined" && window.innerWidth >= 900,
       prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
       screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
-      revealed: false, showEx: true, stats: false, confirmReset: false, noAudio: false,
+      revealed: false, showEx: true, panelTab: "example", stats: false, confirmReset: false, noAudio: false,
       mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
@@ -727,7 +786,7 @@ class Component extends DCLogic {
   };
   // the runtime doesn't pass previous state, so remember what was last applied to the panel
   syncPanel(){
-    const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode;
+    const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode + "|" + this.state.panelTab + "|" + this.state.idx;
     if(key === this.lastPanel) return;
     const same = this.lastScreen === this.state.screen + this.state.mode;
     this.lastPanel = key; this.lastScreen = this.state.screen + this.state.mode;
@@ -772,6 +831,8 @@ class Component extends DCLogic {
 
   // ---- sessions ----
   open(id){
+    clearTimeout(this.nextTimer);
+    this.setState({ panelTab: id.startsWith("rules-") ? "rule" : "example", showEx: true });
     const m = this.state.prog.m;
     let pool;
     // Daily picks and Shuffle all skip mastered words entirely; other collections top up with them for review
@@ -792,6 +853,10 @@ class Component extends DCLogic {
   }
   setCards = () => { if(this.state.mode !== "cards"){ this.state.mode = "cards"; this.setState({ mode: "cards" }); this.open(this.state.coll); } };
   setQuiz = () => { if(this.state.mode !== "quiz"){ this.state.mode = "quiz"; this.setState({ mode: "quiz" }); this.open(this.state.coll); } };
+
+  toggleExample = () => this.setState(s => ({ showEx: !s.showEx }));
+  showExample = () => this.setState({ panelTab: "example", showEx: true });
+  showRule = () => this.setState({ panelTab: "rule", showEx: true });
 
   // ---- quiz ----
   q(){ return this.state.quiz[this.state.qi]; }
@@ -814,7 +879,7 @@ class Component extends DCLogic {
       const prog = { ...s.prog, m }; saveProgress(prog);
       return { status: ok ? "right" : "wrong", picked, prog, results: s.results.concat(ok) };
     });
-    if(ok) this.nextTimer = setTimeout(this.next, 900);
+    if(ok && q.kind !== "rule") this.nextTimer = setTimeout(this.next, 900);
   }
   next = () => {
     clearTimeout(this.nextTimer);
@@ -899,7 +964,7 @@ class Component extends DCLogic {
     this.setState({ stats: false, screen: "onboard", ob: { step: 1, why: p.why || "", level: "", goal: p.goal || 12, accent: p.accent || "qc", check: [], ci: 0, peek: false, known: [] } });
   };
   again12 = () => this.open(this.state.coll);
-  goHome = () => this.setState({ screen: "home", revealed: false });
+  goHome = () => { clearTimeout(this.nextTimer); this.setState({ screen: "home", revealed: false }); };
 
   // ---- direct-to-DOM motion: drags and slides only touch transform/opacity, no re-render per frame ----
   placePanel(p, animate){
@@ -1021,7 +1086,8 @@ class Component extends DCLogic {
     const colls = ordered.map((c, i) => {
       const list = CARDS[c.id], pal = paletteFor(c.color, 0);
       return {
-        title: c.name, en: list[0] ? list[0].fr : "", count: list.length + " words",
+        id: c.id,
+        title: c.name, en: list[0] ? list[0].fr : "", count: list.length + (c.id.startsWith("rules-") ? " rules" : " words"),
         pct: Math.round(100 * masteredIn(list) / Math.max(1, list.length)) + "%",
         // same dark glow as the study cards, tuned for a short wide tile: colour pours in from the top-left
         bg: ringFor(pal, { wide: true }), edge: edgeOf(pal),
@@ -1035,7 +1101,7 @@ class Component extends DCLogic {
     const totalM = masteredIn(ALL);
 
     // study
-    const d = this.card(), h = highlight(d), sess = s.session, n = sess.length || 1;
+    const d = this.card(), h = highlight(d), rule = ruleFor(d), sess = s.session, n = sess.length || 1;
     const nxt = k => sess.length ? sess[(s.idx + k) % sess.length] : d;
     const coll = COLLECTIONS.find(c => c.id === s.coll);
     const days = s.prog.days, today = new Date(), mon = addDays(today, -((today.getDay() + 6) % 7));
@@ -1097,6 +1163,7 @@ class Component extends DCLogic {
       qSel, qBank, qHasSel: qSel.length > 0, qCanCheck: !!(q && q.bank) && !s.status, qCheckOp: s.picked.length && !s.status ? 1 : .35, check: this.check,
       qAnswered: !!s.status, qRight: s.status === "right", qWrong: s.status === "wrong",
       qFeedBg: s.status === "right" ? "#16271d" : "#2a1416", qFeedBd: s.status === "right" ? GOOD + "66" : BAD + "66", qFeedFg: s.status === "right" ? GOOD : BAD,
+      qExplanation: q ? q.explanation || "" : "", qHasExplanation: !!(q && q.explanation),
       qFeedTitle: s.status === "right" ? "Correct!" : "Not quite", qReveal: q ? q.reveal : "",
       qGlow: s.status === "right" ? "0 0 0 2px " + GOOD + ", 0 28px 50px -22px #000" : s.status === "wrong" ? "0 0 0 2px " + BAD + ", 0 28px 50px -22px #000" : "0 28px 50px -22px #000, inset 0 0 0 1px #ffffff1f, inset 0 0 34px -6px " + edgeOf(qc.p),
       next: this.next,
@@ -1106,15 +1173,25 @@ class Component extends DCLogic {
       listDisplay: s.wide ? "grid" : "flex", listGap: s.wide ? "16px" : "0", brDisp: s.wide ? "none" : "inline",
       deskHint: s.wide,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
-      colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
+      colls: colls.filter(c => !c.id.startsWith("rules-")), grammarColls: colls.filter(c => c.id.startsWith("rules-")),
+      shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " cards mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
       cardRef: this.cardRef, panelRef: this.panelRef, btnRef: this.btnRef, noRef: this.noRef, yesRef: this.yesRef,
       paper: ringFor(d.p), edge: edgeOf(d.p), back1: ringFor(nxt(1).p, { dim: true }), back2: ringFor(nxt(2).p, { dim: true }), accent: lighten(d.p[0], .4), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
       badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
-      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.say || d.ipa || "",
+      word: d.fr, wordSize: d.ruleId && d.fr.length > 16 ? "32px" : fitSize(d.fr), meaning: d.en, enSize: d.ruleId ? "28px" : fitSize(d.en), ipa: d.say || d.ipa || "",
       footMeta: s.showEx ? "tap to flip" : "tap to flip · swipe down for example",
       faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enter: s.flip ? "wn-inA" : "wn-inB",
+      hasRule: !!rule, ruleTab: !!rule && s.panelTab === "rule", exampleTab: !rule || s.panelTab !== "rule",
+      ruleTitle: rule ? rule.title : "", ruleIntro: rule ? rule.intro : "", ruleNote: rule ? rule.note : "",
+      ruleRows: rule ? rule.rows.map(([label, form, example]) => ({ label, form, example })) : [],
+      exampleTranslation: d.exEn || "", showExample: this.showExample, showRule: this.showRule,
+      exampleTabBg: s.panelTab === "example" || !rule ? "#ffffff16" : "transparent",
+      ruleTabBg: s.panelTab === "rule" && rule ? "#ffffff16" : "transparent",
+      panelExpanded: s.showEx, panelHidden: !s.showEx, panelVisibility: s.showEx ? "visible" : "hidden",
+      panelTabIndex: s.showEx ? 0 : -1, toggleExample: this.toggleExample,
+      panelToggleLabel: s.showEx ? "Hide example & rule ↑" : "Show example & rule ↓",
       exPre: h.pre, exHit: h.hit, exPost: h.post, hitColor: lighten(d.p[4], .55),
       gotBg: lighten(d.p[4], .6), gotFg: "#141414",
       count: Math.min(s.done + 1, n) + " of " + n,

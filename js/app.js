@@ -21,6 +21,8 @@ const CURATED = [
   {fr:"Bonne journée", en:"Have a good day", type:"farewell", g:"f", un:"une journée", note:"bonne agrees with journée (f).", ipa:"/bɔn ʒuʁ.ne/", say:"bun zhoor-NAY", ex:"Merci, bonne journée !", exEn:"Thank you, have a good day!", p:["#54053a","#8d0028","#0b0414","#270317","#f04431"]}
 ];
 
+const GRAMMAR = window.WN_GRAMMAR || { rules: {}, collections: [], cards: [] };
+
 // ---------- collections ----------
 // collection names; each card on the home page also shows a sample French word as a chip
 const COLLECTIONS = [
@@ -43,7 +45,8 @@ const COLLECTIONS = [
   { id: "grammar",      name: "Small words" },
   { id: "workwords",    name: "Work & study" },
   { id: "numbers",      name: "Numbers" },
-  { id: "conjugations", name: "Être & avoir" }
+  { id: "conjugations", name: "Être & avoir" },
+  ...GRAMMAR.collections
 ];
 const SWATCHES = ["#cdb4f5","#dff07a","#4b5fd6","#f2683a","#8fe0c0","#f5a3c7","#8cc8f5","#f6d873","#ff8a7a","#b9d39b","#a993f0","#7fd1d8"];
 const SESSION = 12;
@@ -108,6 +111,7 @@ function artFor(p){
 function genderOf(type){ return /^masculine noun/.test(type) ? "m" : /^feminine noun/.test(type) ? "f" : ""; }
 function kindLabel(d){
   const t = d.type || "";
+  if(d.ruleId) return "Grammar rule";
   if(d.g) return d.g === "f" ? "Feminine noun" : "Masculine noun";
   if(/^pronoun/.test(t)) return "Small word";
   if(/^plural noun/.test(t)) return "Plural noun";
@@ -137,13 +141,29 @@ function highlight(d){
 // ---------- data ----------
 const VOCAB = window.WN_VOCAB || { categories: [], cards: [] };
 const CARDS = {};   // collection id -> cards
-COLLECTIONS.forEach((c, ci) => { c.color = SWATCHES[ci % SWATCHES.length]; CARDS[c.id] = []; });
+COLLECTIONS.forEach((c, ci) => { c.color = c.color || SWATCHES[ci % SWATCHES.length]; CARDS[c.id] = []; });
 CURATED.forEach((d, i) => CARDS.mdj.push({ ...d, id: "mdj" + i, deck: "mdj" }));
 VOCAB.cards.forEach(d => {
   const list = CARDS[d.deck]; if(!list) return;
   const coll = COLLECTIONS.find(c => c.id === d.deck);
   list.push({ ...d, g: genderOf(d.type), p: paletteFor(coll.color, list.length) });
 });
+GRAMMAR.cards.forEach(d => {
+  const coll = COLLECTIONS.find(c => c.id === d.deck), list = CARDS[d.deck];
+  list.push({ ...d, p: paletteFor(coll.color, list.length) });
+});
+// Offer a related rule alongside ordinary vocabulary cards too.
+function ruleFor(card){
+  if(card.ruleId) return GRAMMAR.rules[card.ruleId];
+  const text = card.fr + " " + (card.ex || "");
+  if(/(?:beaucoup|combien|pas)\s+d(?:e\b|['’])|(?:mange|bois|boit|manger|boire)\s+(?:du\b|des\b|de la\b|de l['’])/i.test(text)) return GRAMMAR.rules.quantity;
+  if(/(?:^|\s)(?:(?:au|aux|à la)\s|à l['’])/i.test(text)) return GRAMMAR.rules.a;
+  if(/(?:^|\s)(?:(?:du|des|de la)\s|de l['’])/i.test(text)) return GRAMMAR.rules.de;
+  if(/\?/.test(card.ex || "")) return /\b(?:qui|quand|pourquoi|comment|combien|quel|quelle|quels|quelles)\b|où|qu['’]est-ce/i.test(text) ? GRAMMAR.rules.questionWords : GRAMMAR.rules.questions;
+  if(card.g || /^adjective/.test(card.type || "")) return GRAMMAR.rules.agreement;
+  if(/^(verb|être|avoir)/.test(card.type || "") || card.aux) return GRAMMAR.rules.verbs;
+  return null;
+}
 const ALL = [].concat(...COLLECTIONS.map(c => CARDS[c.id]));
 
 // ---------- quiz ----------
@@ -214,6 +234,13 @@ const FORMATS = {
 const ROTATION = ["gender", "fill", "build", "mc", "fill", "build", "gender", "mc", "build", "fill"];
 function makeQuiz(cards, pool){
   return cards.map((c, i) => {
+    if(c.exercise){
+      const e = c.exercise;
+      return { card: c, kind: "rule", label: "Apply the rule", prompt: e.prompt,
+        sub: e.hint || "", ask: "Choose the correct form", big: false,
+        options: shuffle([{ t: e.answer, ok: true }, ...e.wrong.map(t => ({ t, ok: false }))]),
+        reveal: c.ex, explanation: e.explanation };
+    }
     let kind = ROTATION[i % ROTATION.length];
     if(!FORMATS[kind].ok(c)) kind = shuffle(Object.keys(FORMATS).filter(k => FORMATS[k].ok(c)))[0];
     return { card: c, kind, label: FORMATS[kind].label, ...FORMATS[kind].make(c, pool) };
@@ -283,7 +310,7 @@ class Component extends DCLogic {
       wide: typeof window !== "undefined" && window.innerWidth >= 900,
       prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
       screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
-      revealed: false, showEx: true, stats: false, confirmReset: false, noAudio: false,
+      revealed: false, showEx: true, panelTab: "example", stats: false, confirmReset: false, noAudio: false,
       mode: "cards", quiz: [], qi: 0, picked: [], status: "", results: [], flip: 0, prog: loadProgress()
     };
     this.cardRef = React.createRef(); this.panelRef = React.createRef(); this.btnRef = React.createRef();
@@ -332,7 +359,7 @@ class Component extends DCLogic {
   };
   // the runtime doesn't pass previous state, so remember what was last applied to the panel
   syncPanel(){
-    const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode;
+    const key = this.state.showEx + "|" + this.state.screen + "|" + this.state.mode + "|" + this.state.panelTab + "|" + this.state.idx;
     if(key === this.lastPanel) return;
     const same = this.lastScreen === this.state.screen + this.state.mode;
     this.lastPanel = key; this.lastScreen = this.state.screen + this.state.mode;
@@ -377,6 +404,8 @@ class Component extends DCLogic {
 
   // ---- sessions ----
   open(id){
+    clearTimeout(this.nextTimer);
+    this.setState({ panelTab: id.startsWith("rules-") ? "rule" : "example", showEx: true });
     const m = this.state.prog.m;
     let pool;
     // Daily picks and Shuffle all skip mastered words entirely; other collections top up with them for review
@@ -397,6 +426,10 @@ class Component extends DCLogic {
   }
   setCards = () => { if(this.state.mode !== "cards"){ this.state.mode = "cards"; this.setState({ mode: "cards" }); this.open(this.state.coll); } };
   setQuiz = () => { if(this.state.mode !== "quiz"){ this.state.mode = "quiz"; this.setState({ mode: "quiz" }); this.open(this.state.coll); } };
+
+  toggleExample = () => this.setState(s => ({ showEx: !s.showEx }));
+  showExample = () => this.setState({ panelTab: "example", showEx: true });
+  showRule = () => this.setState({ panelTab: "rule", showEx: true });
 
   // ---- quiz ----
   q(){ return this.state.quiz[this.state.qi]; }
@@ -419,7 +452,7 @@ class Component extends DCLogic {
       const prog = { ...s.prog, m }; saveProgress(prog);
       return { status: ok ? "right" : "wrong", picked, prog, results: s.results.concat(ok) };
     });
-    if(ok) this.nextTimer = setTimeout(this.next, 900);
+    if(ok && q.kind !== "rule") this.nextTimer = setTimeout(this.next, 900);
   }
   next = () => {
     clearTimeout(this.nextTimer);
@@ -504,7 +537,7 @@ class Component extends DCLogic {
     this.setState({ stats: false, screen: "onboard", ob: { step: 1, why: p.why || "", level: "", goal: p.goal || 12, accent: p.accent || "qc", check: [], ci: 0, peek: false, known: [] } });
   };
   again12 = () => this.open(this.state.coll);
-  goHome = () => this.setState({ screen: "home", revealed: false });
+  goHome = () => { clearTimeout(this.nextTimer); this.setState({ screen: "home", revealed: false }); };
 
   // ---- direct-to-DOM motion: drags and slides only touch transform/opacity, no re-render per frame ----
   placePanel(p, animate){
@@ -626,7 +659,8 @@ class Component extends DCLogic {
     const colls = ordered.map((c, i) => {
       const list = CARDS[c.id], pal = paletteFor(c.color, 0);
       return {
-        title: c.name, en: list[0] ? list[0].fr : "", count: list.length + " words",
+        id: c.id,
+        title: c.name, en: list[0] ? list[0].fr : "", count: list.length + (c.id.startsWith("rules-") ? " rules" : " words"),
         pct: Math.round(100 * masteredIn(list) / Math.max(1, list.length)) + "%",
         // same dark glow as the study cards, tuned for a short wide tile: colour pours in from the top-left
         bg: ringFor(pal, { wide: true }), edge: edgeOf(pal),
@@ -640,7 +674,7 @@ class Component extends DCLogic {
     const totalM = masteredIn(ALL);
 
     // study
-    const d = this.card(), h = highlight(d), sess = s.session, n = sess.length || 1;
+    const d = this.card(), h = highlight(d), rule = ruleFor(d), sess = s.session, n = sess.length || 1;
     const nxt = k => sess.length ? sess[(s.idx + k) % sess.length] : d;
     const coll = COLLECTIONS.find(c => c.id === s.coll);
     const days = s.prog.days, today = new Date(), mon = addDays(today, -((today.getDay() + 6) % 7));
@@ -702,6 +736,7 @@ class Component extends DCLogic {
       qSel, qBank, qHasSel: qSel.length > 0, qCanCheck: !!(q && q.bank) && !s.status, qCheckOp: s.picked.length && !s.status ? 1 : .35, check: this.check,
       qAnswered: !!s.status, qRight: s.status === "right", qWrong: s.status === "wrong",
       qFeedBg: s.status === "right" ? "#16271d" : "#2a1416", qFeedBd: s.status === "right" ? GOOD + "66" : BAD + "66", qFeedFg: s.status === "right" ? GOOD : BAD,
+      qExplanation: q ? q.explanation || "" : "", qHasExplanation: !!(q && q.explanation),
       qFeedTitle: s.status === "right" ? "Correct!" : "Not quite", qReveal: q ? q.reveal : "",
       qGlow: s.status === "right" ? "0 0 0 2px " + GOOD + ", 0 28px 50px -22px #000" : s.status === "wrong" ? "0 0 0 2px " + BAD + ", 0 28px 50px -22px #000" : "0 28px 50px -22px #000, inset 0 0 0 1px #ffffff1f, inset 0 0 34px -6px " + edgeOf(qc.p),
       next: this.next,
@@ -711,15 +746,25 @@ class Component extends DCLogic {
       listDisplay: s.wide ? "grid" : "flex", listGap: s.wide ? "16px" : "0", brDisp: s.wide ? "none" : "inline",
       deskHint: s.wide,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
-      colls, shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " words mastered",
+      colls: colls.filter(c => !c.id.startsWith("rules-")), grammarColls: colls.filter(c => c.id.startsWith("rules-")),
+      shuffleAll: this.shuffleAll, totalLine: totalM + " / " + ALL.length + " cards mastered",
       collTitle: s.coll === "all" ? "All cards" : (coll ? coll.name : ""),
       cardRef: this.cardRef, panelRef: this.panelRef, btnRef: this.btnRef, noRef: this.noRef, yesRef: this.yesRef,
       paper: ringFor(d.p), edge: edgeOf(d.p), back1: ringFor(nxt(1).p, { dim: true }), back2: ringFor(nxt(2).p, { dim: true }), accent: lighten(d.p[0], .4), art: artFor(d.p),
       kind: kindLabel(d), kindDot: d.g ? G[d.g].ink : "#ffffff55",
       badgeBg: (() => { let c = d.p[3]; if(lum(c) > .12) c = mix(d.p[3], d.p[2], .55); return c; })(),
-      word: d.fr, wordSize: fitSize(d.fr), meaning: d.en, enSize: fitSize(d.en), ipa: d.say || d.ipa || "",
+      word: d.fr, wordSize: d.ruleId && d.fr.length > 16 ? "32px" : fitSize(d.fr), meaning: d.en, enSize: d.ruleId ? "28px" : fitSize(d.en), ipa: d.say || d.ipa || "",
       footMeta: s.showEx ? "tap to flip" : "tap to flip · swipe down for example",
       faceT: "rotateY(" + (s.revealed ? 180 : 0) + "deg)", enter: s.flip ? "wn-inA" : "wn-inB",
+      hasRule: !!rule, ruleTab: !!rule && s.panelTab === "rule", exampleTab: !rule || s.panelTab !== "rule",
+      ruleTitle: rule ? rule.title : "", ruleIntro: rule ? rule.intro : "", ruleNote: rule ? rule.note : "",
+      ruleRows: rule ? rule.rows.map(([label, form, example]) => ({ label, form, example })) : [],
+      exampleTranslation: d.exEn || "", showExample: this.showExample, showRule: this.showRule,
+      exampleTabBg: s.panelTab === "example" || !rule ? "#ffffff16" : "transparent",
+      ruleTabBg: s.panelTab === "rule" && rule ? "#ffffff16" : "transparent",
+      panelExpanded: s.showEx, panelHidden: !s.showEx, panelVisibility: s.showEx ? "visible" : "hidden",
+      panelTabIndex: s.showEx ? 0 : -1, toggleExample: this.toggleExample,
+      panelToggleLabel: s.showEx ? "Hide example & rule ↑" : "Show example & rule ↓",
       exPre: h.pre, exHit: h.hit, exPost: h.post, hitColor: lighten(d.p[4], .55),
       gotBg: lighten(d.p[4], .6), gotFg: "#141414",
       count: Math.min(s.done + 1, n) + " of " + n,
