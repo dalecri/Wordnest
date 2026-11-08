@@ -50,5 +50,5 @@ button{transition:transform .15s cubic-bezier(.4,0,.2,1),background .2s}
 .review-button:disabled{background:#ffffff0a;color:#9a9aa2;cursor:default}
 .grammar-shortcut-accuracy{display:block;margin-top:7px;font-size:10px;line-height:1.4;color:#e3d4ff}
 .review-study-hint{font-size:12px;color:#aaaab3;line-height:1.5;margin:14px 0 0}
-@media(min-width:900px){.grammar-shortcuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
+@media(min-width:700px){.grammar-shortcuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
 @media(max-height:700px){.rule-content{max-height:160px}}

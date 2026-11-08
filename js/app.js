@@ -306,11 +306,16 @@ function bestOf(days){
   return best;
 }
 
+// tablet (iPad mini/Air portrait) and up get the grid home and wider study column
+const WIDE_MIN = 700;
+// keyboard hints only make sense with a mouse/trackpad, not on touch tablets
+const FINE_POINTER = typeof matchMedia !== "undefined" && matchMedia("(pointer:fine)").matches;
+
 class Component extends DCLogic {
   constructor(props){
     super(props);
     this.state = {
-      wide: typeof window !== "undefined" && window.innerWidth >= 900,
+      wide: typeof window !== "undefined" && window.innerWidth >= WIDE_MIN, vw: typeof window !== "undefined" ? window.innerWidth : 400, vh: typeof window !== "undefined" ? window.innerHeight : 800,
       prefs: loadPrefs(), ob: { step: 0, why: "", level: "", goal: 12, accent: "qc", check: [], ci: 0, peek: false },
       screen: loadPrefs() ? "home" : "onboard", coll: "mdj", session: [], idx: 0, done: 0, history: [],
       revealed: false, showEx: true, panelTab: "example", stats: false, confirmReset: false, noAudio: false,
@@ -323,7 +328,7 @@ class Component extends DCLogic {
   componentDidMount(){
     this.syncPanel();
     // desktop: track the window width for the wider layouts, and listen for keyboard shortcuts
-    this.onResize = () => { if(this.rz) return; this.rz = requestAnimationFrame(() => { this.rz = 0; if((window.innerWidth >= 900) !== this.state.wide) this.setState({ wide: window.innerWidth >= 900 }); }); };
+    this.onResize = () => { if(this.rz) return; this.rz = requestAnimationFrame(() => { this.rz = 0; const w = window.innerWidth, h = window.innerHeight; if(w !== this.state.vw || h !== this.state.vh) this.setState({ wide: w >= WIDE_MIN, vw: w, vh: h }); }); };
     window.addEventListener("resize", this.onResize);
     window.addEventListener("keydown", this.onKey);
     // Chrome loads voices asynchronously; ask early so they're ready by the first tap
@@ -765,9 +770,10 @@ class Component extends DCLogic {
       next: this.next,
       qDashes: Array.from({length: qn}, (_,i) => ({ bg: i < s.results.length ? (s.results[i] ? GOOD : BAD) : (i === s.qi ? "#eeeae7" : "#ffffff1c"), grow: i === s.qi && !s.status ? 2 : 1 })),
       qCount: "Question " + Math.min(s.qi + 1, qn) + " of " + qn,
-      wide: s.wide, rootMax: s.wide && s.screen === "home" ? "1120px" : (s.wide ? "520px" : "480px"),
+      wide: s.wide, rootMax: s.wide && s.screen === "home" ? "1120px" : (s.wide ? (s.vw >= 1100 && s.vh >= 860 ? "640px" : "600px") : "480px"),
+      cardMax: !s.wide ? "380px" : s.vh >= 1000 ? "500px" : s.vh >= 860 ? "440px" : "400px",
       listDisplay: s.wide ? "grid" : "flex", listGap: s.wide ? "16px" : "0", brDisp: s.wide ? "none" : "inline",
-      deskHint: s.wide,
+      deskHint: s.wide && FINE_POINTER,
       isHome: s.screen === "home", isStudy: s.screen === "study", isDone: s.screen === "done",
       colls: colls.filter(c => !c.id.startsWith("rules-")), grammarColls: colls.filter(c => c.id.startsWith("rules-")).map(c => ({ ...c,
         accuracy: accuracyLine(PRACTICE.accuracy(s.grammarStats, CARDS[c.id])) })),
